@@ -1,0 +1,41 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Droid.Binding", "src\WebRTC.Droid.Binding\WebRTC.Droid.Binding.csproj", "{7A7CA35C-13FC-4E57-A0E3-8619974BB41B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Droid.Demo", "src\WebRTC.Droid.Demo\WebRTC.Droid.Demo.csproj", "{EB0A8F1F-959E-4970-9363-0E988C034EB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Common", "src\WebRTC.Common\WebRTC.Common.csproj", "{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.AppRTC", "WebRTC.AppRTC\WebRTC.AppRTC.csproj", "{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Droid", "src\WebRTC.Droid\WebRTC.Droid.csproj", "{345C6D31-5E81-4E50-90BE-E3A51B3EE890}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|anycpu = Debug|anycpu
+		Release|anycpu = Release|anycpu
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A7CA35C-13FC-4E57-A0E3-8619974BB41B}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{7A7CA35C-13FC-4E57-A0E3-8619974BB41B}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{7A7CA35C-13FC-4E57-A0E3-8619974BB41B}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{7A7CA35C-13FC-4E57-A0E3-8619974BB41B}.Release|anycpu.Build.0 = Release|Any CPU
+		{EB0A8F1F-959E-4970-9363-0E988C034EB9}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{EB0A8F1F-959E-4970-9363-0E988C034EB9}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{EB0A8F1F-959E-4970-9363-0E988C034EB9}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{EB0A8F1F-959E-4970-9363-0E988C034EB9}.Release|anycpu.Build.0 = Release|Any CPU
+		{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}.Release|anycpu.Build.0 = Release|Any CPU
+		{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}.Release|anycpu.Build.0 = Release|Any CPU
+		{345C6D31-5E81-4E50-90BE-E3A51B3EE890}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{345C6D31-5E81-4E50-90BE-E3A51B3EE890}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{345C6D31-5E81-4E50-90BE-E3A51B3EE890}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{345C6D31-5E81-4E50-90BE-E3A51B3EE890}.Release|anycpu.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
