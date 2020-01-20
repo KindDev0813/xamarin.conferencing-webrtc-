@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace WebRTC.Common
+namespace WebRTC.Abstraction
 {
     public class IceCandidate
     {

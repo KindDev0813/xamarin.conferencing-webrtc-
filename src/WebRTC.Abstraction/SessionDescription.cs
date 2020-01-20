@@ -1,16 +1,7 @@
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace WebRTC.Common
+namespace WebRTC.Abstraction
 {
-    public enum SdpType
-    {
-        [EnumMember(Value = "answer")]
-        Answer,
-        [EnumMember(Value = "offer")]
-        Offer
-    }
-
     public class SessionDescription
     {
         public SessionDescription(SdpType type, string sdp)

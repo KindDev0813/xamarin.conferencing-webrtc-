@@ -14,4 +14,8 @@
     <attr path="/api/package[@name='org.webrtc']/class[@name='SessionDescription']/field[@name='type']"
           name="name">SdpType
     </attr>
+
+    <attr path="/api/package[@name='org.webrtc']/class[@name='PeerConnectionFactory']/method[@name='builder']"
+          name="name">NewBuilder
+    </attr>
 </metadata>

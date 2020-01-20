@@ -5,11 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Droid.Binding", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Droid.Demo", "src\WebRTC.Droid.Demo\WebRTC.Droid.Demo.csproj", "{EB0A8F1F-959E-4970-9363-0E988C034EB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Common", "src\WebRTC.Common\WebRTC.Common.csproj", "{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.AppRTC", "WebRTC.AppRTC\WebRTC.AppRTC.csproj", "{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Abstraction", "src\WebRTC.Abstraction\WebRTC.Abstraction.csproj", "{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Droid", "src\WebRTC.Droid\WebRTC.Droid.csproj", "{345C6D31-5E81-4E50-90BE-E3A51B3EE890}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.AppRTC", "src\WebRTC.AppRTC\WebRTC.AppRTC.csproj", "{8DC6AEA2-DD19-499B-B070-4CE8FB433531}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,13 +29,13 @@ Global
 		{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}.Debug|anycpu.Build.0 = Debug|Any CPU
 		{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}.Release|anycpu.ActiveCfg = Release|Any CPU
 		{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}.Release|anycpu.Build.0 = Release|Any CPU
-		{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}.Debug|anycpu.ActiveCfg = Debug|Any CPU
-		{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}.Debug|anycpu.Build.0 = Debug|Any CPU
-		{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}.Release|anycpu.ActiveCfg = Release|Any CPU
-		{E597E8D8-88AF-4BE4-BEB7-1171AC5D2808}.Release|anycpu.Build.0 = Release|Any CPU
 		{345C6D31-5E81-4E50-90BE-E3A51B3EE890}.Debug|anycpu.ActiveCfg = Debug|Any CPU
 		{345C6D31-5E81-4E50-90BE-E3A51B3EE890}.Debug|anycpu.Build.0 = Debug|Any CPU
 		{345C6D31-5E81-4E50-90BE-E3A51B3EE890}.Release|anycpu.ActiveCfg = Release|Any CPU
 		{345C6D31-5E81-4E50-90BE-E3A51B3EE890}.Release|anycpu.Build.0 = Release|Any CPU
+		{8DC6AEA2-DD19-499B-B070-4CE8FB433531}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{8DC6AEA2-DD19-499B-B070-4CE8FB433531}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{8DC6AEA2-DD19-499B-B070-4CE8FB433531}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{8DC6AEA2-DD19-499B-B070-4CE8FB433531}.Release|anycpu.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
