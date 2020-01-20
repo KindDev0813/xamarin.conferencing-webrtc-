@@ -1,7 +1,8 @@
 namespace WebRTC.Abstraction
 {
-    public interface IPeerConnectionFactory
+    public interface IPeerConnectionFactory : INativeObject
     {
-        IPeerConnection CreatePeerConnection(RTCConfiguration configuration,IPeerConnectionListener peerConnectionListener);
+        IPeerConnection CreatePeerConnection(RTCConfiguration configuration,
+            IPeerConnectionListener peerConnectionListener);
     }
 }

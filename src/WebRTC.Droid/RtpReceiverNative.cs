@@ -9,7 +9,9 @@ namespace WebRTC.Droid
 
         public RtpReceiverNative(RtpReceiver receiver)
         {
-            _receiver = receiver;
+             NativeObject = _receiver = receiver;
         }
+
+        public object NativeObject { get; }
     }
 }

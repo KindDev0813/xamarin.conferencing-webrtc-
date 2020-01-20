@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq;
 using Org.Webrtc;
 using WebRTC.Abstraction;
+using WebRTC.Droid.Extensions;
 
 namespace WebRTC.Droid
 {
@@ -11,8 +12,10 @@ namespace WebRTC.Droid
 
         public MediaStreamNative(MediaStream mediaStream)
         {
-            _mediaStream = mediaStream;
+            NativeObject = _mediaStream = mediaStream;
         }
+
+        public object NativeObject { get; }
 
         public string StreamId => _mediaStream.Id;
 
@@ -22,27 +25,24 @@ namespace WebRTC.Droid
 
         public void AddTrack(IAudioTrack audioTrack)
         {
-            var nativeAudioTrack = (AudioTrackNative) audioTrack;
-            _mediaStream.AddTrack((AudioTrack)nativeAudioTrack.NativeTrack);
+            _mediaStream.AddTrack(audioTrack.ToNative<AudioTrack>());
         }
 
         public void AddTrack(IVideoTrack videoTrack)
         {
-            var nativeVideoTrack = (VideoTrackNative) videoTrack;
-            _mediaStream.AddTrack((VideoTrack)nativeVideoTrack.NativeTrack);
+            _mediaStream.AddTrack(videoTrack.ToNative<VideoTrack>());
         }
 
         public void RemoveTrack(IAudioTrack audioTrack)
         {
-            var nativeAudioTrack = (AudioTrackNative) audioTrack;
-            _mediaStream.RemoveTrack((AudioTrack)nativeAudioTrack.NativeTrack);
+            _mediaStream.RemoveTrack(audioTrack.ToNative<AudioTrack>());
         }
 
         public void RemoveTrack(IVideoTrack videoTrack)
         {
-            var nativeVideoTrack = (VideoTrackNative) videoTrack;
-            _mediaStream.RemoveTrack((VideoTrack)nativeVideoTrack.NativeTrack);
+            _mediaStream.RemoveTrack(videoTrack.ToNative<VideoTrack>());
         }
+
         private IAudioTrack[] GetAudioTracks()
         {
             var items = _mediaStream.AudioTracks;
@@ -51,9 +51,10 @@ namespace WebRTC.Droid
             {
                 arr[i] = new AudioTrackNative((AudioTrack) items[i]);
             }
+
             return arr;
         }
-        
+
         private IVideoTrack[] GetVideoTracks()
         {
             var items = _mediaStream.VideoTracks;
@@ -62,6 +63,7 @@ namespace WebRTC.Droid
             {
                 arr[i] = new VideoTrackNative((VideoTrack) items[i]);
             }
+
             return arr;
         }
     }

@@ -2,7 +2,7 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.Droid
 {
-    public class WebRTCFactory : IWebRTCFactory
+    public class NativeWebRTCFactory : INativeWebRTCFactory
     {
         public IPeerConnectionFactory CreateFactory() => new PeerConnectionFactory();
     }

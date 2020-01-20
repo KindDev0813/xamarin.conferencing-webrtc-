@@ -1,6 +1,6 @@
 namespace WebRTC.Abstraction
 {
-    public interface IMediaStreamTrack
+    public interface IMediaStreamTrack :INativeObject
     {
         string Kind { get; }
         string Label { get; }

@@ -1,6 +1,6 @@
 namespace WebRTC.Abstraction
 {
-    public interface IWebRTCFactory
+    public interface INativeWebRTCFactory 
     {
         IPeerConnectionFactory CreateFactory();
     }

@@ -6,23 +6,24 @@ namespace WebRTC.Droid
 {
     public class MediaStreamTrackNative : IMediaStreamTrack
     {
+        private readonly MediaStreamTrack _mediaStreamTrack;
         public MediaStreamTrackNative(MediaStreamTrack mediaStreamTrack)
         {
-            NativeTrack = mediaStreamTrack;
+            NativeObject = _mediaStreamTrack = mediaStreamTrack;
         }
         
-        public MediaStreamTrack NativeTrack { get; }
+        public object NativeObject { get; }
         
-        public string Kind => NativeTrack.Kind();
+        public string Kind => _mediaStreamTrack.Kind();
         
-        public string Label => NativeTrack.Id();
+        public string Label => _mediaStreamTrack.Id();
         
         public bool Enable
         {
-            get => NativeTrack.Enabled();
-            set => NativeTrack.SetEnabled(value);
+            get => _mediaStreamTrack.Enabled();
+            set => _mediaStreamTrack.SetEnabled(value);
         }
 
-        public SourceState State => NativeTrack.InvokeState().ToNet();
+        public SourceState State => _mediaStreamTrack.InvokeState().ToNet();
     }
 }

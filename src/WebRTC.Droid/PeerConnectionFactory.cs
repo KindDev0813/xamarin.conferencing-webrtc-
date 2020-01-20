@@ -11,11 +11,12 @@ namespace WebRTC.Droid
         public PeerConnectionFactory()
         {
             EglBase = Org.Webrtc.EglBase.Create();
-            _factory = Org.Webrtc.PeerConnectionFactory
+            NativeObject = _factory = Org.Webrtc.PeerConnectionFactory
                 .NewBuilder()
                 .CreatePeerConnectionFactory();
         }
 
+        public object NativeObject { get; }
         public IEglBase EglBase { get; }
 
         public IPeerConnection CreatePeerConnection(RTCConfiguration configuration,

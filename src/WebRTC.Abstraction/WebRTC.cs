@@ -1,7 +1,7 @@
 namespace WebRTC.Abstraction
 {
-    public static class WebRTC
+    public static class NativeFactory
     {
-        public static IWebRTCFactory Factory { get; set; } 
+        public static INativeWebRTCFactory Factory { get; set; } 
     }
 }

@@ -1,6 +1,6 @@
 namespace WebRTC.Abstraction
 {
-    public interface IRtpTransceiver
+    public interface IRtpTransceiver:INativeObject
     {
     }
 }

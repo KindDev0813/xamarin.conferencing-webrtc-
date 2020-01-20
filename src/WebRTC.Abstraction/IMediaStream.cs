@@ -1,6 +1,6 @@
 namespace WebRTC.Abstraction
 {
-    public interface IMediaStream
+    public interface IMediaStream : INativeObject
     {
         string StreamId { get; }
         IAudioTrack[] AudioTracks { get; }
