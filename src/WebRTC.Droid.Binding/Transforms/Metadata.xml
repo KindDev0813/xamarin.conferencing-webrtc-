@@ -18,4 +18,9 @@
     <attr path="/api/package[@name='org.webrtc']/class[@name='PeerConnectionFactory']/method[@name='builder']"
           name="name">NewBuilder
     </attr>
+
+<!--    <attr path="/api/package[@name='org.webrtc']/interface[@name='SdpObserver']"-->
+<!--          name="name">ISdpObserverEx-->
+<!--    </attr>-->
+
 </metadata>

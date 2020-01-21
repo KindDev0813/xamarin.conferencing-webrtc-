@@ -64,6 +64,7 @@
     <Compile Include="RtpReceiverNative.cs" />
     <Compile Include="RtpSenderNative.cs" />
     <Compile Include="RtpTransceiverNative.cs" />
+    <Compile Include="SdpObserverProxy.cs" />
     <Compile Include="VideoTrackNative.cs" />
     <Compile Include="NativeWebRTCFactory.cs" />
   </ItemGroup>

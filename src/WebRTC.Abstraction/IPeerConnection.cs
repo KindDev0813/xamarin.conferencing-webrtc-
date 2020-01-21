@@ -2,6 +2,8 @@ using System;
 
 namespace WebRTC.Abstraction
 {
+    public delegate void SdpCompletionHandler(SessionDescription sdp, Exception error);
+    
     public interface IPeerConnection :INativeObject, IDisposable
     {
         //IMediaStream[] LocalStreams { get; }
@@ -43,8 +45,8 @@ namespace WebRTC.Abstraction
         IRtpTransceiver AddTransceiverOfType(RtpMediaType mediaType);
         IRtpTransceiver AddTransceiverOfType(RtpMediaType mediaType, IRtpTransceiverInit init);
         
-        void OfferForConstraints(MediaConstraints constraints,  Action<SessionDescription, Exception> completionHandler);
-        void AnswerForConstraints(MediaConstraints constraints,  Action<SessionDescription, Exception> completionHandler);
+        void CreateOffer(MediaConstraints constraints,  SdpCompletionHandler completionHandler);
+        void CreateAnswer(MediaConstraints constraints,  SdpCompletionHandler completionHandler);
 
         void SetLocalDescription(SessionDescription sdp,  Action<Exception> completionHandler);
         void SetRemoteDescription(SessionDescription sdp,  Action<Exception> completionHandler);

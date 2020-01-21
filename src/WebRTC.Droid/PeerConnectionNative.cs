@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Android.OS;
+using Android.Util;
+using Java.IO;
+using Java.Lang;
 using Org.Webrtc;
 using WebRTC.Abstraction;
 using WebRTC.Droid.Extensions;
+using Exception = System.Exception;
 using IceCandidate = WebRTC.Abstraction.IceCandidate;
 using MediaConstraints = WebRTC.Abstraction.MediaConstraints;
 using SessionDescription = WebRTC.Abstraction.SessionDescription;
@@ -12,25 +17,26 @@ namespace WebRTC.Droid
 {
     public class PeerConnectionNative : IPeerConnection
     {
-        private readonly Org.Webrtc.PeerConnection _peerConnection;
-        
+        private readonly PeerConnection _peerConnection;
+
         private readonly List<RtpSenderNative> _senders = new List<RtpSenderNative>();
         private readonly List<RtpReceiverNative> _receivers = new List<RtpReceiverNative>();
 
-        public PeerConnectionNative(Org.Webrtc.PeerConnection peerConnection)
+        public PeerConnectionNative(PeerConnection peerConnection)
         {
             NativeObject = _peerConnection = peerConnection;
         }
-        
+
         public object NativeObject { get; }
-        
+
         //public IMediaStream[] LocalStreams { get; }
         public SessionDescription LocalDescription => _peerConnection.LocalDescription.ToNet();
         public SessionDescription RemoteDescription => _peerConnection.RemoteDescription.ToNet();
         public SignalingState SignalingState => _peerConnection.InvokeSignalingState().ToNet();
         public IceConnectionState IceConnectionState => _peerConnection.InvokeIceConnectionState().ToNet();
-        public PeerConnectionState PeerConnectionState => _peerConnection.inv
+        public PeerConnectionState PeerConnectionState => _peerConnection.ConnectionState().ToNet();
         public IceGatheringState IceGatheringState => _peerConnection.InvokeIceGatheringState().ToNet();
+
         public IRtpSender[] Senders { get; }
         public IRtpReceiver[] Receivers { get; }
         public IRtpTransceiver[] Transceivers { get; }
@@ -65,12 +71,12 @@ namespace WebRTC.Droid
 
         public void AddStream(IMediaStream stream)
         {
-            _peerConnection.AddStream(((MediaStreamNative) stream).NativeMediaStream);
+            _peerConnection.AddStream(stream.ToNative<MediaStream>());
         }
 
         public void RemoveStream(IMediaStream stream)
         {
-            _peerConnection.RemoveStream(((MediaStreamNative) stream).NativeMediaStream);
+            _peerConnection.RemoveStream(stream.ToNative<MediaStream>());
         }
 
         public IRtpSender AddTrack(IMediaStreamTrack track, string[] streamIds)
@@ -104,42 +110,55 @@ namespace WebRTC.Droid
             throw new NotImplementedException();
         }
 
-        public void OfferForConstraints(MediaConstraints constraints,
-            Action<SessionDescription, Exception> completionHandler)
+        public void CreateOffer(MediaConstraints constraints,
+            SdpCompletionHandler completionHandler)
         {
-            throw new NotImplementedException();
+            _peerConnection.CreateOffer(new SdpObserverProxy(completionHandler), constraints.ToNative());
         }
 
-        public void AnswerForConstraints(MediaConstraints constraints,
-            Action<SessionDescription, Exception> completionHandler)
+        public void CreateAnswer(MediaConstraints constraints,
+            SdpCompletionHandler completionHandler)
         {
-            throw new NotImplementedException();
+            _peerConnection.CreateAnswer(new SdpObserverProxy(completionHandler), constraints.ToNative());
         }
 
         public void SetLocalDescription(SessionDescription sdp, Action<Exception> completionHandler)
         {
-            throw new NotImplementedException();
+            _peerConnection.SetLocalDescription(new SdpObserverProxy(
+                    (_, error) => completionHandler?.Invoke(error)),
+                sdp.ToNative());
         }
 
         public void SetRemoteDescription(SessionDescription sdp, Action<Exception> completionHandler)
         {
-            throw new NotImplementedException();
+            _peerConnection.SetRemoteDescription(new SdpObserverProxy(
+                    (_, error) => completionHandler?.Invoke(error)),
+                sdp.ToNative());
         }
 
         public bool SetBitrate(int min, int current, int max)
         {
-            throw new NotImplementedException();
+            return _peerConnection.SetBitrate(new Integer(min), new Integer(current), new Integer(max));
         }
 
         public bool StartRtcEventLogWithFilePath(string filePath, long maxSizeInBytes)
         {
-            throw new NotImplementedException();
+            try {
+                var file = new File(filePath);
+
+                var fileDescriptor = ParcelFileDescriptor.Open(file,
+                    ParcelFileMode.ReadWrite | ParcelFileMode.Create | ParcelFileMode.Truncate);
+                return _peerConnection.StartRtcEventLog(fileDescriptor.DetachFd(), (int)maxSizeInBytes);
+
+            } catch (IOException e) {
+                Log.Error(nameof(PeerConnectionNative), "Failed to create a new file", e);
+                return false;
+            }
         }
 
         public void StopRtcEventLog()
         {
-            throw new NotImplementedException();
+            _peerConnection.StopRtcEventLog();
         }
-
     }
 }

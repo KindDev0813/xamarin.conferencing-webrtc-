@@ -142,6 +142,27 @@ namespace WebRTC.Droid.Extensions
                     throw new ArgumentOutOfRangeException(nameof(self), self, null);
             }
         }
+
+        public static PeerConnection.PeerConnectionState ToNative(this PeerConnectionState self)
+        {
+            switch (self)
+            {
+                case PeerConnectionState.New:
+                    return PeerConnection.PeerConnectionState.New;
+                case PeerConnectionState.Connecting:
+                    return PeerConnection.PeerConnectionState.Connecting;
+                case PeerConnectionState.Connected:
+                    return PeerConnection.PeerConnectionState.Connected;
+                case PeerConnectionState.Disconnected:
+                    return PeerConnection.PeerConnectionState.Disconnected;
+                case PeerConnectionState.Failed:
+                    return PeerConnection.PeerConnectionState.Failed;
+                case PeerConnectionState.Closed:
+                    return PeerConnection.PeerConnectionState.Closed;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(self), self, null);
+            }
+        }
         
         public static SdpType ToNet(this SessionDescription.Type self)
         {
@@ -218,6 +239,23 @@ namespace WebRTC.Droid.Extensions
                 return DataChannelState.Connecting;
             if (self == DataChannel.State.Open)
                 return DataChannelState.Open;
+            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+        }
+
+        public static PeerConnectionState ToNet(this PeerConnection.PeerConnectionState self)
+        {
+            if (self == PeerConnection.PeerConnectionState.Closed)
+                return PeerConnectionState.Closed;
+            if (self == PeerConnection.PeerConnectionState.Connected)
+                return PeerConnectionState.Connected;
+            if (self == PeerConnection.PeerConnectionState.Connecting)
+                return PeerConnectionState.Connecting;
+            if (self == PeerConnection.PeerConnectionState.Disconnected)
+                return PeerConnectionState.Disconnected;
+            if (self == PeerConnection.PeerConnectionState.Failed)
+                return PeerConnectionState.Failed;
+            if (self == PeerConnection.PeerConnectionState.New)
+                return PeerConnectionState.New;
             throw new ArgumentOutOfRangeException(nameof(self),self,null);
         }
     }
