@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+<LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp">
+
+    <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <android.support.design.widget.TextInputEditText
+
+                android:id="@+id/et_phone"
+                android:text="73367111"
+                android:hint="Phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+    </android.support.design.widget.TextInputLayout>
+
+
+    <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+                android:id="@+id/et_code"
+                android:text="8112"
+                android:hint="Code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+    </android.support.design.widget.TextInputLayout>
+
+
+    <Button
+            android:id="@+id/start_call"
+            android:text="START"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+</LinearLayout>
+    <FrameLayout
+            android:id="@+id/loading_container"
+            android:background="@android:color/white"
+            android:alpha="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+    </FrameLayout>
+</FrameLayout>
+

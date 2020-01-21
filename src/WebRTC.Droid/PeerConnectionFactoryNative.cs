@@ -5,23 +5,20 @@ using MediaConstraints = WebRTC.Abstraction.MediaConstraints;
 
 namespace WebRTC.Droid
 {
-    public class PeerConnectionFactory : NativeObjectBase, IPeerConnectionFactory
+    public class PeerConnectionFactoryNative : NativeObjectBase, IPeerConnectionFactory
     {
-        private readonly Org.Webrtc.PeerConnectionFactory _factory;
+        private readonly PeerConnectionFactory _factory;
 
-        private PeerConnectionFactory(Org.Webrtc.PeerConnectionFactory factory) : base(factory)
+        private PeerConnectionFactoryNative(PeerConnectionFactory factory) : base(factory)
         {
             _factory = factory;
         }
 
-        public PeerConnectionFactory() : this(CreateFactory())
+        public PeerConnectionFactoryNative() : this(CreateFactory())
         {
-            EglBase = Org.Webrtc.EglBase.Create();
         }
 
-
-        public IEglBase EglBase { get; }
-
+        
         public IPeerConnection CreatePeerConnection(RTCConfiguration configuration,
             IPeerConnectionListener peerConnectionListener)
         {
@@ -44,9 +41,9 @@ namespace WebRTC.Droid
             return new VideoTrackNative(_factory.CreateVideoTrack(id, videoSource.ToNative<VideoSource>()));
         }
 
-        private static Org.Webrtc.PeerConnectionFactory CreateFactory()
+        private static PeerConnectionFactory CreateFactory()
         {
-            return Org.Webrtc.PeerConnectionFactory
+            return PeerConnectionFactory
                 .NewBuilder()
                 .CreatePeerConnectionFactory();
         }

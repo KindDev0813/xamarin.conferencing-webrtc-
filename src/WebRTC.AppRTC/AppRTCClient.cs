@@ -78,7 +78,7 @@ namespace WebRTC.AppRTC
     {
         IVideoCapturer CreateVideoCapturer();
 
-        IVideoSource CreateVideoSource(IVideoCapturer videoCapturer);
+        IVideoSource CreateVideoSource(IVideoCapturer videoCapturer, IPeerConnectionFactory factory);
     }
 
     public class AppRTCClient : ISignalingChannelListener, IPeerConnectionListener
@@ -121,7 +121,6 @@ namespace WebRTC.AppRTC
             _videoCapturerFactory = videoCapturerFactory;
 
             _channel = new WebSocketClient(config.WssUrl, config.Token) {Listener = this};
-            _channel.OpenAsync();
         }
 
         public IAppRTCClientListener Listener
@@ -164,15 +163,17 @@ namespace WebRTC.AppRTC
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(TAG,"Failed to open WS.",ex);
+                    _logger.Error(TAG, "Failed to open WS.", ex);
                     return false;
                 }
             }
 
             var location = await Geolocation.GetLastKnownLocationAsync();
 
-            _channel.SendMessage(new RegisterMessage(phone, location.Longitude, location.Latitude));
+            //_channel.SendMessage(new RegisterMessage(phone, location.Longitude, location.Latitude));
 
+            _channel.SendMessage(new RegisterMessage(phone,54.23,12.12));
+            
             StartSignalingIfReady();
 
             return true;
@@ -188,6 +189,7 @@ namespace WebRTC.AppRTC
         {
             if (state == SignalingChannelState.Registered)
             {
+                StartSignalingIfReady();
                 Listener?.DidRegisterWithCollider();
             }
         }
@@ -365,13 +367,14 @@ namespace WebRTC.AppRTC
 
         private IVideoTrack CreateLocalVideoTrack(IVideoCapturer videoCapturer)
         {
-            return _factory.CreateVideoTrack(VideoTrackId, _videoCapturerFactory.CreateVideoSource(videoCapturer));
+            return _factory.CreateVideoTrack(VideoTrackId,
+                _videoCapturerFactory.CreateVideoSource(videoCapturer, _factory));
         }
 
 
         private static async Task<bool> CheckPermissionAsync<T>() where T : Permissions.BasePermission, new()
         {
-            var result = await Permissions.CheckStatusAsync<T>();
+            var result = await Permissions.RequestAsync<T>();
             return result == PermissionStatus.Granted;
         }
 

@@ -61,9 +61,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppRTCFactory.cs" />
+    <Compile Include="CallActivity.cs" />
+    <Compile Include="H113Constants.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VideoCaptuereFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -71,12 +74,6 @@
     <None Include="Assets\AboutAssets.txt" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\activity_main.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-    <AndroidResource Include="Resources\layout\content_main.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
     <AndroidResource Include="Resources\values\colors.xml" />
     <AndroidResource Include="Resources\values\dimens.xml" />
     <AndroidResource Include="Resources\values\ic_launcher_background.xml" />
@@ -100,18 +97,36 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_foreground.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_round.png" />
+    <AndroidResource Include="Resources\layout\main_activity.axml">
+      <SubType>
+      </SubType>
+      <Generator>
+      </Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\call_activity.axml">
+      <SubType>
+      </SubType>
+      <Generator>
+      </Generator>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
+    <Folder Include="Resources\layout\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Square.OkHttp3" Version="4.2.2" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Android.Support.Core.Utils" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Android.Support.CustomTabs" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Essentials" Version="1.4.0-pre2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
+      <Project>{15baf860-547f-4e5f-ac88-97f4b47c5e4b}</Project>
+      <Name>WebRTC.Abstraction</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WebRTC.AppRTC\WebRTC.AppRTC.csproj">
       <Project>{8DC6AEA2-DD19-499B-B070-4CE8FB433531}</Project>
       <Name>WebRTC.AppRTC</Name>
@@ -119,6 +134,10 @@
     <ProjectReference Include="..\WebRTC.Droid.Binding\WebRTC.Droid.Binding.csproj">
       <Project>{7A7CA35C-13FC-4E57-A0E3-8619974BB41B}</Project>
       <Name>WebRTC.Droid.Binding</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WebRTC.Droid\WebRTC.Droid.csproj">
+      <Project>{345c6d31-5e81-4e50-90be-e3a51b3ee890}</Project>
+      <Name>WebRTC.Droid</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
