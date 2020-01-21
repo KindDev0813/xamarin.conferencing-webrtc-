@@ -173,12 +173,12 @@ namespace WebRTC.Droid.Extensions
             throw new ArgumentOutOfRangeException(nameof(self),self,null);
         }
 
-        public static SourceState ToNet(this MediaStreamTrack.State self)
+        public static MediaStreamTrackState ToNet(this MediaStreamTrack.State self)
         {
             if (self == MediaStreamTrack.State.Live)
-                return SourceState.Live;
+                return MediaStreamTrackState.Live;
             if (self == MediaStreamTrack.State.Ended)
-                return SourceState.Ended;
+                return MediaStreamTrackState.Ended;
             throw new ArgumentOutOfRangeException(nameof(self),self,null);
         }
 
@@ -256,6 +256,41 @@ namespace WebRTC.Droid.Extensions
                 return PeerConnectionState.Failed;
             if (self == PeerConnection.PeerConnectionState.New)
                 return PeerConnectionState.New;
+            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+        }
+
+        public static SourceState ToNet(this MediaSource.State self)
+        {
+            if (self == MediaSource.State.Ended)
+                return SourceState.Ended;
+            if (self == MediaSource.State.Initializing)
+                return SourceState.Initializing;
+            if (self == MediaSource.State.Live)
+                return SourceState.Live;
+            if (self == MediaSource.State.Muted)
+                return SourceState.Muted;
+            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+        }
+
+        public static RtpMediaType ToNet(this MediaStreamTrack.MediaType self)
+        {
+            if (self == MediaStreamTrack.MediaType.MediaTypeAudio)
+                return RtpMediaType.Audio;
+            if (self == MediaStreamTrack.MediaType.MediaTypeVideo)
+                return RtpMediaType.Video;
+            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+        }
+
+        public static RtpTransceiverDirection ToNet(this RtpTransceiver.RtpTransceiverDirection self)
+        {
+            if (self == RtpTransceiver.RtpTransceiverDirection.Inactive)
+                return RtpTransceiverDirection.Inactive;
+            if (self == RtpTransceiver.RtpTransceiverDirection.RecvOnly)
+                return RtpTransceiverDirection.RecvOnly;
+            if (self == RtpTransceiver.RtpTransceiverDirection.SendOnly)
+                return RtpTransceiverDirection.SendOnly;
+            if (self == RtpTransceiver.RtpTransceiverDirection.SendRecv)
+                return RtpTransceiverDirection.SendRecv;
             throw new ArgumentOutOfRangeException(nameof(self),self,null);
         }
     }

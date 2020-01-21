@@ -13,29 +13,16 @@ namespace WebRTC.AppRTC
     
     public interface ILogger
     {
-        /// <summary>
-        /// Logs debug message to current log file.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        void Debug(string message);
+     
+        void Debug(string tag,string message);
 
-        /// <summary>
-        /// Logs information message to current log file
-        /// </summary>
-        /// <param name="message">The message.</param>
-        void Info(string message);
+       
+        void Info(string tag,string message);
 
-        /// <summary>
-        /// Logs error message including the exception and stack trace to current log file.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="ex">The ex.</param>
-        void Error(string message, Exception ex);
+      
+        void Error(string tag,string message, Exception ex);
 
-        /// <summary>
-        /// Logs a warning message to current log file
-        /// </summary>
-        /// <param name="message">The message.</param>
-        void Warning(string message);
+      
+        void Warning(string tag,string message);
     }
 }

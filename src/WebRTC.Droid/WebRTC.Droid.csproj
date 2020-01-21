@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioSourceNative.cs" />
     <Compile Include="AudioTrackNative.cs" />
+    <Compile Include="CameraVideoCapturerNative.cs" />
     <Compile Include="DataChannelNative.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\IceCandidateExtension.cs" />
@@ -51,22 +53,28 @@
     <Compile Include="Extensions\MediaConstraintsExtensions.cs" />
     <Compile Include="Extensions\MediaStreamTrackExtensions.cs" />
     <Compile Include="Extensions\NativeObjectExtensions.cs" />
+    <Compile Include="Extensions\RTCCertificateExtension.cs" />
     <Compile Include="Extensions\RTCConfigurationExtensions.cs" />
     <Compile Include="Extensions\SessionDescriptionExtension.cs" />
     <Compile Include="FastJavaByteArray.cs" />
     <Compile Include="MediaSourceNative.cs" />
+    <Compile Include="MediaStreamTrackNative.cs" />
     <Compile Include="MediaStreamNative.cs" />
+    <Compile Include="NativeObjectBase.cs" />
     <Compile Include="PeerConnectionNative.cs" />
     <Compile Include="PeerConnectionFactory.cs" />
     <Compile Include="PeerConnectionListenerProxy.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RptSenderNative.cs" />
     <Compile Include="RtpReceiverNative.cs" />
     <Compile Include="RtpSenderNative.cs" />
     <Compile Include="RtpTransceiverNative.cs" />
     <Compile Include="SdpObserverProxy.cs" />
+    <Compile Include="VideoCapturerNative.cs" />
+    <Compile Include="VideoSourceNative.cs" />
     <Compile Include="VideoTrackNative.cs" />
-    <Compile Include="NativeWebRTCFactory.cs" />
+    <Compile Include="NativeFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

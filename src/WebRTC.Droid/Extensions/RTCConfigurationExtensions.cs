@@ -24,14 +24,18 @@ namespace WebRTC.Droid.Extensions
                 IceCandidatePoolSize = self.IceCandidatePoolSize,
                 PruneTurnPorts = self.ShouldPruneTurnPorts,
                 PresumeWritableWhenFullyRelayed = self.ShouldPresumeWritableWhenFullyRelayed,
-                IceCheckMinInterval = self.IceCheckMinInterval.HasValue ? new Integer(self.IceCheckMinInterval.Value) : null,
-                DisableIPv6OnWifi =  self.DisableIPv6OnWiFi,
+                IceCheckMinInterval = self.IceCheckMinInterval.HasValue
+                    ? new Integer(self.IceCheckMinInterval.Value)
+                    : null,
+                DisableIPv6OnWifi = self.DisableIPv6OnWiFi,
                 MaxIPv6Networks = self.MaxIPv6Networks,
                 DisableIpv6 = self.DisableIPv6,
                 SdpSemantics = self.SdpSemantics.ToNative(),
                 ActiveResetSrtpParams = self.ActiveResetSrtpParams,
                 UseMediaTransport = self.UseMediaTransport,
-                UseMediaTransportForDataChannels = self.UseMediaTransportForDataChannels
+                UseMediaTransportForDataChannels = self.UseMediaTransportForDataChannels,
+                EnableDtlsSrtp = self.EnableDtlsSrtp.HasValue ? new Boolean(self.EnableDtlsSrtp.Value) : null,
+                Certificate = self.Certificate?.ToNative()
             };
         }
     }

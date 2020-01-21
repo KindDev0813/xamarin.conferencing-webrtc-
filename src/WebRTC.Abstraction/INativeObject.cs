@@ -1,6 +1,8 @@
+using System;
+
 namespace WebRTC.Abstraction
 {
-    public interface INativeObject
+    public interface INativeObject : IDisposable
     {
         object NativeObject { get; }
     }

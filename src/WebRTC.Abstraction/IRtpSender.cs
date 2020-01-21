@@ -4,7 +4,7 @@ namespace WebRTC.Abstraction
     {
         string SenderId { get; }
         
-        IMediaStreamTrack Track { get; set; }
+        IMediaStreamTrack Track { get;  }
         
     }
 }

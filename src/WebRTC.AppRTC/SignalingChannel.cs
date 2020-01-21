@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using WebRTC.Abstraction;
 
 
 namespace WebRTC.AppRTC
@@ -25,9 +27,18 @@ namespace WebRTC.AppRTC
 
     public abstract class SignalingChannel : IDisposable
     {
+        protected const string TAG = nameof(SignalingChannel);
+        
+        private readonly SignalingChannelListenerSchedulerProxy
+            _listener = new SignalingChannelListenerSchedulerProxy();
+
         private SignalingChannelState _state;
 
-        public ISignalingChannelListener Listener { get; set; }
+        public ISignalingChannelListener Listener
+        {
+            get => _listener.Listener;
+            set => _listener.Listener = value;
+        }
 
         public SignalingChannelState State
         {
@@ -40,19 +51,21 @@ namespace WebRTC.AppRTC
                 Listener?.DidChangeState(this, value);
             }
         }
+        
+        public abstract bool IsOpen { get; }
 
         public virtual void Dispose()
         {
         }
 
-        public abstract void Open();
+        public abstract Task OpenAsync();
 
-        public abstract void Close();
+        public abstract Task CloseAsync();
         public abstract void SendMessage(SignalingMessage message);
 
         protected void OnReceivedMessage(string message)
         {
-            AppRTC.Logger.Debug($"WSS->C:{message}");
+            AppRTC.Logger.Debug(TAG,$"WSS->C:{message}");
             try
             {
                 var msg = SignalingMessage.FromJson(message);
@@ -60,13 +73,41 @@ namespace WebRTC.AppRTC
             }
             catch (Exception ex)
             {
-                AppRTC.Logger.Error("OnReceivedMessage -> Invalid json", ex);
+                AppRTC.Logger.Error(TAG,"OnReceivedMessage -> Invalid json", ex);
             }
         }
 
         protected virtual void OnReceivedMessage(SignalingMessage message)
         {
             Listener?.DidReceiveMessage(this, message);
+        }
+
+        protected class SignalingChannelListenerSchedulerProxy : ISignalingChannelListener
+        {
+            private readonly IScheduler _scheduler;
+
+            public SignalingChannelListenerSchedulerProxy(IScheduler scheduler = null)
+            {
+                _scheduler = scheduler ?? AppRTC.DefaultScheduler;
+            }
+
+            public SignalingChannelListenerSchedulerProxy(ISignalingChannelListener listener,
+                IScheduler scheduler = null) : this(scheduler)
+            {
+                Listener = listener;
+            }
+
+            public ISignalingChannelListener Listener { get; set; }
+
+            public void DidChangeState(SignalingChannel channel, SignalingChannelState state)
+            {
+                _scheduler.Schedule(() => Listener.DidChangeState(channel, state));
+            }
+
+            public void DidReceiveMessage(SignalingChannel channel, SignalingMessage message)
+            {
+                _scheduler.Schedule(() => Listener.DidReceiveMessage(channel, message));
+            }
         }
     }
 }

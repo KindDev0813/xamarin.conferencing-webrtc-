@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WebRTC.Abstraction;
 
@@ -24,6 +25,8 @@ namespace WebRTC.AppRTC
         private readonly IWebSocketConnection _webSocketConnection;
         private readonly string _url;
         private readonly string _protocol;
+        
+        private TaskCompletionSource<int> _openTask = new TaskCompletionSource<int>();
 
         public WebSocketClient(string url, string protocol)
         {
@@ -36,6 +39,8 @@ namespace WebRTC.AppRTC
 
         public string SocketId { get; private set; }
 
+        public override bool IsOpen => _webSocketConnection.IsOpen;
+
         public override void Dispose()
         {
             base.Dispose();
@@ -45,22 +50,27 @@ namespace WebRTC.AppRTC
             _webSocketConnection.Dispose();
         }
 
-        public override void Open()
+        public override Task OpenAsync()
         {
-            _webSocketConnection.Open(_url, _protocol);
+            if(IsOpen)
+                return Task.CompletedTask;
+            _webSocketConnection.Open(_url,_protocol);
+            return _openTask.Task;
         }
 
-        public override void Close()
+        public override Task CloseAsync()
         {
             _webSocketConnection.Close();
+            return Task.CompletedTask;
         }
+
 
         public override void SendMessage(SignalingMessage message)
         {
             message.SocketId = SocketId;
             var json = JsonConvert.SerializeObject(message);
 
-            AppRTC.Logger.Debug($"C->WSS:{message}");
+            AppRTC.Logger.Debug(TAG,$"C->WSS:{message}");
             _webSocketConnection.Send(json);
         }
 
@@ -96,6 +106,7 @@ namespace WebRTC.AppRTC
 
         private void WebSocketConnectionOnOnError(object sender, Exception e)
         {
+            _openTask.SetException(e);
             State = SignalingChannelState.Error;
         }
 
@@ -106,14 +117,16 @@ namespace WebRTC.AppRTC
 
         private void WebSocketConnectionOnOnOpened(object sender, EventArgs e)
         {
+            _openTask.SetResult(0);
             State = SignalingChannelState.Open;
-            SendMessage(new RegisterMessage("73367111", 54.23, 12.12));
         }
     }
 
-    public class SignalingChannelLoopback : WebSocketClient, ISignalingChannelListener
+    
+
+    public class WebSocketSignalingChannelLoopback : WebSocketClient, ISignalingChannelListener
     {
-        public SignalingChannelLoopback(string url, string token) : base(url, token)
+        public WebSocketSignalingChannelLoopback(string url, string protocol) : base(url, protocol)
         {
             Listener = new SignalingChannelListenerSchedulerProxy(this, AppRTC.DefaultScheduler);
         }

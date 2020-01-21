@@ -6,7 +6,7 @@ namespace WebRTC.Abstraction
         string Label { get; }
         bool Enable { get; set; }
         
-        SourceState State { get; }
+        MediaStreamTrackState State { get; }
     }
 
     public interface IAudioTrack : IMediaStreamTrack

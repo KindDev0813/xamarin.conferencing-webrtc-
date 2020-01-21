@@ -4,26 +4,15 @@ using WebRTC.Droid.Extensions;
 
 namespace WebRTC.Droid
 {
-    public class MediaStreamTrackNative : IMediaStreamTrack
+    public class MediaSourceNative : NativeObjectBase, IMediaSource
     {
-        private readonly MediaStreamTrack _mediaStreamTrack;
-        public MediaStreamTrackNative(MediaStreamTrack mediaStreamTrack)
+        private readonly MediaSource _mediaSource;
+
+        public MediaSourceNative(MediaSource mediaSource) : base(mediaSource)
         {
-            NativeObject = _mediaStreamTrack = mediaStreamTrack;
-        }
-        
-        public object NativeObject { get; }
-        
-        public string Kind => _mediaStreamTrack.Kind();
-        
-        public string Label => _mediaStreamTrack.Id();
-        
-        public bool Enable
-        {
-            get => _mediaStreamTrack.Enabled();
-            set => _mediaStreamTrack.SetEnabled(value);
+            _mediaSource = mediaSource;
         }
 
-        public SourceState State => _mediaStreamTrack.InvokeState().ToNet();
+        public SourceState State => _mediaSource.InvokeState().ToNet();
     }
 }

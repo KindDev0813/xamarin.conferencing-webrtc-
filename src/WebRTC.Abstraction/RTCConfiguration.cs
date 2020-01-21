@@ -27,6 +27,7 @@ namespace WebRTC.Abstraction
             ActiveResetSrtpParams = false;
             UseMediaTransport = false;
             UseMediaTransportForDataChannels = false;
+            EnableDtlsSrtp = null;
         }
         
         public IceServer[] IceServers { get; }
@@ -76,6 +77,10 @@ namespace WebRTC.Abstraction
         public bool ActiveResetSrtpParams { get; set; }
         public bool UseMediaTransport { get; set; }
         public bool UseMediaTransportForDataChannels { get; set; }
+        
+        public bool? EnableDtlsSrtp { get; set; }
+        
+        public RTCCertificate Certificate { get; set; }
 
         //CryptoOptions CryptoOptions { get; set; }
         

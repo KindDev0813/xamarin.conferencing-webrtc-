@@ -15,19 +15,15 @@ using SessionDescription = WebRTC.Abstraction.SessionDescription;
 
 namespace WebRTC.Droid
 {
-    public class PeerConnectionNative : IPeerConnection
+    public class PeerConnectionNative : NativeObjectBase, IPeerConnection
     {
         private readonly PeerConnection _peerConnection;
 
-        private readonly List<RtpSenderNative> _senders = new List<RtpSenderNative>();
-        private readonly List<RtpReceiverNative> _receivers = new List<RtpReceiverNative>();
 
-        public PeerConnectionNative(PeerConnection peerConnection)
+        public PeerConnectionNative(PeerConnection peerConnection) : base(peerConnection)
         {
-            NativeObject = _peerConnection = peerConnection;
+            _peerConnection = peerConnection;
         }
-
-        public object NativeObject { get; }
 
         //public IMediaStream[] LocalStreams { get; }
         public SessionDescription LocalDescription => _peerConnection.LocalDescription.ToNet();
@@ -37,9 +33,14 @@ namespace WebRTC.Droid
         public PeerConnectionState PeerConnectionState => _peerConnection.ConnectionState().ToNet();
         public IceGatheringState IceGatheringState => _peerConnection.InvokeIceGatheringState().ToNet();
 
-        public IRtpSender[] Senders { get; }
-        public IRtpReceiver[] Receivers { get; }
-        public IRtpTransceiver[] Transceivers { get; }
+        public IRtpSender[] Senders =>
+            _peerConnection.Senders.Select(s => new RtpSenderNative(s)).Cast<IRtpSender>().ToArray();
+
+        public IRtpReceiver[] Receivers => _peerConnection.Receivers.Select(s => new RtpReceiverNative(s))
+            .Cast<IRtpReceiver>().ToArray();
+
+        public IRtpTransceiver[] Transceivers => _peerConnection.Transceivers.Select(s => new RtpTransceiverNative(s))
+            .Cast<IRtpTransceiver>().ToArray();
 
         public RTCConfiguration Configuration { get; private set; }
 
@@ -47,11 +48,6 @@ namespace WebRTC.Droid
         {
             Configuration = configuration;
             return _peerConnection.SetConfiguration(configuration.ToNative());
-        }
-
-        public void Dispose()
-        {
-            _peerConnection.Dispose();
         }
 
         public void Close()
@@ -143,14 +139,16 @@ namespace WebRTC.Droid
 
         public bool StartRtcEventLogWithFilePath(string filePath, long maxSizeInBytes)
         {
-            try {
+            try
+            {
                 var file = new File(filePath);
 
                 var fileDescriptor = ParcelFileDescriptor.Open(file,
                     ParcelFileMode.ReadWrite | ParcelFileMode.Create | ParcelFileMode.Truncate);
-                return _peerConnection.StartRtcEventLog(fileDescriptor.DetachFd(), (int)maxSizeInBytes);
-
-            } catch (IOException e) {
+                return _peerConnection.StartRtcEventLog(fileDescriptor.DetachFd(), (int) maxSizeInBytes);
+            }
+            catch (IOException e)
+            {
                 Log.Error(nameof(PeerConnectionNative), "Failed to create a new file", e);
                 return false;
             }

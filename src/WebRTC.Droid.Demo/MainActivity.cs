@@ -32,8 +32,7 @@ namespace WebRTC.Droid.Demo
 
         private void FabBtnOnClick(object sender, EventArgs e)
         {         
-            var ws = new WebSocketClient("wss://video.h113.no/ws","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTk5OSwidXNlck5hbWUiOiJUZXN0IiwiaWF0IjoxNTc5NDc0NzA3LCJleHAiOjE1ODAwNzk1MDd9.3uwcwOpFZu88kz0P4Hsgb22agbBXMNz8eVDqQJQrBvk");
-            ws.Open();
+           
         }
 
 
