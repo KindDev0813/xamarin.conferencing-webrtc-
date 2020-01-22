@@ -10,6 +10,7 @@ using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace WebRTC.Droid.Demo
 {
@@ -28,6 +29,14 @@ namespace WebRTC.Droid.Demo
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
 
             SetContentView(Resource.Layout.main_activity);
+
+            JsonConvert.DefaultSettings = () =>
+            {
+                var settings = new JsonSerializerSettings();
+                settings.NullValueHandling = NullValueHandling.Ignore;
+                settings.Converters.Add(new StringEnumConverter());
+                return settings;
+            };
 
             _phoneEditText = FindViewById<EditText>(Resource.Id.et_phone);
             _codeEditText = FindViewById<EditText>(Resource.Id.et_code);

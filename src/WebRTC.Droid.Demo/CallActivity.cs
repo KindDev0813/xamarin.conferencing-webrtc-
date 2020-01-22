@@ -30,6 +30,12 @@ namespace WebRTC.Droid.Demo
             _appRTCClient.ConnectAsync(H113Constants.Phone);
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _appRTCClient?.DisconnectAsync();
+        }
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions,
             [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {

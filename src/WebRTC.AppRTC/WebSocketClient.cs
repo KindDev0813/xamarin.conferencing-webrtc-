@@ -70,7 +70,7 @@ namespace WebRTC.AppRTC
             message.SocketId = SocketId;
             var json = JsonConvert.SerializeObject(message);
 
-            AppRTC.Logger.Debug(TAG,$"C->WSS:{message}");
+            AppRTC.Logger.Debug(TAG,$"C->WSS:{json}");
             _webSocketConnection.Send(json);
         }
 

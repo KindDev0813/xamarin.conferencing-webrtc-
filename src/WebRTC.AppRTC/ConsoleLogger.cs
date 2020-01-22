@@ -39,12 +39,12 @@ namespace WebRTC.AppRTC
         {
             string rec;
             if (exc == null)
-                rec = $"{DateTime.UtcNow} {logType} - {message}";
+                rec = $"{DateTime.UtcNow} ({tag}) {logType} - {message}";
             else
                 rec =
-                    $"{DateTime.UtcNow} {logType} {message}. EXCEPTION: {exc.Message}. STACK TRACE: {exc.StackTrace ?? ""}.";
+                    $"{DateTime.UtcNow} ({tag}) {logType} {message}. EXCEPTION: {exc.Message}. STACK TRACE: {exc.StackTrace ?? ""}.";
 
-            Console.WriteLine(rec);
+            System.Diagnostics.Debug.WriteLine(rec);
         }
     }
 }

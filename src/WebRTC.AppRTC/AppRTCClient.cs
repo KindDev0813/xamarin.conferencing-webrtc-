@@ -180,9 +180,17 @@ namespace WebRTC.AppRTC
         }
 
 
-        public Task DisconnectAsync()
+        public async Task DisconnectAsync()
         {
-            return Task.CompletedTask;
+            _factory?.Dispose();
+            _factory = null;
+            _peerConnection?.Dispose();
+            _peerConnection = null;
+            _localVideoTrack?.Dispose();
+            _localVideoTrack = null;
+            if(_channel != null)
+             await _channel.CloseAsync();
+          
         }
 
         public void DidChangeState(SignalingChannel channel, SignalingChannelState state)

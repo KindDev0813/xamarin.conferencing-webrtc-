@@ -2,6 +2,7 @@ using System;
 using Android.OS;
 using Java.Lang;
 using Square.OkHttp3;
+using Square.OkIO;
 using WebRTC.AppRTC;
 using Exception = System.Exception;
 
@@ -9,6 +10,7 @@ namespace WebRTC.Droid.Demo
 {
     public class AppRTCFactory : IAppRTCFactory
     {
+        
         public IWebSocketConnection CreateWebSocketConnection() => new WebSocketConnection();
 
         public IScheduler CreateDefaultScheduler() => new Scheduler();
@@ -130,6 +132,11 @@ namespace WebRTC.Droid.Demo
                     base.OnFailure(webSocket, t, response);
                     _webSocketConnection.SendOnError(new Exception(t.Message));
                     IsOpen = false;
+                }
+
+                public override void OnMessage(IWebSocket webSocket, ByteString bytes)
+                {
+                    base.OnMessage(webSocket, bytes);
                 }
 
                 public override void OnMessage(IWebSocket webSocket, string text)
