@@ -4,7 +4,7 @@ using SessionDescription = Org.Webrtc.SessionDescription;
 
 namespace WebRTC.Droid.Extensions
 {
-    public static class SessionDescriptionExtension
+    internal static class SessionDescriptionExtension
     {
         public static SessionDescription ToNative(this Abstraction.SessionDescription self)
         {

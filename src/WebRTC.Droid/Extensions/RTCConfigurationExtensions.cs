@@ -5,7 +5,7 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.Droid.Extensions
 {
-    public static class RTCConfigurationExtensions
+    internal static class RTCConfigurationExtensions
     {
         public static PeerConnection.RTCConfiguration ToNative(this RTCConfiguration self)
         {

@@ -3,7 +3,7 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.Droid
 {
-    public class VideoSourceNative : MediaSourceNative, IVideoSource
+    internal class VideoSourceNative : MediaSourceNative, IVideoSource
     {
         private readonly VideoSource _videoSource;
 

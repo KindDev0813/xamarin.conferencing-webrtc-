@@ -2,8 +2,11 @@ using Android.App;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.V7.App;
+using Org.Webrtc;
 using WebRTC.Abstraction;
 using WebRTC.AppRTC;
+using IVideoCapturer = WebRTC.Abstraction.IVideoCapturer;
+using IVideoSink = Org.Webrtc.IVideoSink;
 
 
 namespace WebRTC.Droid.Demo
@@ -11,29 +14,44 @@ namespace WebRTC.Droid.Demo
     [Activity]
     public class CallActivity : AppCompatActivity, IAppRTCClientListener
     {
-        private AppRTCClient _appRTCClient;
-        private VideoCapturerFactory _videoCapturerFactory;
+        private SurfaceViewRenderer _fullscreenRenderer;
+        private SurfaceViewRenderer _pipRenderer;
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        private IVideoSink _localRenderer;
+        private IVideoSink _remoteRenderer;
+
+
+        private IVideoCapturer _videoCapturer;
+        private IVideoTrack _localVideoTrack;
+        private IVideoTrack _remoteVideoTrack;
+
+        private AppRTCClient _appRTCClient;
+
+
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            
-            AppRTC.AppRTC.Init(new AppRTCFactory());
 
-            _videoCapturerFactory = new VideoCapturerFactory(this);
+            SetContentView(Resource.Layout.call_activity);
+
+            _fullscreenRenderer = FindViewById<SurfaceViewRenderer>(Resource.Id.fullscreen_video_view);
+            _pipRenderer = FindViewById<SurfaceViewRenderer>(Resource.Id.pip_video_view);
+
+
+            var appRTCFactory = new AppRTCFactory(Application);
 
             _appRTCClient = new AppRTCClient(new AppRTCClientConfig(H113Constants.Token, H113Constants.WssUrl),
-                _videoCapturerFactory);
+                appRTCFactory);
 
             _appRTCClient.Listener = this;
-            
-            _appRTCClient.ConnectAsync(H113Constants.Phone);
+
+            await _appRTCClient.ConnectAsync(H113Constants.Phone);
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            _appRTCClient?.DisconnectAsync();
+            _appRTCClient?.Disconnect();
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions,
@@ -45,7 +63,12 @@ namespace WebRTC.Droid.Demo
 
         public void DidCreatePeerConnection(IPeerConnection peerConnection)
         {
-            
+            var nativeFactory = (IPeerConnectionFactoryAndroid) peerConnection.PeerConnectionFactory;
+            _pipRenderer.Init(nativeFactory.EglBaseContext, null);
+            _pipRenderer.SetScalingType(RendererCommon.ScalingType.ScaleAspectFit);
+
+            _fullscreenRenderer.Init(nativeFactory.EglBaseContext, null);
+            _fullscreenRenderer.SetScalingType(RendererCommon.ScalingType.ScaleAspectFit);
         }
 
         public void DidOpenDataChannel(IDataChannel dataChannel)
@@ -58,6 +81,12 @@ namespace WebRTC.Droid.Demo
 
         public void DidReceiveLocalVideoTrack(IVideoTrack videoTrack)
         {
+            _localVideoTrack = videoTrack;
+
+            _localVideoTrack.AddRenderer(new VideoRendererProxy
+            {
+                VideoSink = _pipRenderer
+            });
         }
 
         public void DidReceiveRemoteVideoTrack(IVideoTrack videoTrack)
@@ -66,6 +95,8 @@ namespace WebRTC.Droid.Demo
 
         public void DidCreateCapturer(IVideoCapturer videoCapturer)
         {
+            _videoCapturer = videoCapturer;
+            _videoCapturer.StartCapture(0, 0, 0);
         }
 
         public void DidRegisterWithCollider()

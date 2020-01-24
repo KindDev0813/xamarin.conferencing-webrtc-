@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -26,31 +27,48 @@ namespace WebRTC.AppRTC
 
     public class SignalingMessage
     {
+        public const string Register = "new-app-connection";
+        public const string Registered = "app-start-video";
+        public const string SendOffer = "amk-send-offer";
+        public const string ReceivedAnswer = "receive-answer";
+        public const string ReceiveCandidate = "receive-candidate";
+        public const string SendCandidate = "amk-send-candidate";
+        
         [JsonProperty("type")] public SignalingMessageType MessageType { get; set; }
 
         [JsonProperty("amkSocketId")] public string SocketId { get; set; }
 
         public static SignalingMessage FromJson(string json)
         {
-            var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            var values = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
             if (values.ContainsKey("type"))
             {
-                var type = JsonConvert.DeserializeObject<SignalingMessageType>(values["type"]);
-                switch (type)
+                switch (values["type"].ToString())
                 {
-                    case SignalingMessageType.Registered:
+                    case Registered:
                         return JsonConvert.DeserializeObject<RegisteredMessage>(json);
-                    case SignalingMessageType.Offer:
+                    case SendOffer:
                         break;
-                    case SignalingMessageType.ReceivedAnswer:
-                        return JsonConvert.DeserializeObject<SessionDescriptionMessage>(json);
-                    case SignalingMessageType.ReceiveCandidate:
+                    case ReceivedAnswer:
+                        return GetAnswerSessionDescription(values["answer"].ToString());
+                    case ReceiveCandidate:
                         return JsonConvert.DeserializeObject<IceCandidateMessage>(json);
                 }
             }
 
             AppRTC.Logger.Debug(nameof(SignalingMessage), $"SignalingMessage.FromJson invalid json:{json}");
             return new SignalingMessage();
+        }
+
+        private static SessionDescriptionMessage GetAnswerSessionDescription(string json)
+        {
+            var values = JsonConvert.DeserializeObject<Dictionary<string,string>>(json);
+
+            return new SessionDescriptionMessage
+            {
+                MessageType = SignalingMessageType.ReceivedAnswer,
+                Description = new SessionDescription(SdpType.Answer, values["sdp"])
+            };
         }
     }
 
@@ -112,10 +130,27 @@ namespace WebRTC.AppRTC
         public IceCandidateMessage(IceCandidate iceCandidate)
         {
             MessageType = SignalingMessageType.SendCandidate;
-            IceCandidate = iceCandidate;
+            IceCandidate = new IceCandidateEx
+            {
+                Sdp = iceCandidate.Sdp,
+                SdpMid = iceCandidate.SdpMid,
+                SdpMLineIndex = iceCandidate.SdpMLineIndex
+            };
         }
 
-        [JsonProperty("candidate")] public IceCandidate IceCandidate { get; set; }
+        [JsonProperty("candidate")] public IceCandidateEx IceCandidate { get; set; }
+
+        public class IceCandidateEx
+        {
+            [JsonProperty("candidate")]
+            public string Sdp { get; set; }
+        
+            [JsonProperty("sdpMid")]
+            public string SdpMid { get; set; }
+        
+            [JsonProperty("sdpMlineIndex")]
+            public int SdpMLineIndex { get; set; }
+        }
     }
 
     public class SessionDescriptionMessage : SignalingMessage

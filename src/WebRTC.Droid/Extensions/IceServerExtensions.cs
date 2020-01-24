@@ -5,7 +5,7 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.Droid.Extensions
 {
-    public static class IceServerExtensions
+    internal static class IceServerExtensions
     {
         public static PeerConnection.IceServer ToNative(this IceServer self)
         {

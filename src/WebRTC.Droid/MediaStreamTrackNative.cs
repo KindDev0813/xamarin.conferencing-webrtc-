@@ -4,7 +4,7 @@ using WebRTC.Droid.Extensions;
 
 namespace WebRTC.Droid
 {
-    public class MediaStreamTrackNative : NativeObjectBase, IMediaStreamTrack
+    internal class MediaStreamTrackNative : NativeObjectBase, IMediaStreamTrack
     {
         private readonly MediaStreamTrack _mediaStreamTrack;
         public MediaStreamTrackNative(MediaStreamTrack mediaStreamTrack) : base(mediaStreamTrack)

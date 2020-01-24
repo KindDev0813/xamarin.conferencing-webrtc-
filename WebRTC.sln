@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.Droid", "src\WebRTC.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.AppRTC", "src\WebRTC.AppRTC\WebRTC.AppRTC.csproj", "{8DC6AEA2-DD19-499B-B070-4CE8FB433531}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.iOS.Binding", "src\WebRTC.iOS.Binding\WebRTC.iOS.Binding.csproj", "{98BCCC65-7E7D-45AE-90CB-952CE4E641AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRTC.iOS", "src\WebRTC.iOS\WebRTC.iOS.csproj", "{928F96AA-9E37-4254-8399-5D680CCAF2C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|anycpu = Debug|anycpu
@@ -37,5 +41,13 @@ Global
 		{8DC6AEA2-DD19-499B-B070-4CE8FB433531}.Debug|anycpu.Build.0 = Debug|Any CPU
 		{8DC6AEA2-DD19-499B-B070-4CE8FB433531}.Release|anycpu.ActiveCfg = Release|Any CPU
 		{8DC6AEA2-DD19-499B-B070-4CE8FB433531}.Release|anycpu.Build.0 = Release|Any CPU
+		{98BCCC65-7E7D-45AE-90CB-952CE4E641AC}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{98BCCC65-7E7D-45AE-90CB-952CE4E641AC}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{98BCCC65-7E7D-45AE-90CB-952CE4E641AC}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{98BCCC65-7E7D-45AE-90CB-952CE4E641AC}.Release|anycpu.Build.0 = Release|Any CPU
+		{928F96AA-9E37-4254-8399-5D680CCAF2C7}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{928F96AA-9E37-4254-8399-5D680CCAF2C7}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{928F96AA-9E37-4254-8399-5D680CCAF2C7}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{928F96AA-9E37-4254-8399-5D680CCAF2C7}.Release|anycpu.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

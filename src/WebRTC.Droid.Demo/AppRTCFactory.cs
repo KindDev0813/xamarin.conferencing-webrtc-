@@ -1,4 +1,5 @@
 using System;
+using Android.Content;
 using Android.OS;
 using Java.Lang;
 using Square.OkHttp3;
@@ -10,6 +11,10 @@ namespace WebRTC.Droid.Demo
 {
     public class AppRTCFactory : IAppRTCFactory
     {
+        public AppRTCFactory(Context applicationContext)
+        {
+            NativeFactory.Init(applicationContext);       
+        }
         
         public IWebSocketConnection CreateWebSocketConnection() => new WebSocketConnection();
 
@@ -100,6 +105,8 @@ namespace WebRTC.Droid.Demo
             private class WebSocketListenerEx : WebSocketListener
             {
                 private readonly WebSocketConnection _webSocketConnection;
+                private readonly Handler _handler = new Handler(Looper.MainLooper);
+
 
                 public bool IsOpen { get; private set; }
 
@@ -111,7 +118,7 @@ namespace WebRTC.Droid.Demo
                 public override void OnOpen(IWebSocket webSocket, Response response)
                 {
                     base.OnOpen(webSocket, response);
-                    _webSocketConnection.SendOnOpened();
+                    _handler.Post(_webSocketConnection.SendOnOpened);
                     IsOpen = true;
                 }
 
@@ -124,13 +131,13 @@ namespace WebRTC.Droid.Demo
                 public override void OnClosed(IWebSocket webSocket, int code, string reason)
                 {
                     base.OnClosed(webSocket, code, reason);
-                    _webSocketConnection.SendOnClose();
+                    _handler.Post(_webSocketConnection.SendOnClose);
                 }
 
                 public override void OnFailure(IWebSocket webSocket, Throwable t, Response response)
                 {
                     base.OnFailure(webSocket, t, response);
-                    _webSocketConnection.SendOnError(new Exception(t.Message));
+                    _handler.Post(()=>_webSocketConnection.SendOnError(new Exception(t.Message)));
                     IsOpen = false;
                 }
 
@@ -142,7 +149,7 @@ namespace WebRTC.Droid.Demo
                 public override void OnMessage(IWebSocket webSocket, string text)
                 {
                     base.OnMessage(webSocket, text);
-                    _webSocketConnection.SendOnMessage(text);
+                    _handler.Post(() => _webSocketConnection.SendOnMessage(text));
                 }
             }
         }

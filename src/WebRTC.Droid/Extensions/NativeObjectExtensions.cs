@@ -2,7 +2,7 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.Droid.Extensions
 {
-    public static class NativeObjectExtensions
+    internal static class NativeObjectExtensions
     {
         public static T ToNative<T>(this INativeObject self)
         {

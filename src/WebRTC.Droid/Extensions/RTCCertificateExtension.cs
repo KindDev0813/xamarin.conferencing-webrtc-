@@ -3,7 +3,7 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.Droid.Extensions
 {
-    public static class RTCCertificateExtension
+    internal static class RTCCertificateExtension
     {
         public static RtcCertificatePem ToNative(this RTCCertificate self) =>
             new RtcCertificatePem(self.PrivateKey, self.Certificate);

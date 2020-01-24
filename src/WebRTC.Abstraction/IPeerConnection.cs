@@ -6,6 +6,9 @@ namespace WebRTC.Abstraction
     
     public interface IPeerConnection :INativeObject, IDisposable
     {
+        
+        IPeerConnectionFactory PeerConnectionFactory { get; }
+        
         //IMediaStream[] LocalStreams { get; }
         SessionDescription LocalDescription { get; }
         SessionDescription RemoteDescription { get; }

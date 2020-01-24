@@ -2,7 +2,7 @@ using IceCandidate = Org.Webrtc.IceCandidate;
 
 namespace WebRTC.Droid.Extensions
 {
-    public static class IceCandidateExtension
+    internal static class IceCandidateExtension
     {
         public static IceCandidate ToNative(this Abstraction.IceCandidate self)
         {

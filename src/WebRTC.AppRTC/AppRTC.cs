@@ -1,6 +1,6 @@
 namespace WebRTC.AppRTC
 {
-    public static class AppRTC
+    internal static class AppRTC
     {
         public static IAppRTCFactory AppRTCFactory { get; private set; }
 

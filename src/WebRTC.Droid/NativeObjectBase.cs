@@ -5,14 +5,21 @@ namespace WebRTC.Droid
 {
     public abstract class NativeObjectBase : INativeObject
     {
-        public NativeObjectBase(object nativeObject)
+        
+        protected NativeObjectBase()
+        {
+        }
+        
+        protected NativeObjectBase(object nativeObject)
         {
             NativeObject = nativeObject;
         }
 
-        public object NativeObject { get; }
+       
 
-        public void Dispose()
+        public object NativeObject { get; protected set; }
+
+        public virtual void Dispose()
         {
             if (NativeObject is IDisposable disposable)
                 disposable.Dispose();

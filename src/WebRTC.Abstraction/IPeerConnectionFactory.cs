@@ -9,6 +9,12 @@ namespace WebRTC.Abstraction
 
         IAudioTrack CreateAudioTrack(string id, IAudioSource audioSource);
 
+        IVideoSource CreateVideoSource(bool isScreencast);
+
         IVideoTrack CreateVideoTrack(string id, IVideoSource videoSource);
+
+        ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource,bool frontCamera);
+
+        IFileVideoCapturer CreateFileCapturer(IVideoSource videoSource,string file);
     }
 }

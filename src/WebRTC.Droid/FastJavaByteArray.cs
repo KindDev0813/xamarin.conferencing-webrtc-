@@ -10,7 +10,7 @@ namespace WebRTC.Droid
    /// <summary>
 	/// A wrapper around a Java array that reads elements directly from the pointer instead of through expensive JNI calls.
 	/// </summary>
-	public sealed class FastJavaByteArray : IList<byte>, IDisposable
+   internal sealed class FastJavaByteArray : IList<byte>, IDisposable
 	{
 		private JniObjectReference _javaRef;
 

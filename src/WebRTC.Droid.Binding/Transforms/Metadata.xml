@@ -12,12 +12,12 @@
     </attr>
 
     <attr path="/api/package[@name='org.webrtc']/class[@name='SessionDescription']/field[@name='type']"
-          name="name">SdpType
+          name="managedName">SdpType
     </attr>
 
-    <attr path="/api/package[@name='org.webrtc']/class[@name='PeerConnectionFactory']/method[@name='builder']"
-          name="name">NewBuilder
-    </attr>
+<!--    <attr path="/api/package[@name='org.webrtc']/class[@name='PeerConnectionFactory']/method[@name='builder']"-->
+<!--          name="name">NewBuilder-->
+<!--    </attr>-->
 
 <!--    <attr path="/api/package[@name='org.webrtc']/interface[@name='SdpObserver']"-->
 <!--          name="name">ISdpObserverEx-->

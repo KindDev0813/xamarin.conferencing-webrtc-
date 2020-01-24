@@ -4,7 +4,7 @@ using WebRTC.Droid.Extensions;
 
 namespace WebRTC.Droid
 {
-    public class RptSenderNative : NativeObjectBase, IRtpSender
+    internal class RptSenderNative : NativeObjectBase, IRtpSender
     {
         private readonly RtpSender _rtpSender;
 

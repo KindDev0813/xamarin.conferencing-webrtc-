@@ -4,7 +4,7 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.Droid.Extensions
 {
-    public static class MediaStreamTrackExtensions
+    internal static class MediaStreamTrackExtensions
     {
         public static MediaStreamTrack ToNative(this IMediaStreamTrack self)
         {

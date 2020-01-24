@@ -5,7 +5,7 @@ using SessionDescription = Org.Webrtc.SessionDescription;
 
 namespace WebRTC.Droid.Extensions
 {
-    public static class EnumExtensions
+    internal static class EnumExtensions
     {
         public static PeerConnection.IceTransportsType ToNative(this IceTransportPolicy self)
         {

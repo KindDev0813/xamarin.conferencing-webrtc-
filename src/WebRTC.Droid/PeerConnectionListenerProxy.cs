@@ -7,7 +7,7 @@ using IceCandidate = Org.Webrtc.IceCandidate;
 
 namespace WebRTC.Droid
 {
-    public class PeerConnectionListenerProxy : Java.Lang.Object, PeerConnection.IObserver
+    internal class PeerConnectionListenerProxy : Java.Lang.Object, PeerConnection.IObserver
     {
         private readonly IPeerConnectionListener _listener;
 

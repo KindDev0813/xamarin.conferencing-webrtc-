@@ -3,7 +3,7 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.Droid
 {
-    public class AudioTrackNative : MediaStreamTrackNative, IAudioTrack
+    internal class AudioTrackNative : MediaStreamTrackNative, IAudioTrack
     {
         private readonly AudioTrack _audioTrack;
 

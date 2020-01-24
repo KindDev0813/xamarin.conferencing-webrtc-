@@ -8,13 +8,4 @@ namespace WebRTC.Abstraction
         
         MediaStreamTrackState State { get; }
     }
-
-    public interface IAudioTrack : IMediaStreamTrack
-    {
-        float Volume { get; set; }
-    }
-
-    public interface IVideoTrack : IMediaStreamTrack
-    {
-    }
 }

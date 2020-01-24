@@ -8,16 +8,18 @@ namespace WebRTC.AppRTC.Extensions
         public static IEnumerable<IceServer> GetIceServers(this RegisteredMessage self)
         {
             var list = new List<IceServer>();
-            if(self.RTCServer?.Turn1 != null)
+            if (!string.IsNullOrEmpty(self.StunServer))
+                list.Add(new IceServer(self.StunServer));
+            if (self.RTCServer?.Turn1 != null)
                 list.Add(CreateIceServer(self.RTCServer.Turn1));
-            if(self.RTCServer?.Turn2 != null)
+            if (self.RTCServer?.Turn2 != null)
                 list.Add(CreateIceServer(self.RTCServer.Turn2));
             return list;
         }
 
         private static IceServer CreateIceServer(RegisteredMessage.RTCServerEx server)
         {
-            return new IceServer(server.Url,server.Username,server.Password);
+            return new IceServer(server.Url, server.Username, server.Password);
         }
     }
 }

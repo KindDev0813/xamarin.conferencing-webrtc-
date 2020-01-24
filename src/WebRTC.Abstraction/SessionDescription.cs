@@ -11,8 +11,10 @@ namespace WebRTC.Abstraction
         }
 
 
-        [JsonProperty("type")] public SdpType Type { get; }
+        [JsonProperty("type")] 
+        public SdpType Type { get; }
 
-        [JsonProperty("sdp")] public string Sdp { get; }
+        [JsonProperty("sdp")] 
+        public string Sdp { get; }
     }
 }

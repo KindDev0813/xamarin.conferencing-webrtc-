@@ -74,13 +74,6 @@ namespace WebRTC.AppRTC
         void OnError(AppRTCException error);
     }
 
-    public interface IVideoCapturerFactory
-    {
-        IVideoCapturer CreateVideoCapturer();
-
-        IVideoSource CreateVideoSource(IVideoCapturer videoCapturer, IPeerConnectionFactory factory);
-    }
-
     public class AppRTCClient : ISignalingChannelListener, IPeerConnectionListener
     {
         private const string TAG = nameof(AppRTCClient);
@@ -104,21 +97,21 @@ namespace WebRTC.AppRTC
 
         private AppClientState _appClientState;
 
-        private readonly IVideoCapturerFactory _videoCapturerFactory;
 
         private IPeerConnectionFactory _factory;
         private IPeerConnection _peerConnection;
         private IVideoTrack _localVideoTrack;
 
-        public AppRTCClient(AppRTCClientConfig config, IVideoCapturerFactory videoCapturerFactory,
-            ILogger logger = null, IScheduler scheduler = null)
+        public AppRTCClient(AppRTCClientConfig config, IAppRTCFactory appRTCFactory, ILogger logger = null,
+            IScheduler scheduler = null)
         {
+            AppRTC.Init(appRTCFactory);
+
             _scheduler = scheduler ?? AppRTC.DefaultScheduler;
             _listener = new AppRTCClientListenerSchedulerProxy(_scheduler);
             _logger = logger ?? AppRTC.Logger;
             _config = config;
 
-            _videoCapturerFactory = videoCapturerFactory;
 
             _channel = new WebSocketClient(config.WssUrl, config.Token) {Listener = this};
         }
@@ -172,15 +165,15 @@ namespace WebRTC.AppRTC
 
             //_channel.SendMessage(new RegisterMessage(phone, location.Longitude, location.Latitude));
 
-            _channel.SendMessage(new RegisterMessage(phone,54.23,12.12));
-            
+            _channel.SendMessage(new RegisterMessage(phone, 54.23, 12.12));
+
             StartSignalingIfReady();
 
             return true;
         }
 
 
-        public async Task DisconnectAsync()
+        public void Disconnect()
         {
             _factory?.Dispose();
             _factory = null;
@@ -188,9 +181,7 @@ namespace WebRTC.AppRTC
             _peerConnection = null;
             _localVideoTrack?.Dispose();
             _localVideoTrack = null;
-            if(_channel != null)
-             await _channel.CloseAsync();
-          
+            _channel?.CloseAsync().GetAwaiter().GetResult();
         }
 
         public void DidChangeState(SignalingChannel channel, SignalingChannelState state)
@@ -328,7 +319,7 @@ namespace WebRTC.AppRTC
             {
                 var msg = "Failed to create session description.";
                 _logger.Error(TAG, msg, error);
-                DisconnectAsync();
+                Disconnect();
 
                 Listener?.OnError(new AppRTCException(msg, error,
                     AppErrorCode.CreateSdp));
@@ -349,7 +340,7 @@ namespace WebRTC.AppRTC
 
             var msg = "Failed to set session description.";
             _logger.Error(TAG, msg, error);
-            DisconnectAsync();
+            Disconnect();
             Listener?.OnError(new AppRTCException(msg, error, AppErrorCode.CreateSdp));
         }
 
@@ -360,8 +351,7 @@ namespace WebRTC.AppRTC
 
             _peerConnection.AddTrack(track, new[] {MediaStreamId});
 
-            var videoCapturer = _videoCapturerFactory.CreateVideoCapturer();
-            _localVideoTrack = CreateLocalVideoTrack(videoCapturer);
+            _localVideoTrack = CreateLocalVideoTrack();
 
             if (_localVideoTrack == null)
                 return;
@@ -370,13 +360,17 @@ namespace WebRTC.AppRTC
 
             var receiver = _peerConnection.GetVideoTransceiver()?.Receiver;
 
-            Listener?.DidReceiveLocalVideoTrack(receiver?.Track as IVideoTrack);
+            if (receiver != null)
+                Listener?.DidReceiveRemoteVideoTrack(receiver?.Track as IVideoTrack);
         }
 
-        private IVideoTrack CreateLocalVideoTrack(IVideoCapturer videoCapturer)
+        private IVideoTrack CreateLocalVideoTrack()
         {
-            return _factory.CreateVideoTrack(VideoTrackId,
-                _videoCapturerFactory.CreateVideoSource(videoCapturer, _factory));
+            var source = _factory.CreateVideoSource(false);
+            var capturer = _factory.CreateCameraCapturer(source, true);
+            var videoTrack = _factory.CreateVideoTrack(VideoTrackId, source);
+            Listener.DidCreateCapturer(capturer);
+            return videoTrack;
         }
 
 

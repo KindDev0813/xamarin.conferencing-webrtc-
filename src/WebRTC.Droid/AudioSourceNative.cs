@@ -3,7 +3,7 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.Droid
 {
-    public class AudioSourceNative : MediaSourceNative,IAudioSource
+    internal class AudioSourceNative : MediaSourceNative,IAudioSource
     {
         public AudioSourceNative(AudioSource audioSource) : base(audioSource)
         {

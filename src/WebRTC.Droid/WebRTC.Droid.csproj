@@ -47,7 +47,6 @@
     <Compile Include="AudioTrackNative.cs" />
     <Compile Include="CameraVideoCapturerNative.cs" />
     <Compile Include="DataChannelNative.cs" />
-    <Compile Include="EglUtils.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\IceCandidateExtension.cs" />
     <Compile Include="Extensions\IceServerExtensions.cs" />
@@ -58,6 +57,7 @@
     <Compile Include="Extensions\RTCConfigurationExtensions.cs" />
     <Compile Include="Extensions\SessionDescriptionExtension.cs" />
     <Compile Include="FastJavaByteArray.cs" />
+    <Compile Include="FileVideoCapturerNative.cs" />
     <Compile Include="MediaSourceNative.cs" />
     <Compile Include="MediaStreamTrackNative.cs" />
     <Compile Include="MediaStreamNative.cs" />
@@ -73,6 +73,7 @@
     <Compile Include="RtpTransceiverNative.cs" />
     <Compile Include="SdpObserverProxy.cs" />
     <Compile Include="VideoCapturerNative.cs" />
+    <Compile Include="VideoRendererNative.cs" />
     <Compile Include="VideoSourceNative.cs" />
     <Compile Include="VideoTrackNative.cs" />
     <Compile Include="NativeFactory.cs" />

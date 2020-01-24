@@ -15,15 +15,18 @@ using SessionDescription = WebRTC.Abstraction.SessionDescription;
 
 namespace WebRTC.Droid
 {
-    public class PeerConnectionNative : NativeObjectBase, IPeerConnection
+    internal class PeerConnectionNative : NativeObjectBase, IPeerConnection
     {
         private readonly PeerConnection _peerConnection;
 
 
-        public PeerConnectionNative(PeerConnection peerConnection) : base(peerConnection)
+        public PeerConnectionNative(PeerConnection peerConnection,IPeerConnectionFactory peerConnectionFactory) : base(peerConnection)
         {
             _peerConnection = peerConnection;
+            PeerConnectionFactory = peerConnectionFactory;
         }
+        
+        public IPeerConnectionFactory PeerConnectionFactory { get; }
 
         //public IMediaStream[] LocalStreams { get; }
         public SessionDescription LocalDescription => _peerConnection.LocalDescription.ToNet();
@@ -39,8 +42,17 @@ namespace WebRTC.Droid
         public IRtpReceiver[] Receivers => _peerConnection.Receivers.Select(s => new RtpReceiverNative(s))
             .Cast<IRtpReceiver>().ToArray();
 
-        public IRtpTransceiver[] Transceivers => _peerConnection.Transceivers.Select(s => new RtpTransceiverNative(s))
-            .Cast<IRtpTransceiver>().ToArray();
+        public IRtpTransceiver[] Transceivers
+        {
+            get
+            {
+                // var trans = _peerConnection.Transceivers;
+                //
+                // trans.Select(s => new RtpTransceiverNative(s))
+                //     .Cast<IRtpTransceiver>().ToArray();
+                return Array.Empty<IRtpTransceiver>();
+            }
+        }
 
         public RTCConfiguration Configuration { get; private set; }
 

@@ -1,15 +1,31 @@
-using WebRTC.Abstraction;
+using Android.Content;
+using Org.Webrtc;
+using IVideoCapturer = WebRTC.Abstraction.IVideoCapturer;
 
 namespace WebRTC.Droid
 {
-    public class VideoCapturerNative : NativeObjectBase,IVideoCapturer
+    internal abstract class VideoCapturerNative : NativeObjectBase, IVideoCapturer
     {
         private readonly Org.Webrtc.IVideoCapturer _videoCapturer;
-        
-        public VideoCapturerNative(Org.Webrtc.IVideoCapturer videoCapturer) : base(videoCapturer)
+        private readonly SurfaceTextureHelper _surfaceTextureHelper;
+
+
+        public VideoCapturerNative(Org.Webrtc.IVideoCapturer videoCapturer,Context context, VideoSource videoSource, 
+            IEglBaseContext eglBaseContext) : base(videoCapturer)
         {
             _videoCapturer = videoCapturer;
+
+            _surfaceTextureHelper = SurfaceTextureHelper.Create("CaptureThread", eglBaseContext);
+            videoCapturer.Initialize(_surfaceTextureHelper, context, videoSource.CapturerObserver);
         }
+
+        public override void Dispose()
+        {
+            _surfaceTextureHelper?.Dispose();
+            base.Dispose();
+        }
+
+        public bool IsScreencast => _videoCapturer.IsScreencast;
 
         public void StartCapture(int videoWidth, int videoHeight, int fps)
         {

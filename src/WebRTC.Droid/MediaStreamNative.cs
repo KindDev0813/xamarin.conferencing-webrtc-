@@ -6,7 +6,7 @@ using WebRTC.Droid.Extensions;
 
 namespace WebRTC.Droid
 {
-    public class MediaStreamNative :NativeObjectBase, IMediaStream
+    internal class MediaStreamNative :NativeObjectBase, IMediaStream
     {
         private readonly MediaStream _mediaStream;
 

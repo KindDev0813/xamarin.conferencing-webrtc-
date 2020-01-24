@@ -77,10 +77,10 @@ namespace WebRTC.AppRTC
         protected override void OnReceivedMessage(SignalingMessage message)
         {
             base.OnReceivedMessage(message);
-            if (message is RegisteredMessage)
-            {
-                SocketId = message.SocketId;
-            }
+            if (!(message is RegisteredMessage)) 
+                return;
+            SocketId = message.SocketId;
+            State = SignalingChannelState.Registered;
         }
 
         private void WireEvents()

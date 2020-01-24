@@ -4,7 +4,7 @@ using WebRTC.Droid.Extensions;
 
 namespace WebRTC.Droid
 {
-    public class MediaSourceNative : NativeObjectBase, IMediaSource
+    internal class MediaSourceNative : NativeObjectBase, IMediaSource
     {
         private readonly MediaSource _mediaSource;
 

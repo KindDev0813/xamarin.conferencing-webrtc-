@@ -7,7 +7,7 @@ using WebRTC.Droid.Extensions;
 
 namespace WebRTC.Droid
 {
-    public class DataChannelNative : Java.Lang.Object, IDataChannel, DataChannel.IObserver
+    internal class DataChannelNative : Java.Lang.Object, IDataChannel, DataChannel.IObserver
     {
         private readonly DataChannel _dataChannel;
 

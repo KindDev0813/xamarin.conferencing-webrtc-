@@ -3,7 +3,7 @@ using Org.Webrtc;
 
 namespace WebRTC.Droid.Extensions
 {
-    public static class MediaConstraintsExtensions
+    internal static class MediaConstraintsExtensions
     {
         public static MediaConstraints ToNative(this Abstraction.MediaConstraints self)
         {

@@ -24,7 +24,7 @@ namespace WebRTC.AppRTC
         void DidChangeState(SignalingChannel channel, SignalingChannelState state);
         void DidReceiveMessage(SignalingChannel channel, SignalingMessage message);
     }
-
+    
     public abstract class SignalingChannel : IDisposable
     {
         protected const string TAG = nameof(SignalingChannel);
@@ -61,20 +61,29 @@ namespace WebRTC.AppRTC
         public abstract Task OpenAsync();
 
         public abstract Task CloseAsync();
+        
         public abstract void SendMessage(SignalingMessage message);
 
         protected void OnReceivedMessage(string message)
         {
             AppRTC.Logger.Debug(TAG,$"WSS->C:{message}");
+            SignalingMessage msg = null;
             try
             {
-                var msg = SignalingMessage.FromJson(message);
-                OnReceivedMessage(msg);
+                msg = SignalingMessage.FromJson(message);
             }
             catch (Exception ex)
             {
                 AppRTC.Logger.Error(TAG,"OnReceivedMessage -> Invalid json", ex);
             }
+
+            if (msg == null)
+            {
+                return;
+            }
+            
+            OnReceivedMessage(msg);
+
         }
 
         protected virtual void OnReceivedMessage(SignalingMessage message)
