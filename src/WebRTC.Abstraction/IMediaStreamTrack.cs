@@ -4,7 +4,7 @@ namespace WebRTC.Abstraction
     {
         string Kind { get; }
         string Label { get; }
-        bool Enable { get; set; }
+        bool IsEnabled { get; set; }
         
         MediaStreamTrackState State { get; }
     }

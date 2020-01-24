@@ -2,6 +2,12 @@ namespace WebRTC.Abstraction
 {
     public interface IPeerConnectionFactory : INativeObject
     {
+        /// <summary>
+        /// All callback will be on UI thread
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="peerConnectionListener"></param>
+        /// <returns></returns>
         IPeerConnection CreatePeerConnection(RTCConfiguration configuration,
             IPeerConnectionListener peerConnectionListener);
 

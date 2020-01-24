@@ -15,9 +15,9 @@ namespace WebRTC.Droid.Extensions
         {
             switch (self.Kind())
             {
-                case MediaStreamTrack.AudioTrackKind:
+                case Constants.AudioTrackKind:
                     return new AudioTrackNative((AudioTrack) self);
-                case MediaStreamTrack.VideoTrackKind:
+                case Constants.VideoTrackKind:
                     return new VideoTrackNative((VideoTrack) self);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(self),self,null);

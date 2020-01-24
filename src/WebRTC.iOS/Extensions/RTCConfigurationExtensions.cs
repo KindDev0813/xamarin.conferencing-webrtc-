@@ -1,17 +1,16 @@
 using System.Linq;
-using Java.Lang;
-using Org.Webrtc;
-using WebRTC.Abstraction;
+using Foundation;
 
-namespace WebRTC.Droid.Extensions
+namespace WebRTC.iOS.Extensions
 {
     internal static class RTCConfigurationExtensions
     {
-        public static PeerConnection.RTCConfiguration ToNative(this RTCConfiguration self)
+        public static RTCConfiguration ToNative(this Abstraction.RTCConfiguration self)
         {
-            return new PeerConnection.RTCConfiguration(self.IceServers.ToNative().ToList())
+            return new RTCConfiguration
             {
-                IceTransportsType = self.IceTransportPolicy.ToNative(),
+                IceServers = self.IceServers.ToNative().ToArray(),
+                IceTransportPolicy = self.IceTransportPolicy.ToNative(),
                 BundlePolicy = self.BundlePolicy.ToNative(),
                 RtcpMuxPolicy = self.RtcpMuxPolicy.ToNative(),
                 TcpCandidatePolicy = self.TcpCandidatePolicy.ToNative(),
@@ -22,19 +21,19 @@ namespace WebRTC.Droid.Extensions
                 KeyType = self.KeyType.ToNative(),
                 ContinualGatheringPolicy = self.ContinualGatheringPolicy.ToNative(),
                 IceCandidatePoolSize = self.IceCandidatePoolSize,
-                PruneTurnPorts = self.ShouldPruneTurnPorts,
-                PresumeWritableWhenFullyRelayed = self.ShouldPresumeWritableWhenFullyRelayed,
+                ShouldPruneTurnPorts = self.ShouldPruneTurnPorts,
+                ShouldPresumeWritableWhenFullyRelayed = self.ShouldPresumeWritableWhenFullyRelayed,
                 IceCheckMinInterval = self.IceCheckMinInterval.HasValue
-                    ? new Integer(self.IceCheckMinInterval.Value)
-                    : null,
-                DisableIPv6OnWifi = self.DisableIPv6OnWiFi,
+                    ? new NSNumber(self.IceCheckMinInterval.Value)
+                    :  null,
+                DisableIPV6OnWiFi = self.DisableIPv6OnWiFi,
                 MaxIPv6Networks = self.MaxIPv6Networks,
-                DisableIpv6 = self.DisableIPv6,
+                DisableIPV6 = self.DisableIPv6,
                 SdpSemantics = self.SdpSemantics.ToNative(),
                 ActiveResetSrtpParams = self.ActiveResetSrtpParams,
                 UseMediaTransport = self.UseMediaTransport,
                 UseMediaTransportForDataChannels = self.UseMediaTransportForDataChannels,
-                EnableDtlsSrtp = !self.IsLoopback ? new Boolean(true) : null,
+                //EnableDtlsSrtp = self.EnableDtlsSrtp.HasValue ? new Boolean(self.EnableDtlsSrtp.Value) : null,
                 Certificate = self.Certificate?.ToNative()
             };
         }

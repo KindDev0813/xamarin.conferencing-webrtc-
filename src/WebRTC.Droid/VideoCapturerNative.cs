@@ -1,5 +1,6 @@
 using Android.Content;
 using Org.Webrtc;
+using WebRTC.Abstraction;
 using IVideoCapturer = WebRTC.Abstraction.IVideoCapturer;
 
 namespace WebRTC.Droid
@@ -10,7 +11,7 @@ namespace WebRTC.Droid
         private readonly SurfaceTextureHelper _surfaceTextureHelper;
 
 
-        public VideoCapturerNative(Org.Webrtc.IVideoCapturer videoCapturer,Context context, VideoSource videoSource, 
+        public VideoCapturerNative(Org.Webrtc.IVideoCapturer videoCapturer, Context context, VideoSource videoSource,
             IEglBaseContext eglBaseContext) : base(videoCapturer)
         {
             _videoCapturer = videoCapturer;
@@ -26,6 +27,11 @@ namespace WebRTC.Droid
         }
 
         public bool IsScreencast => _videoCapturer.IsScreencast;
+
+        public void StartCapture()
+        {
+            StartCapture(0, 0, 0);
+        }
 
         public void StartCapture(int videoWidth, int videoHeight, int fps)
         {

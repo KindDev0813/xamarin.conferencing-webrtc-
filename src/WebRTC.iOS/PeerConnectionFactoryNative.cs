@@ -1,0 +1,64 @@
+using Foundation;
+using WebRTC.Abstraction;
+using WebRTC.iOS.Extensions;
+
+namespace WebRTC.iOS
+{
+    internal class PeerConnectionFactoryNative : NativeObjectBase, IPeerConnectionFactory
+    {
+        private readonly RTCPeerConnectionFactory _factory;
+
+        public PeerConnectionFactoryNative()
+        {
+            var decoderFactory = new RTCDefaultVideoDecoderFactory();
+            var encoderFactory = new RTCDefaultVideoEncoderFactory();
+
+            NativeObject = _factory = new RTCPeerConnectionFactory(encoderFactory, decoderFactory);
+        }
+
+        public IPeerConnection CreatePeerConnection(Abstraction.RTCConfiguration configuration,
+            IPeerConnectionListener peerConnectionListener)
+        {
+            var rtcConfiguration = configuration.ToNative();
+            var constraints = new RTCMediaConstraints(null,
+                new NSDictionary<NSString, NSString>(new NSString("DtlsSrtpKeyAgreement"),
+                    new NSString(configuration.IsLoopback ? "false" : "true")));
+
+            var peerConnection = _factory.PeerConnectionWithConfiguration(rtcConfiguration, constraints,
+                new PeerConnectionListenerProxy(peerConnectionListener));
+            return new PeerConnectionNative(peerConnection, this);
+        }
+
+        public IAudioSource CreateAudioSource(MediaConstraints mediaConstraints)
+        {
+            var audioSource = _factory.AudioSourceWithConstraints(mediaConstraints.ToNative());
+            return new AudioSourceNative(audioSource);
+        }
+
+        public IAudioTrack CreateAudioTrack(string id, IAudioSource audioSource)
+        {
+            var audioTrack = _factory.AudioTrackWithSource(audioSource.ToNative<RTCAudioSource>(), id);
+            return new AudioTrackNative(audioTrack);
+        }
+
+        public IVideoSource CreateVideoSource(bool isScreencast) => new VideoSourceNative(_factory.VideoSource);
+
+        public IVideoTrack CreateVideoTrack(string id, IVideoSource videoSource)
+        {
+            var videoTrack = _factory.VideoTrackWithSource(videoSource.ToNative<RTCVideoSource>(), id);
+            return new VideoTrackNative(videoTrack);
+        }
+
+        public ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, bool frontCamera)
+        {
+            var capturer = new RTCCameraVideoCapturer(videoSource.ToNative<RTCVideoSource>());
+            return new CameraVideoCapturerNative(capturer, frontCamera);
+        }
+
+        public IFileVideoCapturer CreateFileCapturer(IVideoSource videoSource, string file)
+        {
+            var capturer = new RTCFileVideoCapturer(videoSource.ToNative<RTCVideoSource>());
+            return new FileVideoCapturerNative(capturer, file);
+        }
+    }
+}

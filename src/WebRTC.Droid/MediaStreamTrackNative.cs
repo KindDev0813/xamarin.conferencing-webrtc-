@@ -16,7 +16,7 @@ namespace WebRTC.Droid
 
         public string Label => _mediaStreamTrack.Id();
 
-        public bool Enable
+        public bool IsEnabled
         {
             get => _mediaStreamTrack.Enabled();
             set => _mediaStreamTrack.SetEnabled(value);

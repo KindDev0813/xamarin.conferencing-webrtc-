@@ -1,7 +1,7 @@
 using System;
 using CoreVideo;
 
-namespace WebRTC
+namespace WebRTC.iOS
 {
     public partial class RTCCVPixelBuffer
     {

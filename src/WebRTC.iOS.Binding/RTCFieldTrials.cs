@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Foundation;
 
-namespace WebRTC
+namespace  WebRTC.iOS
 {
     public class RTCFieldTrials
     {

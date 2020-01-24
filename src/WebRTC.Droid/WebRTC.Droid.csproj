@@ -52,7 +52,6 @@
     <Compile Include="Extensions\IceServerExtensions.cs" />
     <Compile Include="Extensions\MediaConstraintsExtensions.cs" />
     <Compile Include="Extensions\MediaStreamTrackExtensions.cs" />
-    <Compile Include="Extensions\NativeObjectExtensions.cs" />
     <Compile Include="Extensions\RTCCertificateExtension.cs" />
     <Compile Include="Extensions\RTCConfigurationExtensions.cs" />
     <Compile Include="Extensions\SessionDescriptionExtension.cs" />
@@ -61,7 +60,6 @@
     <Compile Include="MediaSourceNative.cs" />
     <Compile Include="MediaStreamTrackNative.cs" />
     <Compile Include="MediaStreamNative.cs" />
-    <Compile Include="NativeObjectBase.cs" />
     <Compile Include="PeerConnectionNative.cs" />
     <Compile Include="PeerConnectionFactoryNative.cs" />
     <Compile Include="PeerConnectionListenerProxy.cs" />

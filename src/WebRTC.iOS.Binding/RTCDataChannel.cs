@@ -1,4 +1,6 @@
-namespace WebRTC
+using Foundation;
+
+namespace  WebRTC.iOS
 {
     public partial class RTCDataChannel
     {

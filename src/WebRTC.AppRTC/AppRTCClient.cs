@@ -288,11 +288,10 @@ namespace WebRTC.AppRTC
             _factory = NativeFactory.CreatePeerConnectionFactory();
 
             var config = new RTCConfiguration(_iceServers.ToArray());
-            config.EnableDtlsSrtp = true;
             config.Certificate = RTCCertificate.GenerateCertificate(EncryptionKeyType.Rsa, 100000);
 
 
-            _peerConnection = _factory.CreatePeerConnection(config, new PeerConnectionListenerProxy(this, _scheduler));
+            _peerConnection = _factory.CreatePeerConnection(config, this);
 
             if (_peerConnection == null)
             {
@@ -429,79 +428,6 @@ namespace WebRTC.AppRTC
             public void OnError(AppRTCException error)
             {
                 _scheduler.Schedule(() => Listener?.OnError(error));
-            }
-        }
-
-
-        private class PeerConnectionListenerProxy : IPeerConnectionListener
-        {
-            private readonly IPeerConnectionListener _listener;
-            private readonly IScheduler _scheduler;
-
-            public PeerConnectionListenerProxy(IPeerConnectionListener listener, IScheduler scheduler)
-            {
-                _listener = listener;
-                _scheduler = scheduler;
-            }
-
-            public void OnSignalingChange(SignalingState signalingState)
-            {
-                _scheduler.Schedule(() => _listener.OnSignalingChange(signalingState));
-            }
-
-            public void OnIceConnectionChange(IceConnectionState iceConnectionState)
-            {
-                _scheduler.Schedule(() => _listener.OnIceConnectionChange(iceConnectionState));
-            }
-
-            public void OnConnectionChange(PeerConnectionState newState)
-            {
-                _scheduler.Schedule(() => _listener.OnConnectionChange(newState));
-            }
-
-            public void OnIceGatheringChange(IceGatheringState iceGatheringState)
-            {
-                _scheduler.Schedule(() => _listener.OnIceGatheringChange(iceGatheringState));
-            }
-
-            public void OnIceCandidate(IceCandidate iceCandidate)
-            {
-                _scheduler.Schedule(() => _listener.OnIceCandidate(iceCandidate));
-            }
-
-            public void OnIceCandidatesRemoved(IceCandidate[] iceCandidates)
-            {
-                _scheduler.Schedule(() => _listener.OnIceCandidatesRemoved(iceCandidates));
-            }
-
-            public void OnAddStream(IMediaStream mediaStream)
-            {
-                _scheduler.Schedule(() => _listener.OnAddStream(mediaStream));
-            }
-
-            public void OnRemoveStream(IMediaStream mediaStream)
-            {
-                _scheduler.Schedule(() => _listener.OnRemoveStream(mediaStream));
-            }
-
-            public void OnDataChannel(IDataChannel dataChannel)
-            {
-                _scheduler.Schedule(() => _listener.OnDataChannel(dataChannel));
-            }
-
-            public void OnRenegotiationNeeded()
-            {
-                _scheduler.Schedule(() => _listener.OnRenegotiationNeeded());
-            }
-
-            public void OnAddTrack(IRtpReceiver rtpReceiver, IMediaStream[] mediaStreams)
-            {
-                _scheduler.Schedule(() => _listener.OnAddTrack(rtpReceiver, mediaStreams));
-            }
-
-            public void OnTrack(IRtpTransceiver transceiver)
-            {
-                _scheduler.Schedule(() => _listener.OnTrack(transceiver));
             }
         }
     }

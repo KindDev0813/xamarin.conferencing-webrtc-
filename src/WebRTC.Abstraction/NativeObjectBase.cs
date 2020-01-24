@@ -1,7 +1,7 @@
 using System;
 using WebRTC.Abstraction;
 
-namespace WebRTC.Droid
+namespace WebRTC.Abstraction
 {
     public abstract class NativeObjectBase : INativeObject
     {

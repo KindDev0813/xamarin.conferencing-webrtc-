@@ -48,10 +48,32 @@ namespace WebRTC.Abstraction
         IRtpTransceiver AddTransceiverOfType(RtpMediaType mediaType);
         IRtpTransceiver AddTransceiverOfType(RtpMediaType mediaType, IRtpTransceiverInit init);
         
+        /// <summary>
+        /// Callback will be on UI Thread
+        /// </summary>
+        /// <param name="constraints"></param>
+        /// <param name="completionHandler"></param>
         void CreateOffer(MediaConstraints constraints,  SdpCompletionHandler completionHandler);
+        
+        /// <summary>
+        /// Callback will be on UI Thread
+        /// </summary>
+        /// <param name="constraints"></param>
+        /// <param name="completionHandler"></param>
         void CreateAnswer(MediaConstraints constraints,  SdpCompletionHandler completionHandler);
 
+        /// <summary>
+        /// Callback will be on UI Thread
+        /// </summary>
+        /// <param name="sdp"></param>
+        /// <param name="completionHandler"></param>
         void SetLocalDescription(SessionDescription sdp,  Action<Exception> completionHandler);
+        
+        /// <summary>
+        /// Callback will be on UI Thread
+        /// </summary>
+        /// <param name="sdp"></param>
+        /// <param name="completionHandler"></param>
         void SetRemoteDescription(SessionDescription sdp,  Action<Exception> completionHandler);
 
         bool SetBitrate(int min, int current, int max);
