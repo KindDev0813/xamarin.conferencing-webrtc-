@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using WebRTC.Abstraction;
+using WebRTC.iOS.Binding;
 
 namespace WebRTC.iOS
 {

@@ -6,7 +6,7 @@ using Foundation;
 using ObjCRuntime;
 using UIKit;
 
-namespace  WebRTC.iOS
+namespace WebRTC.iOS.Binding
 {
     // @interface RTCTracking : NSObject
     [BaseType(typeof(NSObject))]

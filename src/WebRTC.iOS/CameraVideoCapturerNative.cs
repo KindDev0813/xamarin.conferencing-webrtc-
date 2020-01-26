@@ -4,6 +4,8 @@ using System.Linq;
 using AVFoundation;
 using CoreMedia;
 using WebRTC.Abstraction;
+using WebRTC.iOS.Binding;
+
 
 namespace WebRTC.iOS
 {

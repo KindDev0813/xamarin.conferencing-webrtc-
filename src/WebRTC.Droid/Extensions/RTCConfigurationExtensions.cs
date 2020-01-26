@@ -34,7 +34,7 @@ namespace WebRTC.Droid.Extensions
                 ActiveResetSrtpParams = self.ActiveResetSrtpParams,
                 UseMediaTransport = self.UseMediaTransport,
                 UseMediaTransportForDataChannels = self.UseMediaTransportForDataChannels,
-                EnableDtlsSrtp = !self.IsLoopback ? new Boolean(true) : null,
+                EnableDtlsSrtp = !self.EnableDtlsSrtp ? new Boolean(true) : null,
                 Certificate = self.Certificate?.ToNative()
             };
         }

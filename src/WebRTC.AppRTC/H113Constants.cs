@@ -1,4 +1,4 @@
-namespace WebRTC.Droid.Demo
+namespace WebRTC.AppRTC
 {
     public static class H113Constants
     {

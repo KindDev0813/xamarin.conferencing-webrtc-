@@ -1,5 +1,6 @@
 using System.Linq;
 using Foundation;
+using WebRTC.iOS.Binding;
 
 namespace WebRTC.iOS.Extensions
 {

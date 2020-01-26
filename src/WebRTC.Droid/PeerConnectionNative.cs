@@ -20,17 +20,19 @@ namespace WebRTC.Droid
         private readonly PeerConnection _peerConnection;
 
 
-        public PeerConnectionNative(PeerConnection peerConnection,IPeerConnectionFactory peerConnectionFactory) : base(peerConnection)
+        public PeerConnectionNative(PeerConnection peerConnection, RTCConfiguration configuration,
+            IPeerConnectionFactory peerConnectionFactory) : base(peerConnection)
         {
             _peerConnection = peerConnection;
+            Configuration = configuration;
             PeerConnectionFactory = peerConnectionFactory;
         }
-        
+
         public IPeerConnectionFactory PeerConnectionFactory { get; }
 
         //public IMediaStream[] LocalStreams { get; }
-        public SessionDescription LocalDescription => _peerConnection.LocalDescription.ToNet();
-        public SessionDescription RemoteDescription => _peerConnection.RemoteDescription.ToNet();
+        public SessionDescription LocalDescription => _peerConnection.LocalDescription?.ToNet();
+        public SessionDescription RemoteDescription => _peerConnection.RemoteDescription?.ToNet();
         public SignalingState SignalingState => _peerConnection.InvokeSignalingState().ToNet();
         public IceConnectionState IceConnectionState => _peerConnection.InvokeIceConnectionState().ToNet();
         public PeerConnectionState PeerConnectionState => _peerConnection.ConnectionState().ToNet();
@@ -46,11 +48,9 @@ namespace WebRTC.Droid
         {
             get
             {
-                // var trans = _peerConnection.Transceivers;
-                //
-                // trans.Select(s => new RtpTransceiverNative(s))
-                //     .Cast<IRtpTransceiver>().ToArray();
-                return Array.Empty<IRtpTransceiver>();
+                if (Configuration.SdpSemantics != SdpSemantics.UnifiedPlan)
+                    throw new InvalidOperationException("GetTransceivers is only supported with Unified Plan SdpSemantics.");
+                return _peerConnection.Transceivers.Select(t => new RtpTransceiverNative(t)).Cast<IRtpTransceiver>().ToArray();
             }
         }
 
@@ -58,8 +58,10 @@ namespace WebRTC.Droid
 
         public bool SetConfiguration(RTCConfiguration configuration)
         {
-            Configuration = configuration;
-            return _peerConnection.SetConfiguration(configuration.ToNative());
+            var result = _peerConnection.SetConfiguration(configuration.ToNative());
+            if (result)
+                Configuration = configuration;
+            return result;
         }
 
         public void Close()
@@ -149,19 +151,17 @@ namespace WebRTC.Droid
             return _peerConnection.SetBitrate(new Integer(min), new Integer(current), new Integer(max));
         }
 
-        public bool StartRtcEventLogWithFilePath(string filePath, long maxSizeInBytes)
+        public bool StartRtcEventLog(string file, int fileSizeLimitBytes)
         {
             try
             {
-                var file = new File(filePath);
+                ParcelFileDescriptor rtcEventLog = ParcelFileDescriptor.Open(new File(file),
+                    ParcelFileMode.Create | ParcelFileMode.Truncate | ParcelFileMode.ReadWrite);
 
-                var fileDescriptor = ParcelFileDescriptor.Open(file,
-                    ParcelFileMode.ReadWrite | ParcelFileMode.Create | ParcelFileMode.Truncate);
-                return _peerConnection.StartRtcEventLog(fileDescriptor.DetachFd(), (int) maxSizeInBytes);
+                return _peerConnection.StartRtcEventLog(rtcEventLog.DetachFd(), fileSizeLimitBytes);
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                Log.Error(nameof(PeerConnectionNative), "Failed to create a new file", e);
                 return false;
             }
         }

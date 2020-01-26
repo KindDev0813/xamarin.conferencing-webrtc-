@@ -1,5 +1,6 @@
 using WebRTC.Abstraction;
 using WebRTC.iOS.Extensions;
+using WebRTC.iOS.Binding;
 
 namespace WebRTC.iOS
 {

@@ -1,3 +1,5 @@
+using WebRTC.iOS.Binding;
+
 namespace WebRTC.iOS.Extensions
 {
     internal static class RTCCertificateExtensions

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WebRTC.Abstraction;
+using WebRTC.iOS.Binding;
 
 namespace WebRTC.iOS.Extensions
 {

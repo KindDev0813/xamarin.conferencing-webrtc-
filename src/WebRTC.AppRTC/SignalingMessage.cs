@@ -56,8 +56,7 @@ namespace WebRTC.AppRTC
                 }
             }
 
-            AppRTC.Logger.Debug(nameof(SignalingMessage), $"SignalingMessage.FromJson invalid json:{json}");
-            return new SignalingMessage();
+            return null;
         }
 
         private static SessionDescriptionMessage GetAnswerSessionDescription(string json)

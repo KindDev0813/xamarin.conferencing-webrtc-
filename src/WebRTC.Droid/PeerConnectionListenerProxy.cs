@@ -10,7 +10,6 @@ namespace WebRTC.Droid
 {
     internal class PeerConnectionListenerProxy : Java.Lang.Object, PeerConnection.IObserver
     {
-        private readonly Handler _handler = new Handler(Looper.MainLooper);
         private readonly IPeerConnectionListener _listener;
 
         public PeerConnectionListenerProxy(IPeerConnectionListener listener)
@@ -20,57 +19,57 @@ namespace WebRTC.Droid
 
         public void OnAddStream(MediaStream p0)
         {
-            _handler.Post(() => _listener.OnAddStream(new MediaStreamNative(p0)));
+            _listener.OnAddStream(new MediaStreamNative(p0));
         }
 
         public void OnAddTrack(RtpReceiver p0, MediaStream[] p1)
         {
-            _handler.Post(() => _listener.OnAddTrack(new RtpReceiverNative(p0), ConvertToNative(p1)));
+            _listener.OnAddTrack(new RtpReceiverNative(p0), ConvertToNative(p1));
         }
 
         public void OnDataChannel(DataChannel p0)
         {
-            _handler.Post(() =>_listener.OnDataChannel(new DataChannelNative(p0)));
+            _listener.OnDataChannel(new DataChannelNative(p0));
         }
 
         public void OnIceCandidate(IceCandidate p0)
         {
-            _handler.Post(() =>_listener.OnIceCandidate(p0.ToNet()));
+            _listener.OnIceCandidate(p0.ToNet());
         }
 
         public void OnIceCandidatesRemoved(IceCandidate[] p0)
         {
-            _handler.Post(() => _listener.OnIceCandidatesRemoved(p0.Select(p=>p.ToNet()).ToArray()));
+            _listener.OnIceCandidatesRemoved(p0.Select(p => p.ToNet()).ToArray());
         }
 
         public void OnIceConnectionChange(PeerConnection.IceConnectionState p0)
         {
-            _handler.Post(() => _listener.OnIceConnectionChange(p0.ToNet()));
+            _listener.OnIceConnectionChange(p0.ToNet());
         }
 
         public void OnIceConnectionReceivingChange(bool p0)
         {
-           // _handler.Post(() =>_listener.ice
+            // _handler.Post(() =>_listener.ice
         }
 
         public void OnIceGatheringChange(PeerConnection.IceGatheringState p0)
         {
-            _handler.Post(() =>_listener.OnIceGatheringChange(p0.ToNet()));
+            _listener.OnIceGatheringChange(p0.ToNet());
         }
 
         public void OnRemoveStream(MediaStream p0)
         {
-            _handler.Post(() =>_listener.OnRemoveStream(new MediaStreamNative(p0)));
+            _listener.OnRemoveStream(new MediaStreamNative(p0));
         }
 
         public void OnRenegotiationNeeded()
         {
-            _handler.Post(() => _listener.OnRenegotiationNeeded());
+            _listener.OnRenegotiationNeeded();
         }
 
         public void OnSignalingChange(PeerConnection.SignalingState p0)
         {
-            _handler.Post(() =>_listener.OnSignalingChange(p0.ToNet()));
+            _listener.OnSignalingChange(p0.ToNet());
         }
 
         private static IMediaStream[] ConvertToNative(MediaStream[] source)
@@ -80,6 +79,7 @@ namespace WebRTC.Droid
             {
                 arr[i] = new MediaStreamNative(source[i]);
             }
+
             return arr;
         }
     }

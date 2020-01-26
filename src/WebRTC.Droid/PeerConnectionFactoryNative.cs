@@ -2,12 +2,14 @@ using System.Linq;
 using Android.Content;
 using Android.OS;
 using Android.Util;
+using Java.IO;
 using Org.Webrtc;
 using Org.Webrtc.Audio;
 using WebRTC.Abstraction;
 using WebRTC.Droid.Extensions;
 using ICameraVideoCapturer = WebRTC.Abstraction.ICameraVideoCapturer;
 using MediaConstraints = WebRTC.Abstraction.MediaConstraints;
+using PeerConnectionFactory = Org.Webrtc.PeerConnectionFactory;
 
 namespace WebRTC.Droid
 {
@@ -37,6 +39,7 @@ namespace WebRTC.Droid
             EglBaseContext = eglBase.EglBaseContext;
 
             _factory = CreateNativeFactory(context, EglBaseContext);
+            NativeObject = _factory;
         }
 
         public IEglBaseContext EglBaseContext { get; }
@@ -51,18 +54,27 @@ namespace WebRTC.Droid
         public IPeerConnection CreatePeerConnection(RTCConfiguration configuration,
             IPeerConnectionListener peerConnectionListener)
         {
-            return new PeerConnectionNative(_factory.CreatePeerConnection(configuration.ToNative(),
-                new PeerConnectionListenerProxy(peerConnectionListener)), this);
+            var peerConnection = _factory.CreatePeerConnection(configuration.ToNative(),
+                new PeerConnectionListenerProxy(peerConnectionListener));
+            if (peerConnection == null)
+                return null;
+            return new PeerConnectionNative(peerConnection, configuration, this);
         }
 
         public IAudioSource CreateAudioSource(MediaConstraints mediaConstraints)
         {
-            return new AudioSourceNative(_factory.CreateAudioSource(mediaConstraints.ToNative()));
+            var audioSource = _factory.CreateAudioSource(mediaConstraints.ToNative());
+            if (audioSource == null)
+                return null;
+            return new AudioSourceNative(audioSource);
         }
 
         public IAudioTrack CreateAudioTrack(string id, IAudioSource audioSource)
         {
-            return new AudioTrackNative(_factory.CreateAudioTrack(id, audioSource.ToNative<AudioSource>()));
+            var audioTrack = _factory.CreateAudioTrack(id, audioSource.ToNative<AudioSource>());
+            if (audioTrack == null)
+                return null;
+            return new AudioTrackNative(audioTrack);
         }
 
         public IVideoSource CreateVideoSource(bool isScreencast) =>
@@ -70,7 +82,10 @@ namespace WebRTC.Droid
 
         public IVideoTrack CreateVideoTrack(string id, IVideoSource videoSource)
         {
-            return new VideoTrackNative(_factory.CreateVideoTrack(id, videoSource.ToNative<VideoSource>()));
+            var videoTrack = _factory.CreateVideoTrack(id, videoSource.ToNative<VideoSource>());
+            if (videoTrack == null)
+                return null;
+            return new VideoTrackNative(videoTrack);
         }
 
         public ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, bool frontCamera) =>
@@ -81,6 +96,26 @@ namespace WebRTC.Droid
             var fileVideoCapturer = new FileVideoCapturer(file);
             return new FileVideoCapturerNative(fileVideoCapturer, _context, videoSource.ToNative<VideoSource>(),
                 EglBaseContext);
+        }
+
+        public bool StartAecDump(string file, int fileSizeLimitBytes)
+        {
+            try
+            {
+                ParcelFileDescriptor aecDumpFileDescriptor = ParcelFileDescriptor.Open(new File(file),
+                    ParcelFileMode.Create | ParcelFileMode.Truncate | ParcelFileMode.ReadWrite);
+
+                return _factory.StartAecDump(aecDumpFileDescriptor.DetachFd(), fileSizeLimitBytes);
+            }
+            catch (IOException ex)
+            {
+                return false;
+            }
+        }
+
+        public void StopAecDump()
+        {
+            _factory.StopAecDump();
         }
 
 

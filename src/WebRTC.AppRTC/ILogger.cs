@@ -19,7 +19,8 @@ namespace WebRTC.AppRTC
        
         void Info(string tag,string message);
 
-      
+        void Error(string tag, string message);
+        
         void Error(string tag,string message, Exception ex);
 
       

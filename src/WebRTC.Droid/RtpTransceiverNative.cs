@@ -29,7 +29,7 @@ namespace WebRTC.Droid
             {
                 if (_rtpTransceiver.Sender == null)
                     return null;
-                return (_rtpSender ??= new RtpSenderNative(_rtpTransceiver.Sender));
+                return _rtpSender ??= new RtpSenderNative(_rtpTransceiver.Sender);
             }
         }
 
@@ -39,7 +39,7 @@ namespace WebRTC.Droid
             {
                 if (_rtpTransceiver.Receiver == null)
                     return null;
-                return (_rtpReceiver ??= new RtpReceiverNative(_rtpTransceiver.Receiver));
+                return _rtpReceiver ??= new RtpReceiverNative(_rtpTransceiver.Receiver);
             }
         }
 

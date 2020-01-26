@@ -4,6 +4,8 @@ using CoreFoundation;
 using Foundation;
 using WebRTC.Abstraction;
 using WebRTC.iOS.Extensions;
+using WebRTC.iOS.Binding;
+
 
 namespace WebRTC.iOS
 {
@@ -11,28 +13,46 @@ namespace WebRTC.iOS
     {
         private readonly RTCPeerConnection _peerConnection;
 
-        public PeerConnectionNative(RTCPeerConnection peerConnection, IPeerConnectionFactory factory)
+        public PeerConnectionNative(RTCPeerConnection peerConnection,Abstraction.RTCConfiguration configuration, IPeerConnectionFactory factory)
         {
             _peerConnection = peerConnection;
+            Configuration = configuration;
             PeerConnectionFactory = factory;
         }
 
         public IPeerConnectionFactory PeerConnectionFactory { get; }
-        public SessionDescription LocalDescription => _peerConnection.LocalDescription.ToNet();
-        public SessionDescription RemoteDescription => _peerConnection.RemoteDescription.ToNet();
+        public SessionDescription LocalDescription => _peerConnection.LocalDescription?.ToNet();
+        public SessionDescription RemoteDescription => _peerConnection.RemoteDescription?.ToNet();
         public SignalingState SignalingState => _peerConnection.SignalingState.ToNet();
         public IceConnectionState IceConnectionState => _peerConnection.IceConnectionState.ToNet();
         public PeerConnectionState PeerConnectionState => _peerConnection.ConnectionState.ToNet();
         public IceGatheringState IceGatheringState => _peerConnection.IceGatheringState.ToNet();
 
-        public IRtpSender[] Senders { get; }
-        public IRtpReceiver[] Receivers { get; }
-        public IRtpTransceiver[] Transceivers { get; }
-        public Abstraction.RTCConfiguration Configuration { get; }
+        public IRtpSender[] Senders =>
+            _peerConnection.Senders.Select(s => new RtpSenderNative(s)).Cast<IRtpSender>().ToArray();
+
+        public IRtpReceiver[] Receivers =>
+            _peerConnection.Receivers.Select(r => new RtpReceiverNative(r)).Cast<IRtpReceiver>().ToArray();
+
+         
+        public IRtpTransceiver[] Transceivers
+        {
+            get
+            {
+                if (Configuration.SdpSemantics != SdpSemantics.UnifiedPlan)
+                    throw new InvalidOperationException("GetTransceivers is only supported with Unified Plan SdpSemantics.");
+                return _peerConnection.Transceivers.Select(t => new RtpTransceiverNative(t)).Cast<IRtpTransceiver>().ToArray();
+            }
+        }
+
+        public Abstraction.RTCConfiguration Configuration { get; private set; }
 
         public bool SetConfiguration(Abstraction.RTCConfiguration configuration)
         {
-            return _peerConnection.SetConfiguration(configuration.ToNative());
+            var result =  _peerConnection.SetConfiguration(configuration.ToNative());
+            if (result)
+                Configuration = configuration;
+            return result;
         }
 
         public void Close()
@@ -62,17 +82,23 @@ namespace WebRTC.iOS
 
         public IRtpSender AddTrack(IMediaStreamTrack track, string[] streamIds)
         {
-            throw new NotImplementedException();
+            var rtpSender = _peerConnection.AddTrack(track.ToNative<RTCMediaStreamTrack>(), streamIds);
+            if (rtpSender == null)
+                return null;
+            return new RtpSenderNative(rtpSender);
         }
 
         public bool RemoveTrack(IRtpSender sender)
         {
-            throw new NotImplementedException();
+            return _peerConnection.RemoveTrack(sender.ToNative<IRTCRtpSender>());
         }
 
         public IRtpTransceiver AddTransceiverWithTrack(IMediaStreamTrack track)
         {
-            throw new NotImplementedException();
+            var rtpTransceiver = _peerConnection.AddTransceiverWithTrack(track.ToNative<RTCMediaStreamTrack>());
+            if (rtpTransceiver == null)
+                return null;
+            return new RtpTransceiverNative(rtpTransceiver);
         }
 
         public IRtpTransceiver AddTransceiverWithTrack(IMediaStreamTrack track, IRtpTransceiverInit init)
@@ -92,46 +118,31 @@ namespace WebRTC.iOS
 
         public void CreateOffer(MediaConstraints constraints, SdpCompletionHandler completionHandler)
         {
-            _peerConnection.OfferForConstraints(constraints.ToNative(),
-                (sdp, err) =>
-                {
-                    DispatchQueue.MainQueue.DispatchAsync(() =>
-                    {
-                        completionHandler?.Invoke(sdp.ToNet(), new Exception(err.LocalizedDescription));
-                    });
-                });
+            var sdpCallbacksHelper = new SdpCallbackHelper(completionHandler);
+
+            _peerConnection.OfferForConstraints(constraints.ToNative(),sdpCallbacksHelper.CreateSdp);
         }
 
         public void CreateAnswer(MediaConstraints constraints, SdpCompletionHandler completionHandler)
         {
-            _peerConnection.AnswerForConstraints(constraints.ToNative(),
-                (sdp, err) =>
-                {
-                    DispatchQueue.MainQueue.DispatchAsync(() =>
-                    {
-                        completionHandler?.Invoke(sdp.ToNet(), new Exception(err.LocalizedDescription));
-                    });
-                });
+            var sdpCallbacksHelper = new SdpCallbackHelper(completionHandler);
+
+            _peerConnection.OfferForConstraints(constraints.ToNative(), sdpCallbacksHelper.CreateSdp);
         }
 
         public void SetLocalDescription(SessionDescription sdp, Action<Exception> completionHandler)
         {
-            _peerConnection.SetLocalDescription(sdp.ToNative(),
-                (err) =>
-                {
-                    DispatchQueue.MainQueue.DispatchAsync(() =>
-                        completionHandler?.Invoke(new Exception(err.LocalizedDescription)));
-                });
+            var sdpCallbacksHelper = new SdpCallbackHelper((_,err)=>completionHandler?.Invoke(err));
+
+            _peerConnection.SetLocalDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
+          
         }
 
         public void SetRemoteDescription(SessionDescription sdp, Action<Exception> completionHandler)
         {
-            _peerConnection.SetRemoteDescription(sdp.ToNative(),
-                (err) =>
-                {
-                    DispatchQueue.MainQueue.DispatchAsync(() =>
-                        completionHandler?.Invoke(new Exception(err.LocalizedDescription)));
-                });
+            var sdpCallbacksHelper = new SdpCallbackHelper((_, err) => completionHandler?.Invoke(err));
+
+            _peerConnection.SetRemoteDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
         }
 
         public bool SetBitrate(int min, int current, int max)
@@ -147,6 +158,36 @@ namespace WebRTC.iOS
         public void StopRtcEventLog()
         {
             _peerConnection.StopRtcEventLog();
+        }
+
+        private class SdpCallbackHelper
+        {
+            private readonly SdpCompletionHandler _completionHandler;
+
+            public SdpCallbackHelper(SdpCompletionHandler completionHandler)
+            {
+                _completionHandler = completionHandler;
+            }
+
+            public void SetSdp(NSError error)
+            {
+                DispatchQueue.MainQueue.DispatchAsync(() => _completionHandler?.Invoke(null, error == null ? null : new Exception(error.LocalizedDescription)));
+            }
+
+            public void CreateSdp(RTCSessionDescription sdp,NSError error)
+            {
+
+                DispatchQueue.MainQueue.DispatchAsync(() =>
+                {
+                    if (error != null)
+                    {
+                        _completionHandler?.Invoke(null, new Exception(error.LocalizedDescription));
+                        return;
+                    }
+                    _completionHandler?.Invoke(sdp.ToNet(), null);
+                });
+            }
+
         }
     }
 }

@@ -20,6 +20,13 @@ namespace WebRTC.AppRTC
             LogRecord(tag, message, "INFO");
         }
 
+        public void Error(string tag, string message)
+        {
+            if (LogLevel > LogLevel.Error)
+                return;
+            LogRecord(tag, message, "ERROR");
+        }
+
         public void Warning(string tag, string message)
         {
             if (LogLevel > LogLevel.Warning)

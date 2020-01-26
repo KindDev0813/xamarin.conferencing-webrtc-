@@ -1,7 +1,7 @@
 ﻿using System;
 using ObjCRuntime;
 
-namespace  WebRTC.iOS
+namespace WebRTC.iOS.Binding
 {
 
     [Native]

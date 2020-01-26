@@ -5,6 +5,9 @@ using WebRTC.Abstraction;
 
 namespace WebRTC.AppRTC
 {
+    /// <summary>
+    /// All events will be UIThread
+    /// </summary>
     public interface IWebSocketConnection : IDisposable
     {
         event EventHandler OnOpened;
@@ -25,12 +28,13 @@ namespace WebRTC.AppRTC
         private readonly IWebSocketConnection _webSocketConnection;
         private readonly string _url;
         private readonly string _protocol;
-        
-        private TaskCompletionSource<int> _openTask = new TaskCompletionSource<int>();
 
-        public WebSocketClient(string url, string protocol)
+        private readonly TaskCompletionSource<int> _openTask = new TaskCompletionSource<int>();
+
+        public WebSocketClient(string url, string protocol, IWebSocketConnection webSocketConnection,
+            ILogger logger = null) : base(logger)
         {
-            _webSocketConnection = AppRTC.AppRTCFactory.CreateWebSocketConnection();
+            _webSocketConnection = webSocketConnection;
             _url = url;
             _protocol = protocol;
 
@@ -52,9 +56,9 @@ namespace WebRTC.AppRTC
 
         public override Task OpenAsync()
         {
-            if(IsOpen)
+            if (IsOpen)
                 return Task.CompletedTask;
-            _webSocketConnection.Open(_url,_protocol);
+            _webSocketConnection.Open(_url, _protocol);
             return _openTask.Task;
         }
 
@@ -70,14 +74,14 @@ namespace WebRTC.AppRTC
             message.SocketId = SocketId;
             var json = JsonConvert.SerializeObject(message);
 
-            AppRTC.Logger.Debug(TAG,$"C->WSS:{json}");
+            Logger.Debug(TAG, $"C->WSS:{json}");
             _webSocketConnection.Send(json);
         }
 
         protected override void OnReceivedMessage(SignalingMessage message)
         {
             base.OnReceivedMessage(message);
-            if (!(message is RegisteredMessage)) 
+            if (!(message is RegisteredMessage))
                 return;
             SocketId = message.SocketId;
             State = SignalingChannelState.Registered;
@@ -122,13 +126,13 @@ namespace WebRTC.AppRTC
         }
     }
 
-    
 
     public class WebSocketSignalingChannelLoopback : WebSocketClient, ISignalingChannelListener
     {
-        public WebSocketSignalingChannelLoopback(string url, string protocol) : base(url, protocol)
+        public WebSocketSignalingChannelLoopback(string url, string protocol, IWebSocketConnection webSocketConnection)
+            : base(url, protocol, webSocketConnection)
         {
-            Listener = new SignalingChannelListenerSchedulerProxy(this, AppRTC.DefaultScheduler);
+            Listener = this;
         }
 
         public void DidChangeState(SignalingChannel channel, SignalingChannelState state)

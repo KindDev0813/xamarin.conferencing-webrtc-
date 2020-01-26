@@ -1,6 +1,8 @@
 using Foundation;
 using WebRTC.Abstraction;
 using WebRTC.iOS.Extensions;
+using WebRTC.iOS.Binding;
+
 
 namespace WebRTC.iOS
 {
@@ -22,22 +24,28 @@ namespace WebRTC.iOS
             var rtcConfiguration = configuration.ToNative();
             var constraints = new RTCMediaConstraints(null,
                 new NSDictionary<NSString, NSString>(new NSString("DtlsSrtpKeyAgreement"),
-                    new NSString(configuration.IsLoopback ? "false" : "true")));
+                    new NSString(configuration.EnableDtlsSrtp ? "false" : "true")));
 
             var peerConnection = _factory.PeerConnectionWithConfiguration(rtcConfiguration, constraints,
                 new PeerConnectionListenerProxy(peerConnectionListener));
-            return new PeerConnectionNative(peerConnection, this);
+            if (peerConnection == null)
+                return null;
+            return new PeerConnectionNative(peerConnection,configuration, this);
         }
 
         public IAudioSource CreateAudioSource(MediaConstraints mediaConstraints)
         {
             var audioSource = _factory.AudioSourceWithConstraints(mediaConstraints.ToNative());
+            if (audioSource == null)
+                return null;
             return new AudioSourceNative(audioSource);
         }
 
         public IAudioTrack CreateAudioTrack(string id, IAudioSource audioSource)
         {
             var audioTrack = _factory.AudioTrackWithSource(audioSource.ToNative<RTCAudioSource>(), id);
+            if (audioTrack == null)
+                return null;
             return new AudioTrackNative(audioTrack);
         }
 
@@ -46,6 +54,8 @@ namespace WebRTC.iOS
         public IVideoTrack CreateVideoTrack(string id, IVideoSource videoSource)
         {
             var videoTrack = _factory.VideoTrackWithSource(videoSource.ToNative<RTCVideoSource>(), id);
+            if (videoTrack == null)
+                return null;
             return new VideoTrackNative(videoTrack);
         }
 

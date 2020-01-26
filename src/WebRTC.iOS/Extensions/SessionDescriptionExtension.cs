@@ -1,4 +1,5 @@
 using WebRTC.Abstraction;
+using WebRTC.iOS.Binding;
 
 namespace WebRTC.iOS.Extensions
 {
@@ -11,7 +12,7 @@ namespace WebRTC.iOS.Extensions
 
         public static SessionDescription ToNet(this RTCSessionDescription self)
         {
-            return new SessionDescription(self.Type.ToNet(), self.Description);
+            return new SessionDescription(self.Type.ToNet(), self.Sdp);
         }
     }
 }

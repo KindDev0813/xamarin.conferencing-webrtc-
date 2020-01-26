@@ -29,16 +29,16 @@ namespace WebRTC.AppRTC
     {
         protected const string TAG = nameof(SignalingChannel);
         
-        private readonly SignalingChannelListenerSchedulerProxy
-            _listener = new SignalingChannelListenerSchedulerProxy();
-
         private SignalingChannelState _state;
 
-        public ISignalingChannelListener Listener
+        protected SignalingChannel(ILogger logger = null)
         {
-            get => _listener.Listener;
-            set => _listener.Listener = value;
+            Logger = logger ?? new ConsoleLogger();
         }
+        
+        protected ILogger Logger { get;  }
+
+        public ISignalingChannelListener Listener { get; set; }
 
         public SignalingChannelState State
         {
@@ -66,7 +66,6 @@ namespace WebRTC.AppRTC
 
         protected void OnReceivedMessage(string message)
         {
-            AppRTC.Logger.Debug(TAG,$"WSS->C:{message}");
             SignalingMessage msg = null;
             try
             {
@@ -74,7 +73,7 @@ namespace WebRTC.AppRTC
             }
             catch (Exception ex)
             {
-                AppRTC.Logger.Error(TAG,"OnReceivedMessage -> Invalid json", ex);
+                Logger.Error(TAG,"OnReceivedMessage -> Invalid json", ex);
             }
 
             if (msg == null)
@@ -89,34 +88,6 @@ namespace WebRTC.AppRTC
         protected virtual void OnReceivedMessage(SignalingMessage message)
         {
             Listener?.DidReceiveMessage(this, message);
-        }
-
-        protected class SignalingChannelListenerSchedulerProxy : ISignalingChannelListener
-        {
-            private readonly IScheduler _scheduler;
-
-            public SignalingChannelListenerSchedulerProxy(IScheduler scheduler = null)
-            {
-                _scheduler = scheduler ?? AppRTC.DefaultScheduler;
-            }
-
-            public SignalingChannelListenerSchedulerProxy(ISignalingChannelListener listener,
-                IScheduler scheduler = null) : this(scheduler)
-            {
-                Listener = listener;
-            }
-
-            public ISignalingChannelListener Listener { get; set; }
-
-            public void DidChangeState(SignalingChannel channel, SignalingChannelState state)
-            {
-                _scheduler.Schedule(() => Listener.DidChangeState(channel, state));
-            }
-
-            public void DidReceiveMessage(SignalingChannel channel, SignalingMessage message)
-            {
-                _scheduler.Schedule(() => Listener.DidReceiveMessage(channel, message));
-            }
         }
     }
 }

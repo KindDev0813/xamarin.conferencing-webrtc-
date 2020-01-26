@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Foundation;
 
-namespace  WebRTC.iOS
+namespace WebRTC.iOS.Binding
 {
     public class RTCFieldTrials
     {
@@ -11,7 +11,7 @@ namespace  WebRTC.iOS
         [DllImport("__Internal")]
         static extern void RTCInitFieldTrialDictionary(IntPtr intPtr);
 
-        public static void InitFieldTrialDictionary(NSDictionary<NSString, NSString> fieldTrials)
+        private static void InitFieldTrialDictionary(NSDictionary<NSString, NSString> fieldTrials)
         {
             RTCInitFieldTrialDictionary(fieldTrials.Handle);
         }

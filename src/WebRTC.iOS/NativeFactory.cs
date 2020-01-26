@@ -1,16 +1,16 @@
 using Foundation;
-using WebRTC.Abstraction;
 using WebRTC.iOS.Extensions;
+using WebRTC.Abstraction;
 
 namespace WebRTC.iOS
 {
-    public class NativeFactory : INativeFactory
+    internal class NativeFactory : INativeFactory
     {
         public IPeerConnectionFactory CreatePeerConnectionFactory() => new PeerConnectionFactoryNative();
 
-        public WebRTC.Abstraction.RTCCertificate GenerateCertificate(EncryptionKeyType keyType, long expires)
+        public Abstraction.RTCCertificate GenerateCertificate(EncryptionKeyType keyType, long expires)
         {
-            return RTCCertificate.GenerateCertificateWithParams(new NSDictionary<NSString, NSObject>(
+            return WebRTC.iOS.Binding.RTCCertificate.GenerateCertificateWithParams(new NSDictionary<NSString, NSObject>(
                 new[] {"expires".ToNative(), "name".ToNative()},
                 new NSObject[] {new NSNumber(expires), keyType.ToStringNative()}
             )).ToNet();
