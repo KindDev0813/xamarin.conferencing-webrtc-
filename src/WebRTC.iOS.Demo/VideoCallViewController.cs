@@ -4,71 +4,71 @@ using System;
 using UIKit;
 using WebRTC.Abstraction;
 using WebRTC.AppRTC;
+using Xamarin.Essentials;
 
 namespace WebRTC.iOS.Demo
 {
-    public partial class VideoCallViewController : UIViewController, IAppRTCClientListener, IWebSocketConnectionFactory,
-        IVideoCapturerFactory
+    public partial class VideoCallViewController : UIViewController,IH113ClientEvents
     {
-        private AppRTCClient _appRTCClient;
+        private H113Client _client;
 
         public VideoCallViewController(IntPtr handle) : base(handle)
         {
         }
 
-        public async override void ViewDidLoad()
+        public  override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
             Title = "Video call";
-            Platform.Init();
 
-            _appRTCClient = new AppRTCClient(new AppRTCClientConfig(H113Constants.Token, H113Constants.WssUrl), this,
-                this);
-            await _appRTCClient.ConnectAsync(H113Constants.Phone);
+            _client = new H113Client(this);
+            _client.Connect(new ConnectionParameters(H113Constants.WssUrl, H113Constants.Token, "98056391", 54.23,
+              12.12));
         }
 
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
-            _appRTCClient.Disconnect();
+            _client?.Disconnect();
         }
 
-        public void DidCreatePeerConnection(IPeerConnection peerConnection)
+      
+        public void OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
+           
         }
 
-        public void DidOpenDataChannel(IDataChannel dataChannel)
+        public void OnDisconnect(DisconnectType disconnectType)
         {
+            
         }
 
-        public void DidChangeState(AppClientState state)
+        public async void ReadyToCall()
         {
+            var permission = await Xamarin.Essentials.Permissions.RequestAsync<Permissions.Camera>();
+            if (permission == PermissionStatus.Granted)
+            {
+                //_client.StartVideoCall(_localRenderer, _remoteRenderer);
+            }
+            else
+            {
+                
+            }
         }
 
-        public void DidReceiveLocalVideoTrack(IVideoTrack videoTrack)
+        public IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource) => factory.CreateFileCapturer(videoSource, "foreman.mp4");
+       
+
+        public void OnError(string description)
         {
+            var alertDialog = UIAlertController.Create("Error", description, UIAlertControllerStyle.Alert);
+            alertDialog.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Destructive, (s) => Disconnect()));
         }
 
-        public void DidReceiveRemoteVideoTrack(IVideoTrack videoTrack)
+        private void Disconnect()
         {
+            _client.Disconnect();
         }
-
-        public void DidCreateCapturer(IVideoCapturer videoCapturer)
-        {
-        }
-
-        public void DidRegisterWithCollider()
-        {
-        }
-
-        public void OnError(AppRTCException error)
-        {
-        }
-
-        public IWebSocketConnection CreateWebSocket() => new WebSocketConnection();
-
-        public IVideoCapturer CreateCapturer(IVideoSource videoSource, IPeerConnectionFactory factory) =>
-            factory.CreateFileCapturer(videoSource, "foreman.mp4");
     }
 }

@@ -31,14 +31,8 @@ namespace WebRTC.Droid.Demo
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
 
             SetContentView(Resource.Layout.main_activity);
-
-            JsonConvert.DefaultSettings = () =>
-            {
-                var settings = new JsonSerializerSettings();
-                settings.NullValueHandling = NullValueHandling.Ignore;
-                settings.Converters.Add(new StringEnumConverter());
-                return settings;
-            };
+            
+            H113Platform.Init(this);
 
             _phoneEditText = FindViewById<EditText>(Resource.Id.et_phone);
             _codeEditText = FindViewById<EditText>(Resource.Id.et_code);

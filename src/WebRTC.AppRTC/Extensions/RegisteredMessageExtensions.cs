@@ -5,7 +5,7 @@ namespace WebRTC.AppRTC.Extensions
 {
     public static class RegisteredMessageExtensions
     {
-        public static IEnumerable<IceServer> GetIceServers(this RegisteredMessage self)
+        public static IceServer[] GetIceServers(this RegisteredMessage self)
         {
             var list = new List<IceServer>();
             if (!string.IsNullOrEmpty(self.StunServer))
@@ -14,7 +14,7 @@ namespace WebRTC.AppRTC.Extensions
                 list.Add(CreateIceServer(self.RTCServer.Turn1));
             if (self.RTCServer?.Turn2 != null)
                 list.Add(CreateIceServer(self.RTCServer.Turn2));
-            return list;
+            return list.ToArray();
         }
 
         private static IceServer CreateIceServer(RegisteredMessage.RTCServerEx server)

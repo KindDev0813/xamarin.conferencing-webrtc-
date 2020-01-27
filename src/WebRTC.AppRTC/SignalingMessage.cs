@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using WebRTC.Abstraction;
 
 namespace WebRTC.AppRTC
@@ -27,6 +28,14 @@ namespace WebRTC.AppRTC
 
     public class SignalingMessage
     {
+        private static JsonSerializerSettings _settings;
+
+        static SignalingMessage()
+        {
+            _settings = new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore};
+            _settings.Converters.Add(new StringEnumConverter());
+        }
+        
         public const string Register = "new-app-connection";
         public const string Registered = "app-start-video";
         public const string SendOffer = "amk-send-offer";
@@ -38,6 +47,11 @@ namespace WebRTC.AppRTC
 
         [JsonProperty("amkSocketId")] public string SocketId { get; set; }
 
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this, _settings);
+        }
+
         public static SignalingMessage FromJson(string json)
         {
             var values = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
@@ -46,13 +60,13 @@ namespace WebRTC.AppRTC
                 switch (values["type"].ToString())
                 {
                     case Registered:
-                        return JsonConvert.DeserializeObject<RegisteredMessage>(json);
+                        return JsonConvert.DeserializeObject<RegisteredMessage>(json,_settings);
                     case SendOffer:
                         break;
                     case ReceivedAnswer:
                         return GetAnswerSessionDescription(values["answer"].ToString());
                     case ReceiveCandidate:
-                        return JsonConvert.DeserializeObject<IceCandidateMessage>(json);
+                        return JsonConvert.DeserializeObject<IceCandidateMessage>(json,_settings);
                 }
             }
 
@@ -61,7 +75,7 @@ namespace WebRTC.AppRTC
 
         private static SessionDescriptionMessage GetAnswerSessionDescription(string json)
         {
-            var values = JsonConvert.DeserializeObject<Dictionary<string,string>>(json);
+            var values = JsonConvert.DeserializeObject<Dictionary<string,string>>(json,_settings);
 
             return new SessionDescriptionMessage
             {

@@ -70,5 +70,15 @@ namespace WebRTC.iOS
             var capturer = new RTCFileVideoCapturer(videoSource.ToNative<RTCVideoSource>());
             return new FileVideoCapturerNative(capturer, file);
         }
+
+        public bool StartAecDump(string file, int fileSizeLimitBytes)
+        {
+            return _factory.StartAecDumpWithFilePath(file, fileSizeLimitBytes);
+        }
+
+        public void StopAecDump()
+        {
+            _factory.StopAecDump();
+        }
     }
 }

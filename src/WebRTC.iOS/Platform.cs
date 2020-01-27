@@ -14,10 +14,10 @@ namespace WebRTC.iOS
                 RTCFieldTrials.InitFieldTrialDictionary(trialsFields);
             }
 
-            //if (enableInternalTracer)
-            //{
-            //    RTCTracking.RTCSetupInternalTracer();
-            //}
+            if (enableInternalTracer)
+            {
+                RTCTracking.RTCSetupInternalTracer();
+            }
             
             RTCSSLAdapter.RTCInitializeSSL();
             Abstraction.NativeFactory.Init(new NativeFactory());

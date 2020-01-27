@@ -127,8 +127,6 @@
     <None Include="Entitlements.plist" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExecutorServiceImpl.cs" />
-    <Compile Include="WebSocketConnection.cs" />
     <Compile Include="LoginViewController.cs" />
     <Compile Include="LoginViewController.designer.cs">
       <DependentUpon>LoginViewController.cs</DependentUpon>
@@ -140,6 +138,7 @@
     <Compile Include="VideoCallViewController.designer.cs">
       <DependentUpon>VideoCallViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="H113Platform.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">

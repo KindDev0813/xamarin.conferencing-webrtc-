@@ -7,6 +7,8 @@ namespace WebRTC.AppRTC
 {
     public interface IPeerConnectionEvents
     {
+        void OnPeerFactoryCreated(IPeerConnectionFactory factory);
+        
         /// <summary>
         /// Callback fired once DTLS connection is established (PeerConnectionState is CONNECTED).
         /// </summary>
@@ -55,6 +57,8 @@ namespace WebRTC.AppRTC
         /// </summary>
         /// <param name="description"></param>
         void OnPeerConnectionError(string description);
+
+        IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource);
     }
 
     public class PeerConnectionParameters
@@ -65,6 +69,8 @@ namespace WebRTC.AppRTC
         }
 
         public IceServer[] IceServers { get; }
+        
+        public bool IsScreencast { get; set; }
 
         public bool VideoCallEnabled { get; set; }
         public bool Loopback { get; set; }
@@ -111,7 +117,7 @@ namespace WebRTC.AppRTC
 
         private readonly IPeerConnectionEvents _peerConnectionEvents;
 
-        private readonly IExecutor _executor;
+        private readonly IExecutorService _executor;
 
         private readonly ILogger _logger;
 
@@ -158,11 +164,12 @@ namespace WebRTC.AppRTC
         private bool IsVideoCallEnabled => _parameters.VideoCallEnabled && _videoCapturer != null;
 
         public PeerConnectionClient(PeerConnectionParameters parameters, IPeerConnectionEvents peerConnectionEvents,
-            IExecutor executor, ILogger logger = null)
+            ILogger logger = null)
         {
             _parameters = parameters;
             _peerConnectionEvents = peerConnectionEvents;
-            _executor = executor;
+            _executor = ExecutorServiceFactory.CreateExecutorService(TAG);
+
             _logger = logger ?? new ConsoleLogger();
 
             _sdpCallbacks = new SdpCallbacks(this);
@@ -207,15 +214,16 @@ namespace WebRTC.AppRTC
                 throw new InvalidOperationException("PeerConnectionFactory has already been constructed");
             }
 
-            _executor.Execute(() => _factory = new PeerConnectionFactory());
+            _executor.Execute(() =>
+            {
+                _factory = new PeerConnectionFactory();
+            });
         }
 
-        public void CreatePeerConnection(IVideoRenderer localRenderer, IVideoRenderer remoteRenderer,
-            IVideoCapturer videoCapturer)
+        public void CreatePeerConnection(IVideoRenderer localRenderer, IVideoRenderer remoteRenderer)
         {
             _localRenderer = localRenderer;
             _remoteRenderer = remoteRenderer;
-            _videoCapturer = videoCapturer;
 
             _executor.Execute(() =>
             {
@@ -398,6 +406,8 @@ namespace WebRTC.AppRTC
             _peerConnectionEvents.OnPeerConnectionClosed();
             PeerConnectionFactory.StopInternalTracingCapture();
             PeerConnectionFactory.ShutdownInternalTracer();
+
+            _executor.Release();
         }
 
         private void CreateMediaConstraintsInternal()
@@ -465,7 +475,7 @@ namespace WebRTC.AppRTC
 
             if (IsVideoCallEnabled)
             {
-                _peerConnection.AddTrack(CreateVideoTrack(_videoCapturer), mediaStreamLabels);
+                _peerConnection.AddTrack(CreateVideoTrack(), mediaStreamLabels);
 
                 // We can add the renderers right away because we don't need to wait for an
                 // answer to get the remote track.
@@ -522,10 +532,12 @@ namespace WebRTC.AppRTC
             return _localAudioTrack;
         }
 
-        private IVideoTrack CreateVideoTrack(IVideoCapturer videoCapturer)
+        private IVideoTrack CreateVideoTrack()
         {
-            _videoSource = _factory.CreateVideoSource(videoCapturer.IsScreencast);
-            videoCapturer.StartCapture(_videoWidth, _videoHeight, _fps);
+            _videoSource = _factory.CreateVideoSource(_parameters.IsScreencast);
+            _videoCapturer = _peerConnectionEvents.CreateVideoCapturer(_factory, _videoSource);
+
+            _videoCapturer.StartCapture(_videoWidth, _videoHeight, _fps);
             _localVideoTrack = _factory.CreateVideoTrack(VideoTrackId, _videoSource);
 
             _localVideoTrack.IsEnabled = _renderVideo;

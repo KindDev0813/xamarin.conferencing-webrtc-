@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using CoreFoundation;
 using Foundation;
 using WebRTC.Abstraction;
 using WebRTC.iOS.Extensions;
@@ -13,7 +12,7 @@ namespace WebRTC.iOS
     {
         private readonly RTCPeerConnection _peerConnection;
 
-        public PeerConnectionNative(RTCPeerConnection peerConnection,Abstraction.RTCConfiguration configuration, IPeerConnectionFactory factory)
+        public PeerConnectionNative(RTCPeerConnection peerConnection, Abstraction.RTCConfiguration configuration, IPeerConnectionFactory factory)
         {
             _peerConnection = peerConnection;
             Configuration = configuration;
@@ -34,7 +33,7 @@ namespace WebRTC.iOS
         public IRtpReceiver[] Receivers =>
             _peerConnection.Receivers.Select(r => new RtpReceiverNative(r)).Cast<IRtpReceiver>().ToArray();
 
-         
+
         public IRtpTransceiver[] Transceivers
         {
             get
@@ -49,7 +48,7 @@ namespace WebRTC.iOS
 
         public bool SetConfiguration(Abstraction.RTCConfiguration configuration)
         {
-            var result =  _peerConnection.SetConfiguration(configuration.ToNative());
+            var result = _peerConnection.SetConfiguration(configuration.ToNative());
             if (result)
                 Configuration = configuration;
             return result;
@@ -120,7 +119,7 @@ namespace WebRTC.iOS
         {
             var sdpCallbacksHelper = new SdpCallbackHelper(completionHandler);
 
-            _peerConnection.OfferForConstraints(constraints.ToNative(),sdpCallbacksHelper.CreateSdp);
+            _peerConnection.OfferForConstraints(constraints.ToNative(), sdpCallbacksHelper.CreateSdp);
         }
 
         public void CreateAnswer(MediaConstraints constraints, SdpCompletionHandler completionHandler)
@@ -132,10 +131,10 @@ namespace WebRTC.iOS
 
         public void SetLocalDescription(SessionDescription sdp, Action<Exception> completionHandler)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper((_,err)=>completionHandler?.Invoke(err));
+            var sdpCallbacksHelper = new SdpCallbackHelper((_, err) => completionHandler?.Invoke(err));
 
             _peerConnection.SetLocalDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
-          
+
         }
 
         public void SetRemoteDescription(SessionDescription sdp, Action<Exception> completionHandler)
@@ -160,6 +159,11 @@ namespace WebRTC.iOS
             _peerConnection.StopRtcEventLog();
         }
 
+        public bool StartRtcEventLog(string file, int fileSizeLimitBytes)
+        {
+            throw new NotImplementedException();
+        }
+
         private class SdpCallbackHelper
         {
             private readonly SdpCompletionHandler _completionHandler;
@@ -171,21 +175,19 @@ namespace WebRTC.iOS
 
             public void SetSdp(NSError error)
             {
-                DispatchQueue.MainQueue.DispatchAsync(() => _completionHandler?.Invoke(null, error == null ? null : new Exception(error.LocalizedDescription)));
+                _completionHandler?.Invoke(null, error == null ? null : new Exception(error.LocalizedDescription));
             }
 
-            public void CreateSdp(RTCSessionDescription sdp,NSError error)
+            public void CreateSdp(RTCSessionDescription sdp, NSError error)
             {
 
-                DispatchQueue.MainQueue.DispatchAsync(() =>
+                if (error != null)
                 {
-                    if (error != null)
-                    {
-                        _completionHandler?.Invoke(null, new Exception(error.LocalizedDescription));
-                        return;
-                    }
-                    _completionHandler?.Invoke(sdp.ToNet(), null);
-                });
+                    _completionHandler?.Invoke(null, new Exception(error.LocalizedDescription));
+                    return;
+                }
+                _completionHandler?.Invoke(sdp.ToNet(), null);
+
             }
 
         }
