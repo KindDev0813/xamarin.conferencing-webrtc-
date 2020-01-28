@@ -13,16 +13,16 @@ namespace WebRTC.iOS
         {
             _videoTrack = videoTrack;
         }
-        
 
         public void AddRenderer(IVideoRenderer videoRenderer)
         {
-            throw new NotImplementedException();
+            _videoTrack.AddRenderer(videoRenderer.ToNative<IRTCVideoRenderer>());
         }
 
         public void RemoveRenderer(IVideoRenderer videoRenderer)
         {
-            throw new NotImplementedException();
+            _videoTrack.RemoveRenderer(videoRenderer.ToNative<IRTCVideoRenderer>());
+
         }
     }
 }

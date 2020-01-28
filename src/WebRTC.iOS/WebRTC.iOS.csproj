@@ -68,6 +68,7 @@
     <Compile Include="VideoSourceNative.cs" />
     <Compile Include="VideoTrackNative.cs" />
     <Compile Include="Platform.cs" />
+    <Compile Include="VideoRendererProxy.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">

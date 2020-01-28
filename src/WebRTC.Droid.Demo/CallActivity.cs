@@ -38,8 +38,8 @@ namespace WebRTC.Droid.Demo
             _localRenderer = new VideoRendererProxy();
             _remoteRenderer = new VideoRendererProxy();
 
-            _localRenderer.VideoSink = _localRenderer;
-            _remoteRenderer.VideoSink = _remoteRenderer;
+            _localRenderer.Renderer = _pipRenderer;
+            _remoteRenderer.Renderer = _fullscreenRenderer;
 
             _client = new H113Client(this);
             _client.Connect(new ConnectionParameters(H113Constants.WssUrl, H113Constants.Token, "98056391", 54.23,
@@ -62,7 +62,7 @@ namespace WebRTC.Droid.Demo
 
         public void OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
-            var androidFactory = (IPeerConnectionFactoryAndroid) factory;
+            var androidFactory = (IPeerConnectionFactoryAndroid) factory.NativeObject;
             _pipRenderer.Init(androidFactory.EglBaseContext, null);
             _fullscreenRenderer.Init(androidFactory.EglBaseContext, null);
         }

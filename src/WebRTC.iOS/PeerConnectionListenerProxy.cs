@@ -23,17 +23,17 @@ namespace WebRTC.iOS
 
         public void DidAddStream(RTCPeerConnection peerConnection, RTCMediaStream stream)
         {
-             _listener?.OnAddStream(new MediaStreamNative(stream));
+            _listener?.OnAddStream(new MediaStreamNative(stream));
         }
 
         public void DidRemoveStream(RTCPeerConnection peerConnection, RTCMediaStream stream)
         {
-             _listener?.OnRemoveStream(new MediaStreamNative(stream));
+            _listener?.OnRemoveStream(new MediaStreamNative(stream));
         }
 
         public void PeerConnectionShouldNegotiate(RTCPeerConnection peerConnection)
         {
-             _listener?.OnRenegotiationNeeded();
+            _listener?.OnRenegotiationNeeded();
         }
 
         public void DidChangeIceConnectionState(RTCPeerConnection peerConnection, RTCIceConnectionState newState)
@@ -48,18 +48,17 @@ namespace WebRTC.iOS
 
         public void DidGenerateIceCandidate(RTCPeerConnection peerConnection, RTCIceCandidate candidate)
         {
-             _listener?.OnIceCandidate(candidate.ToNet());
+            _listener?.OnIceCandidate(candidate.ToNet());
         }
 
         public void DidRemoveIceCandidates(RTCPeerConnection peerConnection, RTCIceCandidate[] candidates)
         {
-            
-                _listener?.OnIceCandidatesRemoved(candidates.ToNet().ToArray());
+            _listener?.OnIceCandidatesRemoved(candidates.ToNet().ToArray());
         }
 
         public void DidOpenDataChannel(RTCPeerConnection peerConnection, RTCDataChannel dataChannel)
         {
-             _listener?.OnDataChannel(new DataChannelNative(dataChannel));
+            _listener?.OnDataChannel(new DataChannelNative(dataChannel));
         }
     }
 }

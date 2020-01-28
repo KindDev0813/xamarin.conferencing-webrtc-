@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace WebRTC.AppRTC
 {
-   
+
 
     public enum WebSocketConnectionState
     {
@@ -21,13 +21,12 @@ namespace WebRTC.AppRTC
         void OnWebSocketMessage(string message);
         void OnWebSocketError(string description);
     }
-    
+
     public class WebSocketChannelClient
     {
         private const string TAG = nameof(WebSocketChannelClient);
 
         private const int CloseTimeout = 1000;
-
 
         private readonly List<string> _wsSendQueue = new List<string>();
 
@@ -113,6 +112,7 @@ namespace WebRTC.AppRTC
                     _logger.Error(TAG, $"WebSocket send() in error or closed state: {message}");
                     break;
                 case WebSocketConnectionState.Registered:
+                    _logger.Debug(TAG, $"C->WSS: {message}");
                     _webSocketConnection.Send(message);
                     break;
                 default:
@@ -131,6 +131,8 @@ namespace WebRTC.AppRTC
             }
 
             _logger.Debug(TAG, $"C->WSS: {message}");
+
+            Send(message);
 
             State = WebSocketConnectionState.Registered;
 

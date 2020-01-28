@@ -39,12 +39,11 @@ namespace WebRTC.AppRTC
         public H113Client(IH113ClientEvents events, ILogger logger = null)
         {
             _executor = ExecutorServiceFactory.MainExecutor;
-
-
+            
             _logger = logger ?? new ConsoleLogger();
             _rtcClient = new WebSocketRTCClient(this, _logger);
 
-            _events = new H113ClientEventProxy(events, _executor);
+            _events = events;
         }
 
         public void Connect(ConnectionParameters connectionParameters)
@@ -64,6 +63,7 @@ namespace WebRTC.AppRTC
         public void StartVideoCall(IVideoRenderer localRenderer, IVideoRenderer remoteRenderer)
         {
             _peerConnectionClient.CreatePeerConnection(localRenderer, remoteRenderer);
+            _peerConnectionClient.CreateOffer();
         }
 
         public void SwitchCamera()
@@ -75,37 +75,9 @@ namespace WebRTC.AppRTC
         {
             _peerConnectionClient.SetVideoEnabled(enable);
         }
-
         public void SetAudioEnabled(bool enable)
         {
             _peerConnectionClient.SetAudioEnabled(enable);
         }
-
-        private class H113ClientEventProxy : IH113ClientEvents
-        {
-            private readonly IExecutor _executor;
-            private readonly IH113ClientEvents _events;
-
-            public H113ClientEventProxy(IH113ClientEvents events, IExecutor executor)
-            {
-                _events = events;
-                _executor = executor;
-            }
-
-            public void OnPeerFactoryCreated(IPeerConnectionFactory factory) =>
-                _executor.Execute(() => _events.OnPeerFactoryCreated(factory));
-
-            public void OnDisconnect(DisconnectType disconnectType) =>
-                _executor.Execute(() => _events.OnDisconnect(disconnectType));
-
-            public void ReadyToCall() => _executor.Execute(ReadyToCall);
-
-            public IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource) =>
-                _events.CreateVideoCapturer(factory, videoSource);
-
-            public void OnError(string description) => _executor.Execute(() => _events.OnError(description));
-        }
-
-       
     }
 }

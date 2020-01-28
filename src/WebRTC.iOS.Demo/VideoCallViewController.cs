@@ -4,27 +4,38 @@ using System;
 using UIKit;
 using WebRTC.Abstraction;
 using WebRTC.AppRTC;
+using WebRTC.iOS.Binding;
 using Xamarin.Essentials;
 
 namespace WebRTC.iOS.Demo
 {
-    public partial class VideoCallViewController : UIViewController,IH113ClientEvents
+    public partial class VideoCallViewController : UIViewController, IH113ClientEvents
     {
+
+        private VideoRendererProxy _localRenderer;
+        private VideoRendererProxy _remoteRenderer;
+
+
         private H113Client _client;
+
 
         public VideoCallViewController(IntPtr handle) : base(handle)
         {
         }
 
-        public  override void ViewDidLoad()
+        public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
             Title = "Video call";
 
+            _localRenderer = new VideoRendererProxy();
+            _remoteRenderer = new VideoRendererProxy();
+
             _client = new H113Client(this);
             _client.Connect(new ConnectionParameters(H113Constants.WssUrl, H113Constants.Token, "98056391", 54.23,
               12.12));
+
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -33,15 +44,15 @@ namespace WebRTC.iOS.Demo
             _client?.Disconnect();
         }
 
-      
+
         public void OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
-           
+
         }
 
         public void OnDisconnect(DisconnectType disconnectType)
         {
-            
+
         }
 
         public async void ReadyToCall()
@@ -49,16 +60,16 @@ namespace WebRTC.iOS.Demo
             var permission = await Xamarin.Essentials.Permissions.RequestAsync<Permissions.Camera>();
             if (permission == PermissionStatus.Granted)
             {
-                //_client.StartVideoCall(_localRenderer, _remoteRenderer);
+                _client.StartVideoCall(_localRenderer, _remoteRenderer);
             }
             else
             {
-                
+
             }
         }
 
         public IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource) => factory.CreateFileCapturer(videoSource, "foreman.mp4");
-       
+
 
         public void OnError(string description)
         {

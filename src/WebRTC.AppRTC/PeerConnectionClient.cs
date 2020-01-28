@@ -81,7 +81,7 @@ namespace WebRTC.AppRTC
         public bool NoAudioProcessing { get; set; }
         public bool AecDump { get; set; }
         public string AecDumpFile { get; set; }
-        public bool EnableRtcEventLog { get; set; }
+        public bool EnableRtcEventLog { get; set; } = false;
         public string RtcEventLogDirectory { get; set; }
     }
 
@@ -161,7 +161,7 @@ namespace WebRTC.AppRTC
 
         private bool _isError;
 
-        private bool IsVideoCallEnabled => _parameters.VideoCallEnabled && _videoCapturer != null;
+        private bool IsVideoCallEnabled => _parameters.VideoCallEnabled;
 
         public PeerConnectionClient(PeerConnectionParameters parameters, IPeerConnectionEvents peerConnectionEvents,
             ILogger logger = null)
@@ -217,6 +217,7 @@ namespace WebRTC.AppRTC
             _executor.Execute(() =>
             {
                 _factory = new PeerConnectionFactory();
+                _peerConnectionEvents.OnPeerFactoryCreated(_factory);
             });
         }
 
@@ -507,7 +508,7 @@ namespace WebRTC.AppRTC
         {
             if (_peerConnection == null)
                 return;
-            if (_parameters.EnableRtcEventLog)
+            if (!_parameters.EnableRtcEventLog)
             {
                 _logger.Debug(TAG, "RtcEventLog is disabled.");
                 return;

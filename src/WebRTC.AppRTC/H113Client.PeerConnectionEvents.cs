@@ -9,7 +9,10 @@ namespace WebRTC.AppRTC
 
         void IPeerConnectionEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
-            _events.OnPeerFactoryCreated(factory);
+           _executor.Execute(() =>
+           {
+               _events.OnPeerFactoryCreated(factory);
+           });
         }
 
         void IPeerConnectionEvents.OnConnected()
@@ -18,7 +21,10 @@ namespace WebRTC.AppRTC
 
         void IPeerConnectionEvents.OnDisconnected()
         {
-            _events.OnDisconnect(DisconnectType.PeerConnection);
+            _executor.Execute(() =>
+            {
+                _events.OnDisconnect(DisconnectType.PeerConnection);
+            });
         }
 
         void IPeerConnectionEvents.OnLocalDescription(SessionDescription sdp)
@@ -60,7 +66,10 @@ namespace WebRTC.AppRTC
 
         void IPeerConnectionEvents.OnPeerConnectionError(string description)
         {
-            _events.OnError(description);
+            _executor.Execute(() =>
+            {
+                _events.OnError(description);
+            });
         }
     }
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 
 namespace WebRTC.Abstraction
 {
@@ -10,9 +9,7 @@ namespace WebRTC.Abstraction
         {
             _factory = NativeFactory.CreatePeerConnectionFactory();
         }
-        
-        public object NativeObject => _factory.NativeObject;
-
+        public object NativeObject => _factory;
         public void Dispose()
         {
             _factory.Dispose();
