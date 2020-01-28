@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using WebRTC.Abstraction;
 using WebRTC.AppRTC.Extensions;
 
@@ -6,14 +5,11 @@ namespace WebRTC.AppRTC
 {
     public partial class H113Client : ISignalingEvents
     {
-        private IList<IceCandidate> _wsQueue = new List<IceCandidate>();
-        private bool _receivedSdp;
         void ISignalingEvents.OnChannelConnected(RegisteredMessage registeredMessage)
         {
             _logger.Debug(TAG, "Creating PeerConnectionClient");
             _executor.Execute(() =>
             {
-                _wsQueue.Clear();
                 var peerConnectionClientParams = new PeerConnectionParameters(registeredMessage.GetIceServers())
                 {
                     VideoCallEnabled = true
@@ -53,8 +49,6 @@ namespace WebRTC.AppRTC
                     return;
                 }
                 _peerConnectionClient.SetRemoteDescription(sdp);
-                _receivedSdp = true;
-                DrainQueue();
             });
         }
 
@@ -67,14 +61,7 @@ namespace WebRTC.AppRTC
                     _logger.Error(TAG, "Received remote SDP for non-initilized peer connection.");
                     return;
                 }
-                if (!_receivedSdp)
-                {
-                    _wsQueue.Add(candidate);
-                }
-                else
-                {
-                    _peerConnectionClient.AddRemoteIceCandidate(candidate);
-                }
+                _peerConnectionClient.AddRemoteIceCandidate(candidate);
             });
         }
 
@@ -89,14 +76,6 @@ namespace WebRTC.AppRTC
                 }
                 _peerConnectionClient.RemoveRemoteIceCandidates(candidates);
             });
-        }
-
-        private void DrainQueue()
-        {
-            foreach (var candidate in _wsQueue)
-            {
-                _rtcClient.SendLocalIceCandidate(candidate);
-            }
         }
     }
 }
