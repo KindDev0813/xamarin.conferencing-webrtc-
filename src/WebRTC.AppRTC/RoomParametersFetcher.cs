@@ -29,23 +29,17 @@ namespace WebRTC.AppRTC
 
         public void MakeRequest(RoomParametersFetcherCallback callback)
         {
-            ThreadPool.QueueUserWorkItem(async _ =>
+            var httpConnection = new AsyncHttpURLConnection(MethodType.Post,_roomUrl,null,async (response, errorMessage) =>
             {
-                var httpClient = new HttpClient();
-
-                var content = new StringContent(_roomMessage);
-                try
+                if (errorMessage != null)
                 {
-                    var response = await httpClient.PostAsync(new Uri(_roomUrl), content);
-                    var message = await response.Content.ReadAsStringAsync();
-
-                    await RoomResponseParseAsync(message, callback);
+                    callback?.Invoke(null, errorMessage);
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    callback?.Invoke(null, ex.Message);
-                }
+                
+                await RoomResponseParseAsync(response, callback);
             });
+            httpConnection.Send();
         }
 
         private async Task RoomResponseParseAsync(string response, RoomParametersFetcherCallback callback)
@@ -180,8 +174,10 @@ namespace WebRTC.AppRTC
             }
         }
 
-        private static IceServer[] IceServersFromPCConfig(PcConfig pcConfig)
+        private static IceServer[] IceServersFromPCConfig(string json)
         {
+            var pcConfig = JsonConvert.DeserializeObject<PcConfig>(json);
+            
             var iceServers = new List<IceServer>();
 
 

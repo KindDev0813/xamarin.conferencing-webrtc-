@@ -45,7 +45,7 @@ namespace WebRTC.Droid.Demo
             _client.Connect(new AppRTCClient.RoomConnectionParameters
             {
                 RoomUrl = "https://appr.tc",
-                RoomId = "123654",
+                RoomId = "12365455",
                 IsLoopback = false
             });
         }

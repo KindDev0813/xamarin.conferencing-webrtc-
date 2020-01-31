@@ -63,7 +63,7 @@ namespace WebRTC.AppRTC
         public string PcConstraints { get; set; }
 
         [JsonProperty("pc_config")]
-        public PcConfig PcConfig { get; set; }
+        public string PcConfig { get; set; }
 
         [JsonProperty("wss_post_url")]
         public string WssPostUrl { get; set; }

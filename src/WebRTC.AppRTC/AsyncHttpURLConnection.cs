@@ -40,7 +40,7 @@ namespace WebRTC.AppRTC
         {
             _methodType = methodType;
             _url = new Uri(url);
-            _message = message;
+            _message = message ?? "";
             _callback = callback;
         }
 
@@ -56,33 +56,40 @@ namespace WebRTC.AppRTC
 
         private async Task SendHttpMessageAsync()
         {
-            _contentType = _contentType ?? "text/plain; charset=utf-8";
+            _contentType = _contentType ?? "text/plain";
             HttpResponseMessage responseMessage;
 
-            switch (_methodType)
+            try
             {
-                case MethodType.Post:
-                    var content = new StringContent(_message, Encoding.UTF8, _contentType);
-                    responseMessage = await HttpClient.PostAsync(_url, content);
-                    break;
-                case MethodType.Get:
-                    responseMessage = await HttpClient.GetAsync(_url);
-                    break;
-                case MethodType.Delete:
-                    responseMessage = await HttpClient.DeleteAsync(_url);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                switch (_methodType)
+                {
+                    case MethodType.Post:
+                        var content = new StringContent(_message, Encoding.UTF8, _contentType);
+                        responseMessage = await HttpClient.PostAsync(_url, content);
+                        break;
+                    case MethodType.Get:
+                        responseMessage = await HttpClient.GetAsync(_url);
+                        break;
+                    case MethodType.Delete:
+                        responseMessage = await HttpClient.DeleteAsync(_url);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
 
-            if (!responseMessage.IsSuccessStatusCode)
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    _callback?.Invoke(null, $"Non-200 response to {_methodType} to URL: {_url}");
+                    return;
+                }
+
+                var responseContent = await responseMessage.Content.ReadAsStringAsync();
+                _callback?.Invoke(responseContent, null);
+            }
+            catch (Exception ex)
             {
-                _callback?.Invoke(null, $"Non-200 response to {_methodType} to URL: {_url}");
-                return;
+                _callback?.Invoke(null,$"HTTP {_methodType} to {_url} error: {ex.Message}");
             }
-
-            var responseContent = await responseMessage.Content.ReadAsStringAsync();
-            _callback?.Invoke(responseContent, null);
         }
     }
 }
