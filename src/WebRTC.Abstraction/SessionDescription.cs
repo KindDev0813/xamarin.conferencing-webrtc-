@@ -1,3 +1,4 @@
+using System;
 using Newtonsoft.Json;
 
 namespace WebRTC.Abstraction
@@ -16,5 +17,18 @@ namespace WebRTC.Abstraction
 
         [JsonProperty("sdp")] 
         public string Sdp { get; }
+
+        public static SdpType GetSdpTypeFromString(string sdp)
+        {
+            switch (sdp)
+            {
+                case "offer":
+                    return SdpType.Offer;
+                case "answer":
+                    return SdpType.Answer;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sdp));
+            }
+        }
     }
 }

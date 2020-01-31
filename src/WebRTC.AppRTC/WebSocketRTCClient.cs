@@ -11,9 +11,9 @@ namespace WebRTC.AppRTC
         Error
     }
 
-    public class WebSocketRTCClient : IAppRTCCClient, IWebSocketChannelEvents
+    public class H113RTCClient : IAppRTCCClient, IWebSocketChannelEvents
     {
-        private const string TAG = nameof(WebSocketRTCClient);
+        private const string TAG = nameof(H113RTCClient);
 
         private readonly ISignalingEvents _signalingEvents;
         private readonly IExecutorService _executor;
@@ -24,10 +24,10 @@ namespace WebRTC.AppRTC
         private ConnectionParameters _connectionParameters;
         private string _socketId;
         
-        public WebSocketRTCClient(ISignalingEvents signalingEvents, ILogger logger = null)
+        public H113RTCClient(ISignalingEvents signalingEvents, ILogger logger = null)
         {
             _signalingEvents = signalingEvents;
-            _executor = ExecutorServiceFactory.CreateExecutorService(nameof(WebSocketRTCClient));
+            _executor = ExecutorServiceFactory.CreateExecutorService(nameof(H113RTCClient));
             _logger = logger ?? new ConsoleLogger();
             State = ConnectionState.New;
         }
@@ -35,9 +35,9 @@ namespace WebRTC.AppRTC
 
         public ConnectionState State { get; private set; }
 
-        public void Connect(ConnectionParameters connectionParameters)
+        public void Connect(IConnectionParameters connectionParameters)
         {
-            _connectionParameters = connectionParameters;
+            _connectionParameters = (ConnectionParameters) connectionParameters;
 
             _executor.Execute(ConnectInternal);
         }
@@ -65,7 +65,12 @@ namespace WebRTC.AppRTC
                 _wsClient.Send(offerMessage.ToJson());
             });
         }
-        
+
+        public void SendAnswerSdp(SessionDescription sdp)
+        {
+            throw new NotImplementedException();
+        }
+
         public void SendLocalIceCandidate(IceCandidate candidate)
         {
             _executor.Execute(() =>

@@ -103,7 +103,7 @@ namespace WebRTC.AppRTC
         [JsonProperty("latitude")] public double Latitude { get; }
     }
 
-    public class RegisteredMessage : SignalingMessage
+    public class RegisteredMessage : SignalingMessage,ISignalingParameters
     {
         public RegisteredMessage()
         {
