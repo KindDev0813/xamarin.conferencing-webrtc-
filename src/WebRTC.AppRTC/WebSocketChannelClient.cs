@@ -1,243 +1,125 @@
-using System;
 using System.Collections.Generic;
-using System.Threading;
+using Newtonsoft.Json;
+using WebRTC.AppRTC.Abstraction;
 
 namespace WebRTC.AppRTC
 {
-    public enum WebSocketConnectionState
-    {
-        New,
-        Connected,
-        Registered,
-        Closed,
-        Error
-    }
-
-    public interface IWebSocketChannelEvents
-    {
-        void OnWebSocketClose();
-        void OnWebSocketMessage(string message);
-        void OnWebSocketError(string description);
-    }
-
-    public class WebSocketChannelClient
+    public class WebSocketChannelClient : WebSocketChannelClientBase
     {
         private const string TAG = nameof(WebSocketChannelClient);
+        
+        private string _postServerUrl;
 
-        private const int CloseTimeout = 1000;
-
-
-        private readonly IExecutor _executor;
-        private readonly IWebSocketChannelEvents _events;
-
-        private ManualResetEvent _mre;
-        private string _wsUrl;
-
-        private string _registerMessage;
-
-        public WebSocketChannelClient(IExecutor executor, IWebSocketChannelEvents events, ILogger logger = null)
+        private string _roomId;
+        private string _clientId;
+            
+            
+        public WebSocketChannelClient(IExecutor executor, IWebSocketChannelEvents events, ILogger logger = null) : base(executor, events, logger)
         {
-            _executor = executor;
-            _events = events;
-            WebSocketConnection = WebSocketConnectionFactory.CreateWebSocketConnection();
-            Logger = logger ?? new ConsoleLogger();
-
-            State = WebSocketConnectionState.New;
         }
 
-        protected ILogger Logger { get; }
-
-        protected IWebSocketConnection WebSocketConnection { get; }
-
-        protected readonly List<string> WsSendQueue = new List<string>();
-
-        public WebSocketConnectionState State { get; protected set; }
-
-        public virtual void Connect(string wsUrl, string protocol)
+        public override void Connect(string wsUrl, string postUrl)
         {
-            CheckIfCalledOnValidThread();
-            WireEvents();
-
-            _wsUrl = wsUrl;
-            Logger.Debug(TAG, $"Connecting WebSocket to:{wsUrl}. Protocol :{protocol}");
-            WebSocketConnection.Open(wsUrl, protocol);
+            base.Connect(wsUrl,null);
+            _postServerUrl = postUrl;
         }
-
-        public void Disconnect(bool waitForComplete)
+            
+        public void Register(string roomId, string clientId)
         {
             CheckIfCalledOnValidThread();
-            Logger.Debug(TAG, $"Disconnect WebSocket. State: {State}");
-            if (State == WebSocketConnectionState.Registered)
-            {
-                // Send "bye" to WebSocket server.
-                State = WebSocketConnectionState.Connected;
-                SendByeMessage();
-            }
+            _roomId = roomId;
+            _clientId = clientId;
 
-            if (State == WebSocketConnectionState.Connected || State == WebSocketConnectionState.Error)
-            {
-                if (waitForComplete)
-                    _mre = new ManualResetEvent(false);
-                WebSocketConnection.Close();
-                State = WebSocketConnectionState.Closed;
-
-                if (waitForComplete)
-                {
-                    try
-                    {
-                        _mre.WaitOne(CloseTimeout);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(TAG, $"Wait error:{ex}");
-                    }
-                }
-            }
-
-            UnWireEvents();
-
-            Logger.Debug(TAG, "Disconnecting WebSocket done.");
-        }
-
-        public virtual void Send(string message)
-        {
-            CheckIfCalledOnValidThread();
-            switch (State)
-            {
-                case WebSocketConnectionState.New:
-                case WebSocketConnectionState.Connected:
-                    Logger.Debug(TAG, $"WS ACC: {message}");
-                    WsSendQueue.Add(message);
-                    break;
-                case WebSocketConnectionState.Closed:
-                case WebSocketConnectionState.Error:
-                    Logger.Error(TAG, $"WebSocket send() in error or closed state: {message}");
-                    break;
-                case WebSocketConnectionState.Registered:
-                    message = GetRegisterMessage(message);
-                    Logger.Debug(TAG, $"C->WSS: {message}");
-                    WebSocketConnection.Send(message);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public void Register(string message)
-        {
-            CheckIfCalledOnValidThread();
-            _registerMessage = message;
             if (State != WebSocketConnectionState.Connected)
             {
-                Logger.Warning(TAG, $"WebSocket register() in state {State}");
+                Logger.Debug(TAG,$"WebSocket register() in state {State}");
                 return;
             }
+                
+            var registerMessage = new
+            {
+                cmd = "register",
+                roomid = roomId,
+                clientid = clientId
+            };
 
-            Logger.Debug(TAG, $"C->WSS: {message}");
-
-            Send(message);
-
+            var json = JsonConvert.SerializeObject(registerMessage);
+                
+                
+            Logger.Debug(TAG,$"C->WSS: {json}");
+                
+            WebSocketConnection.Send(json);
+                
             State = WebSocketConnectionState.Registered;
 
             foreach (var sendMessage in WsSendQueue)
             {
                 Send(sendMessage);
             }
-
+                
             WsSendQueue.Clear();
-            _registerMessage = null;
         }
 
-        protected virtual string GetRegisterMessage(string message) => message;
-       
-
-        protected virtual void SendByeMessage()
+        protected override string GetRegisterMessage(string message)
         {
-        }
-
-        protected virtual void OnConnectionOpen()
-        {
-            if (_registerMessage != null)
-                Register(_registerMessage);
-        }
-
-
-        protected virtual void OnMessageReceived(string message)
-        {
-            _events.OnWebSocketMessage(message);
-        }
-
-
-        protected void CheckIfCalledOnValidThread()
-        {
-            if (!_executor.IsCurrentExecutor)
-                throw new InvalidOperationException("WebSocket method is not called on valid executor.");
-        }
-
-        protected void ReportError(string errorMessage)
-        {
-            Logger.Error(TAG, errorMessage);
-            _executor.Execute(() =>
+            return JsonConvert.SerializeObject(new
             {
-                if (State == WebSocketConnectionState.Error)
+                cmd = "send",
+                msg = message
+            });
+        }
+
+        protected override void SendByeMessage()
+        {
+            Send(ARDSignalingMessage.CreateByeJson());
+            SendWSSMessage(MethodType.Delete,"");
+        }
+
+        protected override void OnConnectionOpen()
+        {
+            if (_clientId != null && _roomId != null)
+            {
+                Register(_roomId,_clientId);
+            }
+        }
+
+        protected override void OnMessageReceived(string message)
+        {
+
+            var webSocketMessage = JsonConvert.DeserializeObject<Dictionary<string,string>>(message);
+
+            if (webSocketMessage.ContainsKey("error"))
+            {
+                var error = webSocketMessage["error"];
+                if (!string.IsNullOrEmpty(error))
+                {
+                    ReportError($"WebSocket error message: {error}");
                     return;
-                State = WebSocketConnectionState.Error;
-                _events.OnWebSocketError(errorMessage);
-            });
-        }
+                }
+            }
 
-        private void WireEvents()
-        {
-            WebSocketConnection.OnOpened += WebSocketConnectionOnOnOpened;
-            WebSocketConnection.OnClosed += WebSocketConnectionOnOnClosed;
-            WebSocketConnection.OnError += WebSocketConnectionOnOnError;
-            WebSocketConnection.OnMessage += WebSocketConnectionOnOnMessage;
-        }
-
-        private void UnWireEvents()
-        {
-            WebSocketConnection.OnOpened -= WebSocketConnectionOnOnOpened;
-            WebSocketConnection.OnClosed -= WebSocketConnectionOnOnClosed;
-            WebSocketConnection.OnError -= WebSocketConnectionOnOnError;
-            WebSocketConnection.OnMessage -= WebSocketConnectionOnOnMessage;
-        }
-
-        private void WebSocketConnectionOnOnOpened(object sender, EventArgs e)
-        {
-            Logger.Debug(TAG, $"WebSocket connection opened to:{_wsUrl}");
-            _executor.Execute(() =>
+            if (!webSocketMessage.TryGetValue("msg", out string msg) || string.IsNullOrEmpty(msg))
             {
-                State = WebSocketConnectionState.Connected;
-                OnConnectionOpen();
-            });
+                ReportError($"Unexpected WebSocket message: {message}");
+                return;
+            }
+                
+                
+            base.OnMessageReceived(msg);
         }
 
-        private void WebSocketConnectionOnOnMessage(object sender, string e)
+        private void SendWSSMessage(MethodType method, string message)
         {
-            Logger.Debug(TAG, $"WSS->C: {e}");
-            _executor.Execute(() =>
+            var postUrl = $"{_postServerUrl}/{_roomId}/{_clientId}";
+            Logger.Debug(TAG,$"WS {method} : {postUrl} : {message}");
+                
+            var httpConnection = new AsyncHttpURLConnection(method,postUrl,message,(response, errorMessage) =>
             {
-                if (State == WebSocketConnectionState.Connected || State == WebSocketConnectionState.Registered)
-                    OnMessageReceived(e);
+                if(errorMessage != null)
+                    ReportError($"WS {method} error: {errorMessage}");
             });
-        }
-
-        private void WebSocketConnectionOnOnError(object sender, Exception e)
-        {
-            ReportError(e.Message);
-        }
-
-        private void WebSocketConnectionOnOnClosed(object sender, (int code, string reason) e)
-        {
-            Logger.Debug(TAG, $"WebSocket connection closed. Code: {e.code}. Reason: {e.reason}. State: {State}");
-            _mre.Set();
-            _executor.Execute(() =>
-            {
-                if (State == WebSocketConnectionState.Closed)
-                    return;
-                State = WebSocketConnectionState.Closed;
-                _events.OnWebSocketClose();
-            });
+                
+            httpConnection.Send();
         }
     }
 }

@@ -1,0 +1,29 @@
+﻿<metadata>
+  <!--
+  This sample removes the class: android.support.v4.content.AsyncTaskLoader.LoadTask:
+  <remove-node path="/api/package[@name='android.support.v4.content']/class[@name='AsyncTaskLoader.LoadTask']" />
+  
+  This sample removes the method: android.support.v4.content.CursorLoader.loadInBackground:
+  <remove-node path="/api/package[@name='android.support.v4.content']/class[@name='CursorLoader']/method[@name='loadInBackground']" />
+  -->
+      <attr path="/api/package[@name='io.crossbar.autobahn.wamp.messages']/class[@name='Error']/field[@name='error']"
+          name="managedName">Value
+    </attr>
+     <attr  path="/api/package[@name='io.crossbar.autobahn.wamp.types']/class[@name='Publication']/field[@name='publication']"
+          name="managedName">Value
+    </attr>
+     <attr path="/api/package[@name='io.crossbar.autobahn.wamp.types']/class[@name='Registration']/field[@name='registration']"
+          name="managedName">Value
+    </attr>
+     <attr  path="/api/package[@name='io.crossbar.autobahn.wamp.types']/class[@name='Subscription']/field[@name='subscription']"
+          name="managedName">Value
+    </attr>
+    
+    <attr path="/api/package[@name='io.crossbar.autobahn.wamp.requests']/class[@name='Request']/field[@name='request']"
+          name="managedName">Value
+    </attr>
+    
+     <remove-node path="/api/package[@name='io.crossbar.autobahn.wamp.reflectionRoles']/class[@name='MethodEventHandler']" />
+ 
+    
+</metadata>

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Foundation;
 using WebRTC.Abstraction;
+using WebRTC.Abstraction.Extensions;
 using WebRTC.iOS.Extensions;
 using WebRTC.iOS.Binding;
 

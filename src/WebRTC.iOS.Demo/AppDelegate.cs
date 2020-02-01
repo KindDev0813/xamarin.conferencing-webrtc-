@@ -12,6 +12,8 @@ namespace WebRTC.iOS.Demo
         [Export("window")]
         public UIWindow Window { get; set; }
 
+        public static UIEdgeInsets SafeAreaInsets => UIApplication.SharedApplication.KeyWindow.SafeAreaInsets;
+
         [Export("application:didFinishLaunchingWithOptions:")]
         public bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
@@ -37,6 +39,12 @@ namespace WebRTC.iOS.Demo
             // Called when the user discards a scene session.
             // If any sessions were discarded while the application was not running, this will be called shortly after `FinishedLaunching`.
             // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+        }
+
+        [Export("applicationWillTerminate:")]
+        public void WillTerminate(UIApplication application)
+        {
+            H113Platform.Cleanup();
         }
     }
 }

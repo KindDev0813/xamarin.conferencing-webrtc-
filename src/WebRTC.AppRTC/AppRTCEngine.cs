@@ -1,30 +1,33 @@
+using WebRTC.AppRTC.Abstraction;
+
 namespace WebRTC.AppRTC
 {
-    public class AppRTCEngine : AppRTCEngineBase, AppRTCClient.ISignalingEventsEx
+    public class AppRTCEngine : AppRTCEngineBase
     {
         public AppRTCEngine(IAppRTCEngineEvents events, ILogger logger = null) : base(events, logger)
         {
         }
 
-        public override IAppRTCCClient CreateClient() => new AppRTCClient(this, Logger);
+        protected override IAppRTCCClient CreateClient() => new AppRTCClient(this, Logger);
 
 
-        public override PeerConnectionParameters CreatePeerConnectionParameters(
+        protected override PeerConnectionParameters CreatePeerConnectionParameters(
             ISignalingParameters signalingParameters)
         {
-            var signalingParam = (AppRTCClient.SignalingParameters) signalingParameters;
+            var signalingParam = (SignalingParameters) signalingParameters;
             return new PeerConnectionParameters(signalingParam.IceServers)
             {
                 VideoCallEnabled = true
             };
         }
 
-        public void OnConnectedToRoom(AppRTCClient.SignalingParameters signalingParameters)
+        protected override void OnChannelConnectedInternal(ISignalingParameters signalingParameters)
         {
-            Executor.Execute(() => OnConnectedToRoomInternal(signalingParameters));
+            OnConnectedToRoomInternal((SignalingParameters) signalingParameters);
         }
 
-        private void OnConnectedToRoomInternal(AppRTCClient.SignalingParameters signalingParameters)
+
+        private void OnConnectedToRoomInternal(SignalingParameters signalingParameters)
         {
             if (signalingParameters.IsInitiator)
             {

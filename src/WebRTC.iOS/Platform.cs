@@ -22,6 +22,11 @@ namespace WebRTC.iOS
             RTCSSLAdapter.RTCInitializeSSL();
             Abstraction.NativeFactory.Init(new NativeFactory());
         }
-        
+
+        public static void Cleanup()
+        {
+            RTCTracking.RTCShutdownInternalTracer();
+            RTCSSLAdapter.RTCCleanupSSL();
+        }
     }
 }

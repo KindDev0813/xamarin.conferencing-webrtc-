@@ -1,3 +1,6 @@
+using System.Security;
+using System.Text;
+
 namespace WebRTC.Abstraction
 {
     public class IceServer
@@ -23,7 +26,19 @@ namespace WebRTC.Abstraction
 
         public override string ToString()
         {
-            return $"{Urls} [{Username}:{Password}] [{TlsCertPolicy}]";
+            var sb = new StringBuilder();
+            sb.Append("[");
+            foreach (var url in Urls)
+            {
+                sb.Append(url).Append(", ");
+            }
+
+            sb.Remove(sb.Length - 2, 2);
+            sb.Append("] ");
+            if (!string.IsNullOrEmpty(Username))
+                sb.Append("[").Append(Username).Append(":").Append("] ");
+            sb.Append("[").Append(TlsCertPolicy).Append("]");
+            return sb.ToString();
         }
     }
 }

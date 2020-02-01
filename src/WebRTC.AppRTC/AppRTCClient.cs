@@ -1,22 +1,28 @@
 using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using WebRTC.Abstraction;
+using WebRTC.AppRTC.Abstraction;
 
 namespace WebRTC.AppRTC
 {
     public class AppRTCClient : IAppRTCCClient, IWebSocketChannelEvents
     {
+        private enum MessageType
+        {
+            Message,
+            Leave
+        }
+
         private const string TAG = nameof(AppRTCClient);
         private const string ROOM_JOIN = "join";
         private const string ROOM_MESSAGE = "message";
         private const string ROOM_LEAVE = "leave";
 
-        private readonly ISignalingEventsEx _signalingEvents;
+        private readonly ISignalingEvents _signalingEvents;
         private readonly IExecutorService _executor;
         private readonly ILogger _logger;
 
-        private WebSocketChannelClientEx _wsClient;
+        private WebSocketChannelClient _wsClient;
 
         private RoomConnectionParameters _connectionParameters;
 
@@ -25,7 +31,7 @@ namespace WebRTC.AppRTC
         private string _leaveUrl;
 
 
-        public AppRTCClient(ISignalingEventsEx signalingEvents, ILogger logger = null)
+        public AppRTCClient(ISignalingEvents signalingEvents, ILogger logger = null)
         {
             _signalingEvents = signalingEvents;
             _executor = ExecutorServiceFactory.CreateExecutorService(nameof(AppRTCClient));
@@ -208,7 +214,7 @@ namespace WebRTC.AppRTC
             _logger.Debug(TAG, $"Connect to room: {connectionUrl}");
 
             State = ConnectionState.New;
-            _wsClient = new WebSocketChannelClientEx(_executor,this,_logger);
+            _wsClient = new WebSocketChannelClient(_executor,this,_logger);
             
             var roomParametersFetcher = new RoomParametersFetcher(connectionUrl,null,_logger);
             roomParametersFetcher.MakeRequest((parameters, description) =>
@@ -302,7 +308,7 @@ namespace WebRTC.AppRTC
 
             State = ConnectionState.Connected;
             
-            _signalingEvents.OnConnectedToRoom(signalingParameters);
+            _signalingEvents.OnChannelConnected(signalingParameters);
 
             _wsClient.Connect(signalingParameters.WssUrl, signalingParameters.WssPostUrl);
             _wsClient.Register(_connectionParameters.RoomId, signalingParameters.ClientId);
@@ -343,155 +349,6 @@ namespace WebRTC.AppRTC
         private static string GetQueryString(RoomConnectionParameters roomConnectionParameters)
         {
             return roomConnectionParameters.UrlParameters != null ? $"?{roomConnectionParameters.UrlParameters}" : "";
-        }
-        
-
-        private enum MessageType
-        {
-            Message,
-            Leave
-        }
-
-        public interface ISignalingEventsEx : ISignalingEvents
-        {
-            void OnConnectedToRoom(SignalingParameters signalingParameters);
-        }
-
-        public class RoomConnectionParameters : IConnectionParameters
-        {
-            public string RoomUrl { get; set; }
-            public string RoomId { get; set; }
-            
-            public bool IsLoopback { get; set; }
-            public string UrlParameters { get; set; }
-        }
-
-        public class SignalingParameters:ISignalingParameters
-        {
-            public IceServer[] IceServers { get; set; }
-            public bool IsInitiator { get; set; }
-            public string ClientId { get; set; }
-            public string WssUrl { get; set; }
-            public string WssPostUrl { get; set; }
-            public SessionDescription OfferSdp { get; set; }
-            public IceCandidate[] IceCandidates { get; set; }
-        }
-
-        private class WebSocketChannelClientEx : WebSocketChannelClient
-        {
-            private string _postServerUrl;
-
-            private string _roomId;
-            private string _clientId;
-            
-            
-            public WebSocketChannelClientEx(IExecutor executor, IWebSocketChannelEvents events, ILogger logger = null) : base(executor, events, logger)
-            {
-            }
-
-            public override void Connect(string wsUrl, string postUrl)
-            {
-                base.Connect(wsUrl,null);
-                _postServerUrl = postUrl;
-            }
-            
-            public void Register(string roomId, string clientId)
-            {
-                CheckIfCalledOnValidThread();
-                _roomId = roomId;
-                _clientId = clientId;
-
-                if (State != WebSocketConnectionState.Connected)
-                {
-                    Logger.Debug(TAG,$"WebSocket register() in state {State}");
-                    return;
-                }
-                
-                var registerMessage = new
-                {
-                    cmd = "register",
-                    roomid = roomId,
-                    clientid = clientId
-                };
-
-                var json = JsonConvert.SerializeObject(registerMessage);
-                
-                
-                Logger.Debug(TAG,$"C->WSS: {json}");
-                
-                WebSocketConnection.Send(json);
-                
-                State = WebSocketConnectionState.Registered;
-
-                foreach (var sendMessage in WsSendQueue)
-                {
-                    Send(sendMessage);
-                }
-                
-                WsSendQueue.Clear();
-            }
-
-            protected override string GetRegisterMessage(string message)
-            {
-                 return JsonConvert.SerializeObject(new
-                {
-                    cmd = "send",
-                    msg = message
-                });
-            }
-
-            protected override void SendByeMessage()
-            {
-                Send(ARDSignalingMessage.CreateByeJson());
-                SendWSSMessage(MethodType.Delete,"");
-            }
-
-            protected override void OnConnectionOpen()
-            {
-                if (_clientId != null && _roomId != null)
-                {
-                    Register(_roomId,_clientId);
-                }
-            }
-
-            protected override void OnMessageReceived(string message)
-            {
-
-                var webSocketMessage = JsonConvert.DeserializeObject<Dictionary<string,string>>(message);
-
-                if (webSocketMessage.ContainsKey("error"))
-                {
-                    var error = webSocketMessage["error"];
-                    if (!string.IsNullOrEmpty(error))
-                    {
-                        ReportError($"WebSocket error message: {error}");
-                        return;
-                    }
-                }
-
-                if (!webSocketMessage.TryGetValue("msg", out string msg) || string.IsNullOrEmpty(msg))
-                {
-                    ReportError($"Unexpected WebSocket message: {message}");
-                    return;
-                }
-                
-                
-                base.OnMessageReceived(msg);
-            }
-
-            private void SendWSSMessage(MethodType method, string message)
-            {
-                var postUrl = $"{_postServerUrl}/{_roomId}/{_clientId}";
-                Logger.Debug(TAG,$"WS {method} : {postUrl} : {message}");
-                
-                var httpConnection = new AsyncHttpURLConnection(method,postUrl,message,(response, errorMessage) =>
-                {
-                    if(errorMessage != null)
-                        ReportError($"WS {method} error: {errorMessage}");
-                });
-                
-                httpConnection.Send();
-            }
         }
     }
 }

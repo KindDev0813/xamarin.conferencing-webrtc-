@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WebRTC.Abstraction;
+using WebRTC.AppRTC.Abstraction;
 
 namespace WebRTC.AppRTC
 {
@@ -24,7 +25,7 @@ namespace WebRTC.AppRTC
             _logger = logger ?? new ConsoleLogger();
         }
 
-        public delegate void RoomParametersFetcherCallback(AppRTCClient.SignalingParameters signalingParameters,
+        public delegate void RoomParametersFetcherCallback(SignalingParameters signalingParameters,
             string errorDescription);
 
         public void MakeRequest(RoomParametersFetcherCallback callback)
@@ -134,7 +135,7 @@ namespace WebRTC.AppRTC
                     iceServers.AddRange(turnsServers.iceServers);
                 }
 
-                var signalingParameters = new AppRTCClient.SignalingParameters()
+                var signalingParameters = new SignalingParameters()
                 {
                     IceServers = iceServers.ToArray(),
                     IsInitiator = serverParams.IsInitiator,

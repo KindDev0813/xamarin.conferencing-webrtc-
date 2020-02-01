@@ -1,5 +1,3 @@
-using System;
-using WebRTC.Abstraction;
 using SessionDescription = Org.Webrtc.SessionDescription;
 
 namespace WebRTC.Droid.Extensions

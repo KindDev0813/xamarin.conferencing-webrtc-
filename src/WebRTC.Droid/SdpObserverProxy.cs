@@ -1,7 +1,6 @@
 using System;
-using Android.OS;
-using Org.Webrtc;
 using WebRTC.Abstraction;
+using Org.Webrtc;
 using WebRTC.Droid.Extensions;
 using SessionDescription = Org.Webrtc.SessionDescription;
 

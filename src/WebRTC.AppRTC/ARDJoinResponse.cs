@@ -75,7 +75,7 @@ namespace WebRTC.AppRTC
         public string[] WarningMessages { get; set; }
 
         [JsonProperty("room_id")]
-        public long RoomId { get; set; }
+        public string RoomId { get; set; }
     }
 
 

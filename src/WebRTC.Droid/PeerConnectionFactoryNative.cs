@@ -3,9 +3,10 @@ using Android.Content;
 using Android.OS;
 using Android.Util;
 using Java.IO;
+using WebRTC.Abstraction;
+using WebRTC.Abstraction.Extensions;
 using Org.Webrtc;
 using Org.Webrtc.Audio;
-using WebRTC.Abstraction;
 using WebRTC.Droid.Extensions;
 using ICameraVideoCapturer = WebRTC.Abstraction.ICameraVideoCapturer;
 using MediaConstraints = WebRTC.Abstraction.MediaConstraints;
@@ -54,7 +55,8 @@ namespace WebRTC.Droid
         public IPeerConnection CreatePeerConnection(RTCConfiguration configuration,
             IPeerConnectionListener peerConnectionListener)
         {
-            var peerConnection = _factory.CreatePeerConnection(configuration.ToNative(),
+            var nativeConfiguration = configuration.ToNative();
+            var peerConnection = _factory.CreatePeerConnection(nativeConfiguration,
                 new PeerConnectionListenerProxy(peerConnectionListener));
             if (peerConnection == null)
                 return null;

@@ -1,7 +1,6 @@
 using System.Linq;
-using Android.OS;
-using Org.Webrtc;
 using WebRTC.Abstraction;
+using Org.Webrtc;
 using WebRTC.Droid.Extensions;
 using DataChannel = Org.Webrtc.DataChannel;
 using IceCandidate = Org.Webrtc.IceCandidate;

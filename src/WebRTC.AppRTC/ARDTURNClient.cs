@@ -13,34 +13,27 @@ namespace WebRTC.AppRTC
 
         private readonly HttpClient _httpClient = new HttpClient();
 
-        private readonly string _url;
+        private readonly Uri _url;
 
         public ARDTURNClient(string url)
         {
-            _url = url;
+            _url = new Uri(url);
+            
+            _httpClient.DefaultRequestHeaders.Referrer = new Uri(TURNRefererURLString);
         }
 
         public async Task<IceServer[]> RequestServersAsync()
         {
-            var response = await _httpClient.GetAsync(_url).ConfigureAwait(false);
+            var response = await _httpClient.PostAsync(_url,new StringContent("")).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var serverParams = JsonConvert.DeserializeObject<ServerParams>(json);
 
-            var turnResponse = await MakeTurnServerRequestToUrlAsync(serverParams.IceServerUrl).ConfigureAwait(false);
-
+            var turnResponse = JsonConvert.DeserializeObject<ARDTurnResponse>(json);
+            
             var array = turnResponse.IceServers
                 .Select(iceServer => new IceServer(iceServer.Urls, iceServer.Username, iceServer.Credential)).ToArray();
 
             return array;
-        }
-
-        private async Task<ARDTurnResponse> MakeTurnServerRequestToUrlAsync(string iceServer)
-        {
-            _httpClient.DefaultRequestHeaders.Referrer = new Uri(TURNRefererURLString);
-            var response = await _httpClient.PostAsync(iceServer, null).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<ARDTurnResponse>(json);
         }
     }
 }

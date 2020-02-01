@@ -1,7 +1,4 @@
-using System.Runtime.CompilerServices;
-using WebRTC.Abstraction;
-
-namespace WebRTC
+namespace WebRTC.Abstraction.Extensions
 {
     public static class NativeObjectExtensions
     {

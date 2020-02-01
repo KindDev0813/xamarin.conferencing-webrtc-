@@ -1,6 +1,6 @@
 using Android.Content;
-using Org.Webrtc;
 using WebRTC.Abstraction;
+using Org.Webrtc;
 using IVideoCapturer = WebRTC.Abstraction.IVideoCapturer;
 
 namespace WebRTC.Droid

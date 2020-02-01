@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Linq;
-using Org.Webrtc;
 using WebRTC.Abstraction;
-using WebRTC.Droid.Extensions;
+using WebRTC.Abstraction.Extensions;
+using Org.Webrtc;
 
 namespace WebRTC.Droid
 {

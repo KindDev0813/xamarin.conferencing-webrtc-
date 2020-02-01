@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Org.Webrtc;
 using WebRTC.Abstraction;
+using Org.Webrtc;
 
 namespace WebRTC.Droid.Extensions
 {
@@ -9,13 +9,16 @@ namespace WebRTC.Droid.Extensions
     {
         public static PeerConnection.IceServer ToNative(this IceServer self)
         {
-            return PeerConnection.IceServer.InvokeBuilder(self.Urls)
-                .SetUsername(self.Username)
-                .SetPassword(self.Password)
-                .SetTlsCertPolicy(self.TlsCertPolicy.ToNative())
-                .CreateIceServer();
+            var builder = PeerConnection.IceServer.InvokeBuilder(self.Urls)
+                .SetTlsCertPolicy(self.TlsCertPolicy.ToNative());
+
+            if (!string.IsNullOrEmpty(self.Username))
+                builder.SetUsername(self.Username)
+                    .SetPassword(self.Password);
+
+            return builder.CreateIceServer();
         }
-        
+
         public static IEnumerable<PeerConnection.IceServer> ToNative(this IEnumerable<IceServer> self)
         {
             return self.Select(ToNative);

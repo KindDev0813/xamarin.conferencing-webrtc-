@@ -4,7 +4,7 @@ using CoreFoundation;
 using Foundation;
 using ObjCRuntime;
 using Square.SocketRocket;
-using WebRTC.AppRTC;
+using WebRTC.AppRTC.Abstraction;
 
 namespace WebRTC.iOS.Demo
 {
@@ -19,6 +19,11 @@ namespace WebRTC.iOS.Demo
             ExecutorServiceFactory.MainExecutor = new MainExecutor();
 
             ExecutorServiceFactory.Factory = (tag) => new ExecutorService(tag);
+        }
+
+        public static void Cleanup()
+        {
+            Platform.Cleanup();
         }
 
 

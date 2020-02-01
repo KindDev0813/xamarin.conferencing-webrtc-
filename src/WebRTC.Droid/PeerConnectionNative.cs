@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Android.OS;
-using Android.Util;
 using Java.IO;
 using Java.Lang;
-using Org.Webrtc;
 using WebRTC.Abstraction;
+using WebRTC.Abstraction.Extensions;
+using Org.Webrtc;
 using WebRTC.Droid.Extensions;
 using Exception = System.Exception;
 using IceCandidate = WebRTC.Abstraction.IceCandidate;

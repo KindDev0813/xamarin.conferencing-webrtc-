@@ -16,7 +16,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="AZz-Yl-yvJ" kind="relationship" relationship="rootViewController" id="Hns-dV-tj9"/>
+                        <segue destination="jFg-cG-7Zm" kind="relationship" relationship="rootViewController" id="o6N-cK-uuh"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Su2-2P-j5B" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -55,10 +55,10 @@
                                 </subviews>
                             </stackView>
                             <view hidden="YES" alpha="0.80000000000000004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fzh-sf-99G">
-                                <rect key="frame" x="0.0" y="88" width="414" height="808"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="852"/>
                                 <subviews>
                                     <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="IgT-sn-ZXB">
-                                        <rect key="frame" x="188.5" y="385.5" width="37" height="37"/>
+                                        <rect key="frame" x="188.5" y="407.5" width="37" height="37"/>
                                     </activityIndicatorView>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
@@ -89,25 +89,51 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IPE-gr-FKU" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="524.63768115942037" y="127.90178571428571"/>
+            <point key="canvasLocation" x="1384" y="135"/>
         </scene>
-        <!--Video Call View Controller-->
-        <scene sceneID="iZn-hp-ybV">
+        <!--Main View Controller-->
+        <scene sceneID="juL-9T-TcX">
             <objects>
-                <viewController storyboardIdentifier="VideoCallViewController" id="H9F-xo-kzU" customClass="VideoCallViewController" sceneMemberID="viewController">
+                <viewController id="jFg-cG-7Zm" customClass="MainViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="DTr-r5-aY1"/>
-                        <viewControllerLayoutGuide type="bottom" id="Qfq-dN-afU"/>
+                        <viewControllerLayoutGuide type="top" id="GY2-ai-lxX"/>
+                        <viewControllerLayoutGuide type="bottom" id="VuH-u7-q0b"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Z1h-PE-91w">
+                    <view key="view" contentMode="scaleToFill" id="cC4-zb-rKR">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="24" translatesAutoresizingMaskIntoConstraints="NO" id="iuc-Jn-73R">
+                                <rect key="frame" x="40" y="417" width="334" height="62"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="749" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c3l-gY-A4q">
+                                        <rect key="frame" x="0.0" y="0.0" width="334" height="19"/>
+                                        <state key="normal" title="AppRTC"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rqd-4N-vGf">
+                                        <rect key="frame" x="0.0" y="43" width="334" height="19"/>
+                                        <state key="normal" title="H113"/>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="iuc-Jn-73R" firstAttribute="leading" secondItem="cC4-zb-rKR" secondAttribute="leading" constant="40" id="E3v-lj-IHI"/>
+                            <constraint firstItem="iuc-Jn-73R" firstAttribute="centerX" secondItem="cC4-zb-rKR" secondAttribute="centerX" id="Pmw-wZ-MJZ"/>
+                            <constraint firstItem="VuH-u7-q0b" firstAttribute="top" secondItem="iuc-Jn-73R" secondAttribute="bottom" constant="383" id="c9b-0y-ASO"/>
+                            <constraint firstItem="iuc-Jn-73R" firstAttribute="centerY" secondItem="cC4-zb-rKR" secondAttribute="centerY" id="fwG-ec-C3R"/>
+                        </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="3dC-FG-WpB"/>
+                    <connections>
+                        <outlet property="AppRTCButton" destination="c3l-gY-A4q" id="acX-x2-A56"/>
+                        <outlet property="H113Button" destination="Rqd-4N-vGf" id="I2a-gf-0Vy"/>
+                    </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="yph-bA-rq1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="y9m-wR-88Q" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1503" y="129"/>
+            <point key="canvasLocation" x="491" y="129"/>
         </scene>
     </scenes>
 </document>
