@@ -6,20 +6,19 @@ namespace WebRTC.H113
 {
     
 
-    public class H113RTCClient : IAppRTCCClient, IWebSocketChannelEvents
+    public class H113RTCClient : IAppRTCCClient<ConnectionParameters>, IWebSocketChannelEvents
     {
         private const string TAG = nameof(H113RTCClient);
 
-        private readonly ISignalingEvents _signalingEvents;
+        private readonly ISignalingEvents<RegisteredMessage> _signalingEvents;
         private readonly IExecutorService _executor;
         private readonly ILogger _logger;
 
         private H113WebSocketClient _wsClient;
 
         private ConnectionParameters _connectionParameters;
-        private string _socketId;
         
-        public H113RTCClient(ISignalingEvents signalingEvents, ILogger logger = null)
+        public H113RTCClient(ISignalingEvents<RegisteredMessage> signalingEvents, ILogger logger = null)
         {
             _signalingEvents = signalingEvents;
             _executor = ExecutorServiceFactory.CreateExecutorService(nameof(H113RTCClient));
@@ -28,11 +27,13 @@ namespace WebRTC.H113
         }
 
 
+        private string _socketId;
+
         public ConnectionState State { get; private set; }
 
-        public void Connect(IConnectionParameters connectionParameters)
+        public void Connect(ConnectionParameters connectionParameters)
         {
-            _connectionParameters = (ConnectionParameters) connectionParameters;
+            _connectionParameters = connectionParameters;
 
             _executor.Execute(ConnectInternal);
         }

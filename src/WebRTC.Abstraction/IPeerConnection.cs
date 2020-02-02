@@ -3,6 +3,15 @@ using System;
 namespace WebRTC.Abstraction
 {
     public delegate void SdpCompletionHandler(SessionDescription sdp, Exception error);
+
+
+    public interface ISdpObserver
+    {
+        void OnCreateSuccess(SessionDescription sdp);
+        void OnSetSuccess();
+        void OnCreateFailure(string error);
+        void OnSetFailure(string error);
+    }
     
     public interface IPeerConnection :INativeObject, IDisposable
     {
@@ -48,13 +57,13 @@ namespace WebRTC.Abstraction
         IRtpTransceiver AddTransceiverOfType(RtpMediaType mediaType);
         IRtpTransceiver AddTransceiverOfType(RtpMediaType mediaType, IRtpTransceiverInit init);
         
-        void CreateOffer(MediaConstraints constraints,  SdpCompletionHandler completionHandler);
+        void CreateOffer(MediaConstraints constraints,  ISdpObserver observer);
         
-        void CreateAnswer(MediaConstraints constraints,  SdpCompletionHandler completionHandler);
+        void CreateAnswer(MediaConstraints constraints,  ISdpObserver observer);
         
-        void SetLocalDescription(SessionDescription sdp,  Action<Exception> completionHandler);
+        void SetLocalDescription(SessionDescription sdp,  ISdpObserver observer);
         
-        void SetRemoteDescription(SessionDescription sdp,  Action<Exception> completionHandler);
+        void SetRemoteDescription(SessionDescription sdp,  ISdpObserver observer);
 
         bool SetBitrate(int min, int current, int max);
         bool StartRtcEventLog(string file, int fileSizeLimitBytes);

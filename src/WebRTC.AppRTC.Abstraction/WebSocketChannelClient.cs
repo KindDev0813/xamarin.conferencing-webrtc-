@@ -1,4 +1,0 @@
-namespace WebRTC.AppRTC.Abstraction
-{
-    
-}

@@ -14,8 +14,10 @@ using IVideoCapturer = WebRTC.Abstraction.IVideoCapturer;
 
 namespace WebRTC.Droid.Demo
 {
-    public abstract class CallActivityBase<T> : BaseActivity, IAppRTCEngineEvents, CallFragment.IOnCallEvents
-        where T : AppRTCEngineBase
+    public abstract class CallActivityBase<TConnectionParam, TSignalParam,TController> : BaseActivity, IAppRTCEngineEvents, CallFragment.IOnCallEvents
+        where TSignalParam : ISignalingParameters
+        where TConnectionParam : IConnectionParameters
+        where TController : AppRTCControllerBase<TConnectionParam,TSignalParam>
     {
         private CallFragment _callFragment;
 
@@ -25,14 +27,14 @@ namespace WebRTC.Droid.Demo
         private VideoRendererProxy _localRenderer;
         private VideoRendererProxy _remoteRenderer;
 
-        private T _client;
+        private TController _client;
         private bool _isSwappedFeed;
         private bool _callControlFragmentVisible = true;
         private bool _micEnabled = true;
 
-        protected abstract T CreateEngine();
+        protected abstract TController CreateEngine();
 
-        protected abstract void Connect(T rtcEngine, Intent intent);
+        protected abstract void Connect(TController rtcEngine, Intent intent);
 
         protected abstract CallFragment CreateCallFragment(Intent intent);
 
@@ -95,6 +97,7 @@ namespace WebRTC.Droid.Demo
 
         public void OnDisconnect(DisconnectType disconnectType)
         {
+            Disconnect();
         }
 
         public IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource) =>
@@ -116,6 +119,8 @@ namespace WebRTC.Droid.Demo
 
         public void OnError(string description)
         {
+            if (_client == null)
+                return;
             new AlertDialog.Builder(this)
                 .SetTitle("Error")
                 .SetMessage(description)

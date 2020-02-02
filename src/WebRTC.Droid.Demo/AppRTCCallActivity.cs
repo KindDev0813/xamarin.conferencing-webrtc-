@@ -5,7 +5,7 @@ using WebRTC.AppRTC;
 namespace WebRTC.Droid.Demo
 {
     [Activity]
-    public class AppRTCCallActivity : CallActivityBase<AppRTCEngine>
+    public class AppRTCCallActivity : CallActivityBase<RoomConnectionParameters,SignalingParameters,AppRTCController>
     {
         private const string ExtraRoomId = "room_id";
         private const string ExtraIsLoopback = "loopback";
@@ -26,9 +26,9 @@ namespace WebRTC.Droid.Demo
             return intent;
         }
 
-        protected override AppRTCEngine CreateEngine() => new AppRTCEngine(this);
+        protected override AppRTCController CreateEngine() => new AppRTCController(this);
 
-        protected override void Connect(AppRTCEngine rtcEngine, Intent intent)
+        protected override void Connect(AppRTCController rtcController, Intent intent)
         {
             var roomId = intent.GetStringExtra(ExtraRoomId);
             var loopback = intent.GetBooleanExtra(ExtraIsLoopback, false);
@@ -41,7 +41,7 @@ namespace WebRTC.Droid.Demo
                 RoomUrl = roomUrl
             };
 
-            rtcEngine.Connect(roomConnectionParam);
+            rtcController.Connect(roomConnectionParam);
         }
 
         protected override CallFragment CreateCallFragment(Intent intent)

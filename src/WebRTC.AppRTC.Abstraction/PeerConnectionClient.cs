@@ -109,7 +109,7 @@ namespace WebRTC.AppRTC.Abstraction
         private const int HDVideoWidth = 1280;
         private const int HDVideoHeight = 720;
 
-        private readonly SdpCallbacks _sdpCallbacks;
+        private readonly SdpObserver _observer;
 
         private readonly IPeerConnectionListener _peerConnectionListener;
 
@@ -172,7 +172,7 @@ namespace WebRTC.AppRTC.Abstraction
 
             _logger = logger ?? new ConsoleLogger();
 
-            _sdpCallbacks = new SdpCallbacks(this);
+            _observer = new SdpObserver(this);
             _peerConnectionListener = new PeerConnectionListener(this);
         }
 
@@ -250,7 +250,7 @@ namespace WebRTC.AppRTC.Abstraction
                     return;
                 _logger.Debug(TAG, "PC Create OFFER");
                 _isInitiator = true;
-                _peerConnection.CreateOffer(_sdpMediaConstraints, _sdpCallbacks.SdpCreateHandler);
+                _peerConnection.CreateOffer(_sdpMediaConstraints, _observer);
             });
         }
 
@@ -262,7 +262,7 @@ namespace WebRTC.AppRTC.Abstraction
                     return;
                 _logger.Debug(TAG, "PC create ANSWER");
                 _isInitiator = false;
-                _peerConnection.CreateAnswer(_sdpMediaConstraints, _sdpCallbacks.SdpCreateHandler);
+                _peerConnection.CreateAnswer(_sdpMediaConstraints, _observer);
             });
         }
 
@@ -304,7 +304,7 @@ namespace WebRTC.AppRTC.Abstraction
                 if (_peerConnection == null || _isError)
                     return;
                 _logger.Debug(TAG, "Set remote SDP.");
-                _peerConnection.SetRemoteDescription(sdp, _sdpCallbacks.SdpSetHandler);
+                _peerConnection.SetRemoteDescription(sdp, _observer);
             });
         }
 
@@ -718,7 +718,7 @@ namespace WebRTC.AppRTC.Abstraction
             }
         }
 
-        private class SdpCallbacks
+        private class SdpObserver : ISdpObserver
         {
             private readonly PeerConnectionClient _peerConnectionClient;
             private readonly IPeerConnectionEvents _events;
@@ -734,7 +734,9 @@ namespace WebRTC.AppRTC.Abstraction
                 set => _peerConnectionClient._localSdp = value;
             }
 
-            public SdpCallbacks(PeerConnectionClient peerConnectionClient)
+            private bool IsInitiator => _peerConnectionClient._isInitiator;
+
+            public SdpObserver(PeerConnectionClient peerConnectionClient)
             {
                 _peerConnectionClient = peerConnectionClient;
                 _executor = peerConnectionClient._executor;
@@ -742,16 +744,9 @@ namespace WebRTC.AppRTC.Abstraction
                 _events = _peerConnectionClient._peerConnectionEvents;
             }
 
-            private bool IsInitiator => _peerConnectionClient._isInitiator;
 
-            public void SdpCreateHandler(SessionDescription sdp, Exception error)
+            public void OnCreateSuccess(SessionDescription sdp)
             {
-                if (error != null)
-                {
-                    ReportError($"createSDP error: {error.Message}");
-                    return;
-                }
-
                 if (LocalSdp != null)
                 {
                     ReportError("Multiple SDP create.");
@@ -764,20 +759,14 @@ namespace WebRTC.AppRTC.Abstraction
                     if (PeerConnection == null || IsError)
                         return;
                     _logger.Debug(TAG, $"Set local SDP from {sdp.Type}");
-                    PeerConnection.SetLocalDescription(sdp, SdpSetHandler);
+                    PeerConnection.SetLocalDescription(sdp, this);
                 });
             }
 
-            public void SdpSetHandler(Exception error)
+            public void OnSetSuccess()
             {
                 _executor.Execute(() =>
                 {
-                    if (error != null)
-                    {
-                        ReportError($"setSdp error: {error.Message}");
-                        return;
-                    }
-
                     if (PeerConnection == null || IsError)
                     {
                         return;
@@ -822,6 +811,16 @@ namespace WebRTC.AppRTC.Abstraction
                 });
             }
 
+            public void OnCreateFailure(string error)
+            {
+                ReportError($"createSDP error: {error}");
+            }
+
+            public void OnSetFailure(string error)
+            {
+                ReportError($"setSDP error: {error}");   
+            }
+            
             private void ReportError(string description)
             {
                 _peerConnectionClient.ReportError(description);

@@ -7,10 +7,15 @@ using Xamarin.Essentials;
 
 namespace WebRTC.iOS.Demo
 {
-    public abstract class CallViewControllerBase<T> : UIViewController, IARDVideoCallViewDelegate, IAppRTCEngineEvents
-        where T : AppRTCEngineBase
-    {
 
+    public interface IARDVideoCallViewControllerDelegate
+    {
+        void DidFinish(CallViewControllerBase viewController);
+    }
+
+
+    public abstract class CallViewControllerBase : UIViewController, IARDVideoCallViewDelegate, IAppRTCEngineEvents
+    {
         private ARDVideoCallView _videoCallView;
 
         private VideoRendererProxy _localRenderer;
@@ -18,12 +23,10 @@ namespace WebRTC.iOS.Demo
 
         private ARDFileCaptureController _fileCaptureController;
 
-        private T _rtcEngine;
+        public IARDVideoCallViewControllerDelegate Delegate { get; set; }
 
+        public bool IsSimulator => ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR;
 
-        protected abstract T CreateEngine();
-
-        protected abstract void Connect(T rtcEngine);
 
         public override void ViewDidLoad()
         {
@@ -32,21 +35,20 @@ namespace WebRTC.iOS.Demo
             _localRenderer = new VideoRendererProxy();
             _remoteRenderer = new VideoRendererProxy();
 
-            _localRenderer.Renderer = _videoCallView.RemoteVideoRender;
+            _localRenderer.Renderer = _videoCallView.LocalVideoRender;
             _remoteRenderer.Renderer = _videoCallView.RemoteVideoRender;
 
-            _rtcEngine = CreateEngine();
 
-            Connect(_rtcEngine);
 
-          
         }
 
         public override void LoadView()
         {
             base.LoadView();
 
-            _videoCallView = new ARDVideoCallView(CGRect.Empty);
+
+
+            _videoCallView = new ARDVideoCallView(CGRect.Empty, !IsSimulator);
             _videoCallView.Delegate = this;
 
             View = _videoCallView;
@@ -66,17 +68,17 @@ namespace WebRTC.iOS.Demo
 
         public void OnDisconnect(DisconnectType disconnectType)
         {
-
+            Disconnect();
         }
 
         public IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource)
         {
-            if (ObjCRuntime.Runtime.Arch != ObjCRuntime.Arch.SIMULATOR)
+            if (!IsSimulator)
             {
                 return factory.CreateCameraCapturer(videoSource, true);
             }
 
-            var fileCapturer = factory.CreateFileCapturer(videoSource, "");
+            var fileCapturer = factory.CreateFileCapturer(videoSource, "foreman.mp4");
 
             _fileCaptureController = new ARDFileCaptureController((IFileVideoCaptureriOS)fileCapturer);
             return fileCapturer;
@@ -89,7 +91,7 @@ namespace WebRTC.iOS.Demo
             var permission = await Xamarin.Essentials.Permissions.RequestAsync<Permissions.Camera>();
             if (permission == PermissionStatus.Granted)
             {
-                _rtcEngine.StartVideoCall(_localRenderer, _remoteRenderer);
+                StartVideoCall(_localRenderer, _remoteRenderer);
             }
             else
             {
@@ -104,14 +106,14 @@ namespace WebRTC.iOS.Demo
         }
 
 
-        public void DidSwitchCamera(ARDVideoCallView view)
+        public virtual void DidSwitchCamera(ARDVideoCallView view)
         {
-            if(_fileCaptureController != null)
+            if (_fileCaptureController != null)
             {
                 _fileCaptureController.Toggle();
                 return;
             }
-            _rtcEngine.SwitchCamera();
+            SwitchCamera();
         }
 
         public void DidChangeRoute(ARDVideoCallView view)
@@ -129,10 +131,51 @@ namespace WebRTC.iOS.Demo
 
         }
 
+        protected abstract void Disconnect();
 
-        private void Disconnect()
-        {           
-            _rtcEngine.Disconnect();
+        protected abstract void SwitchCamera();
+
+        protected abstract void StartVideoCall(IVideoRenderer localRenderer, IVideoRenderer remoteRenderer);
+
+    }
+
+    public abstract class CallViewControllerBase<TConnectionParam, TSignalParam, TController> : CallViewControllerBase
+        where TSignalParam : ISignalingParameters
+        where TConnectionParam : IConnectionParameters
+        where TController : AppRTCControllerBase<TConnectionParam, TSignalParam>
+    {
+
+        private TController _rtcController;
+
+
+        protected abstract TController CreateController();
+
+        protected abstract void Connect(TController rtcController);
+
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            _rtcController = CreateController();
+
+            Connect(_rtcController);
+        }
+
+        protected override void Disconnect()
+        {
+            _rtcController.Disconnect();
+            Delegate?.DidFinish(this);
+        }
+
+        protected override void SwitchCamera()
+        {
+            _rtcController.SwitchCamera();
+        }
+
+        protected override void StartVideoCall(IVideoRenderer localRenderer, IVideoRenderer remoteRenderer)
+        {
+            _rtcController.StartVideoCall(localRenderer, remoteRenderer);
         }
     }
 }

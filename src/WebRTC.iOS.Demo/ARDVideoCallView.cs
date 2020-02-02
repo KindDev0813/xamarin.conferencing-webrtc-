@@ -30,7 +30,7 @@ namespace WebRTC.iOS.Demo
         private readonly UIButton _hangupButton;
         private CGSize _remoteVideoSize;
 
-        public ARDVideoCallView(CGRect frame) : base(frame)
+        public ARDVideoCallView(CGRect frame,bool useCameraPreview) : base(frame)
         {
             RemoteView = new RTCEAGLVideoView
             {
@@ -39,7 +39,17 @@ namespace WebRTC.iOS.Demo
 
             AddSubview(RemoteView);
 
-            LocalVideoView = new RTCCameraPreviewView();
+            if (useCameraPreview)
+            {
+                LocalVideoView = new RTCCameraPreviewView();
+            }
+            else
+            {
+                LocalVideoView = new RTCEAGLVideoView
+                {
+                    Delegate = this
+                };
+            }
             AddSubview(LocalVideoView);
 
             StatsView = new ARDStatsView(CGRect.Empty);
@@ -84,8 +94,9 @@ namespace WebRTC.iOS.Demo
 
         public IARDVideoCallViewDelegate Delegate { get; set; }
         public UILabel StatusLabel { get; }
-        public RTCCameraPreviewView LocalVideoView { get; }
+        public UIView LocalVideoView { get; }
         public IRTCVideoRenderer RemoteVideoRender => RemoteView as IRTCVideoRenderer;
+        public IRTCVideoRenderer LocalVideoRender => LocalVideoView as IRTCVideoRenderer;
         public UIView RemoteView { get; }
         public ARDStatsView StatsView { get; }
 

@@ -17,7 +17,7 @@ namespace WebRTC.Droid.Demo
         {
             Platform.Init(activity);
             WebSocketConnectionFactory.Factory = () => new OkHttpWebSocket();
-            ExecutorServiceFactory.Factory = tag => new ExecutorServiceImpl(tag);
+           // ExecutorServiceFactory.Factory = tag => new ExecutorServiceImpl(tag);
             ExecutorServiceFactory.MainExecutor = new MainExecutor();
         }
 

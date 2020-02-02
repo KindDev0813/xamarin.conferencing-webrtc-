@@ -9,6 +9,7 @@ using Org.Webrtc;
 using WebRTC.Droid.Extensions;
 using Exception = System.Exception;
 using IceCandidate = WebRTC.Abstraction.IceCandidate;
+using ISdpObserver = WebRTC.Abstraction.ISdpObserver;
 using MediaConstraints = WebRTC.Abstraction.MediaConstraints;
 using SessionDescription = WebRTC.Abstraction.SessionDescription;
 
@@ -48,8 +49,10 @@ namespace WebRTC.Droid
             get
             {
                 if (Configuration.SdpSemantics != SdpSemantics.UnifiedPlan)
-                    throw new InvalidOperationException("GetTransceivers is only supported with Unified Plan SdpSemantics.");
-                return _peerConnection.Transceivers.Select(t => new RtpTransceiverNative(t)).Cast<IRtpTransceiver>().ToArray();
+                    throw new InvalidOperationException(
+                        "GetTransceivers is only supported with Unified Plan SdpSemantics.");
+                return _peerConnection.Transceivers.Select(t => new RtpTransceiverNative(t)).Cast<IRtpTransceiver>()
+                    .ToArray();
             }
         }
 
@@ -120,28 +123,27 @@ namespace WebRTC.Droid
         }
 
         public void CreateOffer(MediaConstraints constraints,
-            SdpCompletionHandler completionHandler)
+            ISdpObserver observer)
         {
-            _peerConnection.CreateOffer(new SdpObserverProxy(completionHandler), constraints.ToNative());
+            _peerConnection.CreateOffer(new SdpObserverProxy(observer), constraints.ToNative());
         }
 
         public void CreateAnswer(MediaConstraints constraints,
-            SdpCompletionHandler completionHandler)
+            ISdpObserver observer)
         {
-            _peerConnection.CreateAnswer(new SdpObserverProxy(completionHandler), constraints.ToNative());
+            _peerConnection.CreateAnswer(new SdpObserverProxy(observer), constraints.ToNative());
         }
 
-        public void SetLocalDescription(SessionDescription sdp, Action<Exception> completionHandler)
+        public void SetLocalDescription(SessionDescription sdp, ISdpObserver observer)
         {
-            _peerConnection.SetLocalDescription(new SdpObserverProxy(
-                    (_, error) => completionHandler?.Invoke(error)),
+            _peerConnection.SetLocalDescription(new SdpObserverProxy(observer),
                 sdp.ToNative());
         }
 
-        public void SetRemoteDescription(SessionDescription sdp, Action<Exception> completionHandler)
+        public void SetRemoteDescription(SessionDescription sdp, ISdpObserver observer)
         {
             _peerConnection.SetRemoteDescription(new SdpObserverProxy(
-                    (_, error) => completionHandler?.Invoke(error)),
+                    observer),
                 sdp.ToNative());
         }
 

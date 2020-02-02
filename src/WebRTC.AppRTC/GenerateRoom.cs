@@ -11,7 +11,7 @@ namespace WebRTC.AppRTC
         {
             var sb = new StringBuilder();
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < length; i++)
             {
                 sb.Append(Random.Next(10).ToString());
             }

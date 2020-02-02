@@ -22,18 +22,16 @@ namespace WebRTC.AppRTC.Abstraction
         WebSocket
     }
 
-    public abstract class AppRTCEngineBase : ISignalingEvents, IPeerConnectionEvents
+    public abstract class AppRTCControllerBase<TConnectionParam, TSignalParam> : ISignalingEvents<TSignalParam>,
+        IPeerConnectionEvents
+        where TSignalParam : ISignalingParameters
+        where TConnectionParam : IConnectionParameters
     {
-        private const string TAG = nameof(AppRTCEngineBase);
+        private const string TAG = nameof(AppRTCControllerBase<TConnectionParam, TSignalParam>);
 
-        protected readonly IExecutor Executor;
-        protected readonly IAppRTCEngineEvents Events;
-        protected readonly ILogger Logger;
-        
-        protected IAppRTCCClient RTCClient { get; private set; }
-        protected PeerConnectionClient PeerConnectionClient { get; private set; }
+        private TSignalParam _signalingParameters;
 
-        protected AppRTCEngineBase(IAppRTCEngineEvents events, ILogger logger = null)
+        protected AppRTCControllerBase(IAppRTCEngineEvents events, ILogger logger = null)
         {
             Events = events;
             Logger = logger ?? new ConsoleLogger();
@@ -41,17 +39,28 @@ namespace WebRTC.AppRTC.Abstraction
             Executor = ExecutorServiceFactory.MainExecutor;
         }
 
-        
+        protected readonly IExecutor Executor;
+        protected readonly IAppRTCEngineEvents Events;
+        protected readonly ILogger Logger;
+
+        protected IAppRTCCClient<TConnectionParam> RTCClient { get; private set; }
+        protected PeerConnectionClient PeerConnectionClient { get; private set; }
+
         public bool Connected { get; private set; }
-        
-        protected abstract IAppRTCCClient CreateClient();
+
+        protected abstract bool IsInitiator { get; }
+
+        protected TSignalParam SignalingParameters { get; private set; }
+
+        protected abstract IAppRTCCClient<TConnectionParam> CreateClient();
 
         protected abstract PeerConnectionParameters CreatePeerConnectionParameters(
-            ISignalingParameters signalingParameters);
+            TSignalParam signalingParameters);
 
-        protected abstract void OnChannelConnectedInternal(ISignalingParameters signalingParameters);
 
-        public void Connect(IConnectionParameters connectionParameters)
+        protected abstract void OnChannelConnectedInternal(TSignalParam signalingParameters);
+
+        public void Connect(TConnectionParam connectionParameters)
         {
             RTCClient = CreateClient();
             RTCClient.Connect(connectionParameters);
@@ -68,12 +77,16 @@ namespace WebRTC.AppRTC.Abstraction
 
         public void StartVideoCall(IVideoRenderer localRenderer, IVideoRenderer remoteRenderer)
         {
-            PeerConnectionClient.CreatePeerConnection(localRenderer, remoteRenderer);
+            Executor.Execute(() =>
+            {
+                PeerConnectionClient.CreatePeerConnection(localRenderer, remoteRenderer);
+                OnChannelConnectedInternal(_signalingParameters);
+            });
         }
 
         public void ChangeCaptureFormat(int width, int height, int framerate)
         {
-            PeerConnectionClient?.ChangeCaptureFormat(width,height,framerate);
+            PeerConnectionClient?.ChangeCaptureFormat(width, height, framerate);
         }
 
         public void SwitchCamera()
@@ -91,17 +104,19 @@ namespace WebRTC.AppRTC.Abstraction
             PeerConnectionClient?.SetAudioEnabled(enable);
         }
 
-        public void OnChannelConnected(ISignalingParameters signalingParameters)
+        public void OnChannelConnected(TSignalParam signalingParameters)
         {
             Logger.Debug(TAG, "Creating PeerConnectionClient");
+            SignalingParameters = signalingParameters;
             Executor.Execute(() =>
             {
+                _signalingParameters = signalingParameters;
+
                 var peerConnectionClientParams = CreatePeerConnectionParameters(signalingParameters);
                 PeerConnectionClient =
                     new PeerConnectionClient(peerConnectionClientParams, this,
                         Logger);
                 PeerConnectionClient.CreatePeerConnectionFactory();
-                OnChannelConnectedInternal(signalingParameters);
                 Events.ReadyToStart();
                 Logger.Debug(TAG, "Created PeerConnectionClient");
             });
@@ -177,23 +192,22 @@ namespace WebRTC.AppRTC.Abstraction
         {
             Executor.Execute(() =>
             {
-                RTCClient?.SendOfferSdp(sdp);
+                Logger.Debug(TAG, $"Sending {sdp.Type}");
+                if (IsInitiator)
+                    RTCClient?.SendOfferSdp(sdp);
+                else
+                    RTCClient?.SendAnswerSdp(sdp);
             });
         }
 
         public void OnIceCandidate(IceCandidate candidate)
         {
-            Executor.Execute(() =>
-            {
-                RTCClient?.SendLocalIceCandidate(candidate);
-            });        }
+            Executor.Execute(() => { RTCClient?.SendLocalIceCandidate(candidate); });
+        }
 
         public void OnIceCandidateRemoved(IceCandidate[] candidates)
         {
-            Executor.Execute(() =>
-            {
-                RTCClient?.SendLocalIceCandidateRemovals(candidates);
-            });
+            Executor.Execute(() => { RTCClient?.SendLocalIceCandidateRemovals(candidates); });
         }
 
         public void OnIceConnected()

@@ -37,6 +37,7 @@ namespace WebRTC.H113
             WsSendQueue.Clear();
             _registerMessage = null;
         }
+        
 
         protected override void SendByeMessage()
         {

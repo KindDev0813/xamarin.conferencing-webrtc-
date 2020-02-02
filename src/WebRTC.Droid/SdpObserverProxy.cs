@@ -2,37 +2,38 @@ using System;
 using WebRTC.Abstraction;
 using Org.Webrtc;
 using WebRTC.Droid.Extensions;
+using ISdpObserver = Org.Webrtc.ISdpObserver;
 using SessionDescription = Org.Webrtc.SessionDescription;
 
 namespace WebRTC.Droid
 {
     public class SdpObserverProxy : Java.Lang.Object, ISdpObserver
     {
-        private readonly SdpCompletionHandler _completionHandler;
+        private readonly Abstraction.ISdpObserver _observer;
 
-        public SdpObserverProxy(SdpCompletionHandler completionHandler)
+        public SdpObserverProxy(Abstraction.ISdpObserver observer)
         {
-            _completionHandler = completionHandler;
+            _observer = observer;
         }
 
         public void OnCreateFailure(string p0)
         {
-            _completionHandler?.Invoke(null, new Exception(p0));
+            _observer?.OnCreateFailure(p0);
         }
 
         public void OnCreateSuccess(SessionDescription p0)
         {
-             _completionHandler?.Invoke(p0.ToNet(), null);
+            _observer?.OnCreateSuccess(p0.ToNet());
         }
 
         public void OnSetFailure(string p0)
         {
-           _completionHandler?.Invoke(null, new Exception(p0));
+           _observer.OnSetFailure(p0);
         }
 
         public void OnSetSuccess()
         {
-            _completionHandler?.Invoke(null, null);
+            _observer.OnSetSuccess();
         }
     }
 }

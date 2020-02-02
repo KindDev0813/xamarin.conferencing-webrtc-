@@ -83,6 +83,12 @@ namespace WebRTC.AppRTC
                     return;
                 }
 
+                if (_methodType == MethodType.Delete)
+                {
+                    _callback?.Invoke("",null);
+                    return;
+                }
+
                 var responseContent = await responseMessage.Content.ReadAsStringAsync();
                 _callback?.Invoke(responseContent, null);
             }

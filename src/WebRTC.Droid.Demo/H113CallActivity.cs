@@ -5,18 +5,18 @@ using WebRTC.H113;
 
 namespace WebRTC.Droid.Demo
 {
-        
     [Activity]
-    public class H113CallActivity : CallActivityBase<H113Engine>
+    public class H113CallActivity : CallActivityBase<ConnectionParameters, RegisteredMessage, H113Controller>
     {
-        protected override H113Engine CreateEngine() => new H113Engine(this);
-       
+        protected override H113Controller CreateEngine() => new H113Controller(this);
 
-        protected override void Connect(H113Engine rtcEngine,Intent intent)
+
+        protected override void Connect(H113Controller rtcController, Intent intent)
         {
-            rtcEngine.Connect(new ConnectionParameters("","","",0,0));
+            rtcController.Connect(new ConnectionParameters(H113Constants.WssUrl, H113Constants.Token, "98056391", 54.23,
+                12.12));
         }
 
-        protected override CallFragment CreateCallFragment(Intent intent) => CallFragment.Create("",true,true);
+        protected override CallFragment CreateCallFragment(Intent intent) => CallFragment.Create("", true, true);
     }
 }

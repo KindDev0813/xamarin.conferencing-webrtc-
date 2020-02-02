@@ -150,6 +150,8 @@
       <DependentUpon>MainViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="Extensions\UIImageExtension.cs" />
+    <Compile Include="ConnectivityViewController.cs" />
+    <Compile Include="ARDMainView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
@@ -186,6 +188,7 @@
     <BundleResource Include="Resources\ic_surround_sound_black_24dp.png" />
     <BundleResource Include="Resources\ic_switch_video_black_24dp.png" />
     <BundleResource Include="Resources\ic_settings_black_24dp.png" />
+    <BundleResource Include="Resources\mozart.mp3" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

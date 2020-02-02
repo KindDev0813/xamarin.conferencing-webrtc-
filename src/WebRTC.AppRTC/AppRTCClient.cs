@@ -5,7 +5,7 @@ using WebRTC.AppRTC.Abstraction;
 
 namespace WebRTC.AppRTC
 {
-    public class AppRTCClient : IAppRTCCClient, IWebSocketChannelEvents
+    public class AppRTCClient : IAppRTCCClient<RoomConnectionParameters>, IWebSocketChannelEvents
     {
         private enum MessageType
         {
@@ -18,7 +18,7 @@ namespace WebRTC.AppRTC
         private const string ROOM_MESSAGE = "message";
         private const string ROOM_LEAVE = "leave";
 
-        private readonly ISignalingEvents _signalingEvents;
+        private readonly ISignalingEvents<SignalingParameters> _signalingEvents;
         private readonly IExecutorService _executor;
         private readonly ILogger _logger;
 
@@ -31,7 +31,7 @@ namespace WebRTC.AppRTC
         private string _leaveUrl;
 
 
-        public AppRTCClient(ISignalingEvents signalingEvents, ILogger logger = null)
+        public AppRTCClient(ISignalingEvents<SignalingParameters> signalingEvents, ILogger logger = null)
         {
             _signalingEvents = signalingEvents;
             _executor = ExecutorServiceFactory.CreateExecutorService(nameof(AppRTCClient));
@@ -42,9 +42,9 @@ namespace WebRTC.AppRTC
         public ConnectionState State { get; private set; }
         
        
-        public void Connect(IConnectionParameters connectionParameters)
+        public void Connect(RoomConnectionParameters connectionParameters)
         {
-            _connectionParameters = (RoomConnectionParameters) connectionParameters;
+            _connectionParameters = connectionParameters;
             _executor.Execute(ConnectToRoomInternal);
         }
 
@@ -63,11 +63,8 @@ namespace WebRTC.AppRTC
                     return;
                 }
 
-                var json = JsonConvert.SerializeObject(new
-                {
-                    sdp = sdp.Sdp,
-                    type = "offer"
-                });
+                var json = ARDSignalingMessage.CreateJson(sdp);
+
                 SendPostMessage(MessageType.Message,_messageUrl,json);
 
                 if (_connectionParameters.IsLoopback)
@@ -89,11 +86,9 @@ namespace WebRTC.AppRTC
                     return;
                 }
 
-                var json = JsonConvert.SerializeObject(new
-                {
-                    sdp = sdp.Sdp,
-                    type = "answer"
-                });
+                var json = ARDSignalingMessage.CreateJson(sdp);
+
+               
                 _wsClient.Send(json);
             });
         }

@@ -9,30 +9,29 @@ namespace WebRTC.AppRTC.Abstraction
         Closed,
         Error
     }
-    
-    public interface IAppRTCCClient
+
+    public interface IAppRTCCClient<in TConnectionParam>
+        where TConnectionParam : IConnectionParameters
     {
-        
         ConnectionState State { get; }
         
-        
-        void Connect(IConnectionParameters connectionParameters);
+        void Connect(TConnectionParam connectionParameters);
 
         void Disconnect();
-        
+
         void SendOfferSdp(SessionDescription sdp);
 
         void SendAnswerSdp(SessionDescription sdp);
-        
+
         void SendLocalIceCandidate(IceCandidate candidate);
         void SendLocalIceCandidateRemovals(IceCandidate[] candidates);
     }
-    
-    
 
-    public interface ISignalingEvents
+
+    public interface ISignalingEvents<in TSignalParam>
+        where TSignalParam : ISignalingParameters
     {
-        void OnChannelConnected(ISignalingParameters signalingParameters);
+        void OnChannelConnected(TSignalParam signalingParameters);
 
         void OnChannelClose();
         void OnChannelError(string description);
@@ -44,12 +43,9 @@ namespace WebRTC.AppRTC.Abstraction
 
     public interface IConnectionParameters
     {
-        
     }
 
     public interface ISignalingParameters
     {
-        
     }
-    
 }

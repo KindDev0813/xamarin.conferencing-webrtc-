@@ -68,8 +68,8 @@ namespace WebRTC.AppRTC.Abstraction
             if (State == WebSocketConnectionState.Registered)
             {
                 // Send "bye" to WebSocket server.
-                State = WebSocketConnectionState.Connected;
                 SendByeMessage();
+                State = WebSocketConnectionState.Connected;
             }
 
             if (State == WebSocketConnectionState.Connected || State == WebSocketConnectionState.Error)

@@ -18,7 +18,7 @@ namespace WebRTC.iOS.Demo
 
             ExecutorServiceFactory.MainExecutor = new MainExecutor();
 
-            ExecutorServiceFactory.Factory = (tag) => new ExecutorService(tag);
+            //ExecutorServiceFactory.Factory = (tag) => new ExecutorService(tag);
         }
 
         public static void Cleanup()
@@ -31,7 +31,7 @@ namespace WebRTC.iOS.Demo
         {
             public bool IsCurrentExecutor => DispatchQueue.MainQueue == DispatchQueue.CurrentQueue;
 
-            public void Execute(Action action) => DispatchQueue.MainQueue.DispatchAsync(action);          
+            public void Execute(Action action) => DispatchQueue.MainQueue.DispatchAsync(action);
         }
 
         private class ExecutorService : IExecutorService
@@ -43,13 +43,17 @@ namespace WebRTC.iOS.Demo
 
             public ExecutorService(string tag)
             {
-                _dispatchQueue = new DispatchQueue(tag, false);
+                _dispatchQueue = new DispatchQueue(tag, new DispatchQueue.Attributes
+                {
+                    QualityOfService = DispatchQualityOfService.Background,
+                    Concurrent = false
+                });
             }
 
             public bool IsCurrentExecutor => _dispatchQueue == DispatchQueue.CurrentQueue;
 
             public void Execute(Action action) => _dispatchQueue.DispatchAsync(action);
-           
+
 
             public void Release()
             {

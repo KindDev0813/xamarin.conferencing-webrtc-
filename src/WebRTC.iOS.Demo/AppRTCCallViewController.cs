@@ -3,7 +3,7 @@ using WebRTC.AppRTC;
 
 namespace WebRTC.iOS.Demo
 {
-    public class AppRTCCallViewController : CallViewControllerBase<AppRTCEngine>
+    public class AppRTCCallViewController : CallViewControllerBase<RoomConnectionParameters,SignalingParameters, AppRTCController>
     {
         private readonly string _roomId;
         private readonly bool _isLoopback;
@@ -16,12 +16,12 @@ namespace WebRTC.iOS.Demo
 
       
 
-        protected override AppRTCEngine CreateEngine() => new AppRTCEngine(this);
+        protected override AppRTCController CreateController() => new AppRTCController(this);
 
 
-        protected override void Connect(AppRTCEngine rtcEngine)
+        protected override void Connect(AppRTCController rtcController)
         {
-            rtcEngine.Connect(new RoomConnectionParameters
+            rtcController.Connect(new RoomConnectionParameters
             {
                 RoomId = _roomId,
                 IsLoopback = _isLoopback,

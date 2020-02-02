@@ -12,6 +12,7 @@ namespace WebRTC.AppRTC
         CandidateRemoval,
         Offer,
         Answer,
+        PrAnswer,
         Bye,
     }
 
@@ -21,6 +22,7 @@ namespace WebRTC.AppRTC
         protected const string CandidateRemovalType = "remove-candidates";
         protected const string OfferType = "offer";
         protected const string AnswerType = "answer";
+        protected const string PrAnswerType = "pranswer";
         protected const string ByeType = "bye";
 
         public static ARDSignalingMessage MessageFromJSONString(string json)
@@ -47,6 +49,10 @@ namespace WebRTC.AppRTC
                         break;
                     case AnswerType:
                         description = new SessionDescription(SdpType.Answer, values["sdp"]);
+                        message = new ARDSessionDescriptionMessage(description);
+                        break;
+                    case PrAnswerType:
+                        description = new SessionDescription(SdpType.PrAnswer, values["sdp"]);
                         message = new ARDSessionDescriptionMessage(description);
                         break;
                     case ByeType:
@@ -108,13 +114,15 @@ namespace WebRTC.AppRTC
             switch (type)
             {
                 case ARDSignalingMessageType.Candidate:
-                    return CandidateRemovalType;
+                    return CandidateType;
                 case ARDSignalingMessageType.CandidateRemoval:
                     return CandidateRemovalType;
                 case ARDSignalingMessageType.Offer:
                     return OfferType;
+                case ARDSignalingMessageType.PrAnswer:
                 case ARDSignalingMessageType.Answer:
                     return AnswerType;
+                    //return PrAnswerType;
                 case ARDSignalingMessageType.Bye:
                     return ByeType;
                 default:
@@ -170,6 +178,7 @@ namespace WebRTC.AppRTC
                     Type = ARDSignalingMessageType.Offer;
                     break;
                 case SdpType.PrAnswer:
+                    Type = ARDSignalingMessageType.PrAnswer;
                     break;
                 case SdpType.Answer:
                     Type = ARDSignalingMessageType.Answer;
