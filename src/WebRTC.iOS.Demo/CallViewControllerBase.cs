@@ -99,6 +99,7 @@ namespace WebRTC.iOS.Demo
         {
             var alertDialog = UIAlertController.Create("Error", description, UIAlertControllerStyle.Alert);
             alertDialog.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Destructive, (s) => Disconnect()));
+            PresentViewController(alertDialog, true, null);
         }
 
 
