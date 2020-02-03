@@ -775,7 +775,7 @@ namespace WebRTC.iOS.Binding
         void StopCapture();
     }
 
-    // @interface RTCMTLVideoView : UIView <RTCVideoRenderer>
+    // @interface RTCMTLVideoView : UIView<RTCVideoRenderer>
     //[Introduced(PlatformName.iOS, 9, 0)]
     //[BaseType(typeof(UIView))]
     //interface RTCMTLVideoView : RTCVideoRenderer

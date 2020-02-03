@@ -237,6 +237,7 @@ namespace WebRTC.AppRTC
             }
             State = ConnectionState.Closed;
             _wsClient?.Disconnect(true);
+            _executor.Release();
         }
 
         private void SendPostMessage(MessageType messageType, string url, string message)

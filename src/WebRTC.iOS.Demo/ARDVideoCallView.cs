@@ -30,7 +30,7 @@ namespace WebRTC.iOS.Demo
         private readonly UIButton _hangupButton;
         private CGSize _remoteVideoSize;
 
-        public ARDVideoCallView(CGRect frame,bool useCameraPreview) : base(frame)
+        public ARDVideoCallView(CGRect frame, bool useCameraPreview) : base(frame)
         {
             RemoteView = new RTCEAGLVideoView
             {

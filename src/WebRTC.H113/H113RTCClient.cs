@@ -4,8 +4,6 @@ using WebRTC.AppRTC.Abstraction;
 
 namespace WebRTC.H113
 {
-    
-
     public class H113RTCClient : IAppRTCCClient<ConnectionParameters>, IWebSocketChannelEvents
     {
         private const string TAG = nameof(H113RTCClient);
