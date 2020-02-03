@@ -11,6 +11,8 @@ namespace WebRTC.Droid.Demo
         {
             base.OnCreate(savedInstanceState);
             
+            Xamarin.Essentials.Platform.Init(this, savedInstanceState); // add this line to your code, it may also be called: bundle
+
             H113Platform.Init(this);
             
             SetContentView(Resource.Layout.activity_main);

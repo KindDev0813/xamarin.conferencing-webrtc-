@@ -1,9 +1,8 @@
-﻿using System;
-using WebRTC.iOS.Binding;
+﻿using WebRTC.Abstraction;
 
 namespace WebRTC.iOS.Demo
 {
-    public class ARDFileCaptureController
+    public class ARDFileCaptureController : FileVideoCapturer
     {
         private readonly string[] Files =
         {
@@ -11,13 +10,11 @@ namespace WebRTC.iOS.Demo
             "SampleVideo_1280x720_10mb.mp4"
         };
 
-        private readonly IFileVideoCaptureriOS _fileCapturer;
         private bool _hasStarted;
         private int _currentFile;
 
-        public ARDFileCaptureController(IFileVideoCaptureriOS fileCapturer)
+        public ARDFileCaptureController(IVideoSource videoSource) : base(videoSource)
         {
-            _fileCapturer = fileCapturer;
         }
 
         public void Toggle()
@@ -27,19 +24,19 @@ namespace WebRTC.iOS.Demo
             StartCapture();
         }
 
-        public void StartCapture()
+        public override void StartCapture()
         {
             if (_hasStarted)
                 return;
 
             _hasStarted = true;
-            _fileCapturer.StartCapturingFromFileNamed(Files[_currentFile]);
+            StartCapturingFromFileNamed(Files[_currentFile]);
         }
 
-        public void StopCapture()
+        public override void StopCapture()
         {
+            base.StopCapture();
             _hasStarted = false;
-            _fileCapturer.StopCapture();
         }
     }
 }

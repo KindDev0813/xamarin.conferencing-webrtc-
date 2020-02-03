@@ -44,6 +44,7 @@
     <Compile Include="AudioTrackNative.cs" />
     <Compile Include="CameraVideoCapturerNative.cs" />
     <Compile Include="DataChannelNative.cs" />
+    <Compile Include="Extensions\DataChannelConfigurationExtensions.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\IceCandidateExtension.cs" />

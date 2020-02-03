@@ -10,7 +10,7 @@ using WebRTC.H113;
 
 namespace WebRTC.iOS.Demo
 {
-    public partial class LoginViewController : UIViewController
+    public partial class LoginViewController : ConnectivityViewControllerBase, IARDVideoCallViewControllerDelegate
     {
         private readonly LoginService _loginService = new LoginService();
 
@@ -21,7 +21,7 @@ namespace WebRTC.iOS.Demo
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            
+
             JsonConvert.DefaultSettings = () =>
             {
                 var settings = new JsonSerializerSettings();
@@ -38,6 +38,8 @@ namespace WebRTC.iOS.Demo
             LoginButton.TouchUpInside += LoginButtonOnTouchUpInside;
         }
 
+
+
         private async void LoginButtonOnTouchUpInside(object sender, EventArgs e)
         {
             LoadingContainer.Hidden = false;
@@ -46,15 +48,21 @@ namespace WebRTC.iOS.Demo
             {
                 return;
             }
-            
+
             LoadingContainer.Hidden = true;
 
 
             H113Constants.Token = token;
 
-            var storyboard = UIStoryboard.FromName("Main", null);
-            var vc = storyboard.InstantiateViewController("VideoCallViewController");
-            NavigationController.PushViewController(vc, true);
+            var vc = new H113CallViewController
+            {
+                Delegate = this
+            };
+
+            vc.ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
+            vc.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
+
+            PresentViewController(vc, true, null);
         }
     }
 }

@@ -152,6 +152,7 @@
     <Compile Include="Extensions\UIImageExtension.cs" />
     <Compile Include="ConnectivityViewController.cs" />
     <Compile Include="ARDMainView.cs" />
+    <Compile Include="ConnectivityViewControllerBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">

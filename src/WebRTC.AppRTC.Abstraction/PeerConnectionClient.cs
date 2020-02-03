@@ -8,6 +8,8 @@ namespace WebRTC.AppRTC.Abstraction
     public interface IPeerConnectionEvents
     {
         void OnPeerFactoryCreated(IPeerConnectionFactory factory);
+
+        void OnPeerConnectionCreated(IPeerConnection peerConnection);
         
         /// <summary>
         /// Callback fired once DTLS connection is established (PeerConnectionState is CONNECTED).
@@ -239,6 +241,8 @@ namespace WebRTC.AppRTC.Abstraction
                     ReportError("Failed to create peer connection: " + ex.Message);
                     throw;
                 }
+                if(_peerConnection != null)
+                    _peerConnectionEvents.OnPeerConnectionCreated(_peerConnection);
             });
         }
 

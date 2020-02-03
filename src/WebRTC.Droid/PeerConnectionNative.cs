@@ -147,6 +147,12 @@ namespace WebRTC.Droid
                 sdp.ToNative());
         }
 
+        public IDataChannel CreateDataChannel(string label, DataChannelConfiguration dataChannelConfiguration)
+        {
+            var dataChannel = _peerConnection.CreateDataChannel(label, dataChannelConfiguration.ToNative());
+            return dataChannel == null ? null : new DataChannelNative(dataChannel);
+        }
+
         public bool SetBitrate(int min, int current, int max)
         {
             return _peerConnection.SetBitrate(new Integer(min), new Integer(current), new Integer(max));

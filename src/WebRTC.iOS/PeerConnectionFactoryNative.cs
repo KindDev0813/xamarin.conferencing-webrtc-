@@ -31,7 +31,7 @@ namespace WebRTC.iOS
                 new PeerConnectionListenerProxy(peerConnectionListener));
             if (peerConnection == null)
                 return null;
-            return new PeerConnectionNative(peerConnection,configuration, this);
+            return new PeerConnectionNative(peerConnection, configuration, this);
         }
 
         public IAudioSource CreateAudioSource(MediaConstraints mediaConstraints)
@@ -68,8 +68,7 @@ namespace WebRTC.iOS
 
         public IFileVideoCapturer CreateFileCapturer(IVideoSource videoSource, string file)
         {
-            var capturer = new RTCFileVideoCapturer(videoSource.ToNative<RTCVideoSource>());
-            return new FileVideoCapturerNative(capturer, file);
+            return new FileVideoCapturer(videoSource, file);
         }
 
         public bool StartAecDump(string file, int fileSizeLimitBytes)

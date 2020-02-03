@@ -7,13 +7,14 @@ using WebRTC.iOS.Binding;
 
 namespace WebRTC.iOS
 {
-    internal class DataChannelNative : NSObject,IDataChannel,IRTCDataChannelDelegate
+    internal class DataChannelNative : NSObject, IDataChannel, IRTCDataChannelDelegate
     {
         private readonly RTCDataChannel _dataChannel;
 
         public DataChannelNative(RTCDataChannel dataChannel)
         {
             _dataChannel = dataChannel;
+            _dataChannel.Delegate = this;
         }
 
         public event EventHandler OnStateChange;
@@ -23,7 +24,16 @@ namespace WebRTC.iOS
         public string Label => _dataChannel.Label;
         public DataChannelState State => _dataChannel.ReadyState.ToNet();
         public long BufferedAmount => (long)_dataChannel.BufferedAmount;
-        
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _dataChannel.Delegate = null;
+            }
+            base.Dispose(disposing);
+        }
+
         public void Close()
         {
             _dataChannel.Close();
@@ -36,13 +46,13 @@ namespace WebRTC.iOS
 
         public void DataChannelDidChangeState(RTCDataChannel dataChannel)
         {
-            OnStateChange?.Invoke(this,EventArgs.Empty);
+            OnStateChange?.Invoke(this, EventArgs.Empty);
         }
 
         public void DidReceiveMessageWithBuffer(RTCDataChannel dataChannel, RTCDataBuffer buffer)
         {
-            var netBuffer = new DataBuffer(buffer.Data.ToArray(),buffer.IsBinary);
-            OnMessage?.Invoke(this,netBuffer);
+            var netBuffer = new DataBuffer(buffer.Data.ToArray(), buffer.IsBinary);
+            OnMessage?.Invoke(this, netBuffer);
         }
     }
 }

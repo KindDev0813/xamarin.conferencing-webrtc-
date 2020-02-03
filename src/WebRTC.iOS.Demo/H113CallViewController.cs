@@ -3,16 +3,14 @@ using WebRTC.H113;
 
 namespace WebRTC.iOS.Demo
 {
-    public class H113CallViewController : CallViewControllerBase<ConnectionParameters,RegisteredMessage, H113Controller>
+    public class H113CallViewController : CallViewControllerBase<ConnectionParameters, RegisteredMessage, H113Controller>
     {
         protected override void Connect(H113Controller rtcController)
         {
-            throw new NotImplementedException();
+            rtcController.Connect(new ConnectionParameters(H113Constants.WssUrl, H113Constants.Token, "98056391", 54.23,
+                          12.12));
         }
 
-        protected override H113Controller CreateController() 
-        {
-            throw new NotImplementedException();
-        }
+        protected override H113Controller CreateController() => new H113Controller(this);
     }
 }

@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\DataChannelConfigurationExtension.cs" />
     <Compile Include="Extensions\ScalingTypeExtensions.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="AudioSourceNative.cs" />
@@ -57,7 +58,6 @@
     <Compile Include="Extensions\RTCCertificateExtension.cs" />
     <Compile Include="Extensions\RTCConfigurationExtensions.cs" />
     <Compile Include="Extensions\SessionDescriptionExtension.cs" />
-    <Compile Include="FastJavaByteArray.cs" />
     <Compile Include="FileVideoCapturerNative.cs" />
     <Compile Include="MediaSourceNative.cs" />
     <Compile Include="MediaStreamTrackNative.cs" />
@@ -68,6 +68,7 @@
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RptSenderNative.cs" />
+    <Compile Include="RTCAudioManager.cs" />
     <Compile Include="RtpReceiverNative.cs" />
     <Compile Include="RtpSenderNative.cs" />
     <Compile Include="RtpTransceiverNative.cs" />

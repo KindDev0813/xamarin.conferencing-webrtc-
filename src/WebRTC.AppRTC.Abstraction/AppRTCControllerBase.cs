@@ -66,7 +66,7 @@ namespace WebRTC.AppRTC.Abstraction
             RTCClient.Connect(connectionParameters);
         }
 
-        public void Disconnect()
+        public virtual void Disconnect()
         {
             Connected = false;
             RTCClient?.Disconnect();
@@ -179,12 +179,19 @@ namespace WebRTC.AppRTC.Abstraction
             Executor.Execute(() => { Events.OnPeerFactoryCreated(factory); });
         }
 
+        public void OnPeerConnectionCreated(IPeerConnection peerConnection)
+        {
+            Executor.Execute(()=>  OnPeerConnectionCreatedInternal(peerConnection));
+        }
+
         public void OnConnected()
         {
+            Connected = true;
         }
 
         public void OnDisconnected()
         {
+            Connected = false;
             Executor.Execute(() => { Events.OnDisconnect(DisconnectType.PeerConnection); });
         }
 
@@ -230,6 +237,11 @@ namespace WebRTC.AppRTC.Abstraction
         public IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource)
         {
             return Events.CreateVideoCapturer(factory, videoSource);
+        }
+
+        protected virtual void OnPeerConnectionCreatedInternal(IPeerConnection peerConnection)
+        {
+            
         }
     }
 }

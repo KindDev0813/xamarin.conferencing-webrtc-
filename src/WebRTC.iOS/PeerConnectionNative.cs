@@ -145,6 +145,12 @@ namespace WebRTC.iOS
             _peerConnection.SetRemoteDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
         }
 
+        public IDataChannel CreateDataChannel(string label, DataChannelConfiguration dataChannelConfiguration)
+        {
+            var dataChannel = _peerConnection.DataChannelForLabel(label, dataChannelConfiguration.ToNative());
+            return dataChannel == null ? null : new DataChannelNative(dataChannel);
+        }
+
         public bool SetBitrate(int min, int current, int max)
         {
             return _peerConnection.SetBweMinBitrateBps(new NSNumber(min), new NSNumber(current), new NSNumber(max));
@@ -164,6 +170,8 @@ namespace WebRTC.iOS
         {
             throw new NotImplementedException();
         }
+
+
 
         private class SdpCallbackHelper
         {

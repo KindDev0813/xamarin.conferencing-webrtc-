@@ -169,11 +169,15 @@ namespace WebRTC.Droid
 
             var encoderFactory = new DefaultVideoEncoderFactory(eglBaseContext, true, true);
             var decoderFactory = new DefaultVideoDecoderFactory(eglBaseContext);
-            return PeerConnectionFactory.InvokeBuilder()
+            var factory =  PeerConnectionFactory.InvokeBuilder()
                 .SetAudioDeviceModule(adm)
                 .SetVideoEncoderFactory(encoderFactory)
                 .SetVideoDecoderFactory(decoderFactory)
                 .CreatePeerConnectionFactory();
+            
+            adm.Release();
+
+            return factory;
         }
 
         private static IAudioDeviceModule CreateJavaAudioDevice(Context context)

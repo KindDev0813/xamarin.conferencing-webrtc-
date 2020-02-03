@@ -44,10 +44,13 @@ namespace WebRTC.AppRTC.Abstraction
             {
                 try
                 {
-                    foreach (var job in _jobs.GetConsumingEnumerable(_cts.Token))
+                    using (_jobs)
                     {
-                        Console.WriteLine("Executing job - {0}",_tag);
-                        job();
+                        foreach (var job in _jobs.GetConsumingEnumerable(_cts.Token))
+                        {
+                            Console.WriteLine("Executing job - {0}", _tag);
+                            job();
+                        }
                     }
                 }
                 catch (OperationCanceledException)

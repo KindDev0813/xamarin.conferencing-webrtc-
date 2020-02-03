@@ -8,7 +8,7 @@ using WebRTC.iOS.Binding;
 
 namespace WebRTC.iOS.Demo
 {
-    public class ConnectivityViewController : UIViewController, IARDMainViewDelegate, IRTCAudioSessionDelegate, IARDVideoCallViewControllerDelegate
+    public class ConnectivityViewController : ConnectivityViewControllerBase, IARDMainViewDelegate
     {
         private const string barButtonImageString = @"ic_settings_black_24dp.png";
         private const string loopbackLaunchProcessArgument = @"loopback";
@@ -28,14 +28,6 @@ namespace WebRTC.iOS.Demo
 
             AddSettingsBarButton();
 
-            var webRTCConfig = new RTCAudioSessionConfiguration();
-
-            webRTCConfig.CategoryOptions |= AVAudioSessionCategoryOptions.DefaultToSpeaker;
-            RTCAudioSessionConfiguration.SetWebRTCConfiguration(webRTCConfig);
-
-            var session = RTCAudioSession.SharedInstance;
-            session.AddDelegate(this);
-
             ConfigureAudioSession();
             SetupAudioPlayer();
         }
@@ -45,51 +37,6 @@ namespace WebRTC.iOS.Demo
             base.ViewWillAppear(animated);
 
             _mainView.RoomId = GenerateRoom.GenerateRoomName();
-        }
-
-        [Export("audioSessionDidStartPlayOrRecord:")]
-        public void AudioSessionDidStartPlayOrRecord(RTCAudioSession session)
-        {
-            // Stop playback on main queue and then configure WebRTC.
-            RTCDispatcher.DispatchAsyncOnType(RTCDispatcherQueueType.Main, () =>
-            {
-                if (_mainView.IsAudioLoopPlaying)
-                {
-                    Console.WriteLine("Stopping audio loop due to WebRTC start.");
-                    _audioPlayer.Stop();
-                }
-
-                Console.WriteLine("Setting isAudioEnabled to YES.");
-                session.IsAudioEnabled = true;
-            });
-        }
-
-        [Export("audioSessionDidStopPlayOrRecord:")]
-        public void AudioSessionDidStopPlayOrRecord(RTCAudioSession session)
-        {
-            // WebRTC is done with the audio session. Restart playback.
-            RTCDispatcher.DispatchAsyncOnType(RTCDispatcherQueueType.Main, () =>
-            {
-                Console.WriteLine("audioSessionDidStopPlayOrRecord");
-                RestartAudioPlayerIfNeeded();
-            });
-        }
-
-        private void AddSettingsBarButton()
-        {
-            var settingButton = new UIBarButtonItem(new UIImage(barButtonImageString), UIBarButtonItemStyle.Plain, ShowSettings);
-            NavigationItem.RightBarButtonItem = settingButton;
-        }
-
-        public void DidFinish(CallViewControllerBase viewController)
-        {
-            if (!viewController.IsBeingDismissed)
-            {
-                Console.WriteLine("Dismissing VC");
-                viewController.DismissViewController(true, RestartAudioPlayerIfNeeded);
-            }
-            var session = RTCAudioSession.SharedInstance;
-            session.IsAudioEnabled = false;
         }
 
         public void OnStartCall(ARDMainView mainView, string room, bool isLoopback)
@@ -124,6 +71,7 @@ namespace WebRTC.iOS.Demo
 
             // var videoCallViewController = new ARDVideoCallViewController(room, isLoopback, this);
             videoCallViewController.ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
+            videoCallViewController.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
 
             PresentViewController(videoCallViewController, true, null);
         }
@@ -142,37 +90,35 @@ namespace WebRTC.iOS.Demo
             mainView.IsAudioLoopPlaying = _audioPlayer.Playing;
         }
 
-
-
-        private void ConfigureAudioSession()
+        protected override void OnDismissVideoController()
         {
-            var configuration = new RTCAudioSessionConfiguration();
-            configuration.Category = AVAudioSession.CategoryAmbient;
-            configuration.CategoryOptions = AVAudioSessionCategoryOptions.DuckOthers;
-            configuration.Mode = AVAudioSession.ModeDefault;
-
-            var session = RTCAudioSession.SharedInstance;
-            session.LockForConfiguration();
-
-            bool hasSucceeded;
-            NSError error;
-
-            if (session.IsActive)
-            {
-                hasSucceeded = session.SetConfiguration(configuration, out error);
-            }
-            else
-            {
-                hasSucceeded = session.SetConfiguration(configuration, true, out error);
-            }
-
-            if (!hasSucceeded)
-            {
-                Console.WriteLine("Error setting configuration:{0}", error.LocalizedDescription);
-            }
-
-            session.UnlockForConfiguration();
+            base.OnDismissVideoController();
+            RestartAudioPlayerIfNeeded();
         }
+
+        protected override void AudioSessionDidStartPlayOrRecord(RTCAudioSession session)
+        {
+            if (_mainView.IsAudioLoopPlaying)
+            {
+                Console.WriteLine("Stopping audio loop due to WebRTC start.");
+                _audioPlayer.Stop();
+            }
+            base.AudioSessionDidStartPlayOrRecord(session);
+        }
+
+        protected override void AudioSessionDidStopPlayOrRecord(RTCAudioSession session)
+        {
+            base.AudioSessionDidStopPlayOrRecord(session);
+            RestartAudioPlayerIfNeeded();
+        }
+
+
+        private void AddSettingsBarButton()
+        {
+            var settingButton = new UIBarButtonItem(new UIImage(barButtonImageString), UIBarButtonItemStyle.Plain, ShowSettings);
+            NavigationItem.RightBarButtonItem = settingButton;
+        }
+
 
         private void SetupAudioPlayer()
         {

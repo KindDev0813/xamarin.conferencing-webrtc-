@@ -39,7 +39,6 @@ namespace WebRTC.iOS.Demo
             _remoteRenderer.Renderer = _videoCallView.RemoteVideoRender;
 
 
-
         }
 
         public override void LoadView()
@@ -78,11 +77,8 @@ namespace WebRTC.iOS.Demo
                 return factory.CreateCameraCapturer(videoSource, true);
             }
 
-            var fileCapturer = factory.CreateFileCapturer(videoSource, "foreman.mp4");
-
-            _fileCaptureController = new ARDFileCaptureController((IFileVideoCaptureriOS)fileCapturer);
-            return fileCapturer;
-
+            _fileCaptureController = new ARDFileCaptureController(videoSource);
+            return _fileCaptureController;
         }
 
 

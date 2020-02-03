@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Android.OS;
 using Java.Nio;
 using WebRTC.Abstraction;
 using Org.Webrtc;
@@ -10,6 +11,7 @@ namespace WebRTC.Droid
 {
     internal class DataChannelNative : Java.Lang.Object, IDataChannel, DataChannel.IObserver
     {
+        private readonly Handler _handler = new Handler(Looper.MainLooper);
         private readonly DataChannel _dataChannel;
 
         public DataChannelNative(DataChannel dataChannel)
@@ -54,17 +56,22 @@ namespace WebRTC.Droid
 
         void DataChannel.IObserver.OnBufferedAmountChange(long p0)
         {
-            OnBufferedAmountChange?.Invoke(this, p0);
+            _handler.Post(() => { OnBufferedAmountChange?.Invoke(this, p0); });
         }
 
         void DataChannel.IObserver.OnMessage(DataChannel.Buffer p0)
         {
-            OnMessage?.Invoke(this, new DataBuffer(new FastJavaByteArray(p0.Data.Handle).ToArray(), p0.Binary));
+            _handler.Post(() =>
+            {
+                var buffer = new byte[p0.Data.Remaining()];
+                p0.Data.Get(buffer, 0, buffer.Length);
+                OnMessage?.Invoke(this, new DataBuffer(buffer, p0.Binary));
+            });
         }
 
         void DataChannel.IObserver.OnStateChange()
         {
-            OnStateChange?.Invoke(this, EventArgs.Empty);
+            _handler.Post(() => { OnStateChange?.Invoke(this, EventArgs.Empty); });
         }
     }
 }

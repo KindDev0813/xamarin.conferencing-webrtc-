@@ -1,45 +1,48 @@
 using System;
 using System.Diagnostics;
 using WebRTC.Abstraction;
+using WebRTC.Abstraction.Extensions;
 using WebRTC.iOS.Binding;
 
 namespace WebRTC.iOS
 {
-    public interface IFileVideoCaptureriOS : IFileVideoCapturer
-    {
-        void StartCapturingFromFileNamed(string fileName);
-    }
-
-    internal class FileVideoCapturerNative : NativeObjectBase, IFileVideoCaptureriOS
+    public class FileVideoCapturer : NativeObjectBase, IFileVideoCapturer
     {
         private readonly RTCFileVideoCapturer _capturer;
         private readonly string _file;
 
 
-        public FileVideoCapturerNative(RTCFileVideoCapturer capturer,string file):base(capturer)
+        public FileVideoCapturer(IVideoSource videoSource)
         {
-            _capturer = capturer;
+            _capturer = new RTCFileVideoCapturer(videoSource.ToNative<IRTCVideoCapturerDelegate>());
+            NativeObject = _capturer;
+        }
+
+        public FileVideoCapturer(IVideoSource videoSource, string file) : this(videoSource)
+        {
             _file = file;
         }
 
+
         public bool IsScreencast => false;
-        
-        public void StartCapture()
+
+        public virtual void StartCapture()
         {
             StartCapturingFromFileNamed(_file);
         }
 
-        public void StartCapture(int videoWidth, int videoHeight, int fps)
+        public virtual void StartCapture(int videoWidth, int videoHeight, int fps)
         {
             StartCapture();
         }
 
-        public void StartCapturingFromFileNamed(string fileName)
+        public virtual void StartCapturingFromFileNamed(string file)
         {
-            _capturer.StartCapturingFromFileNamed(_file, (err) => Debug.WriteLine($"FileVideoCapturerNative failed:{err}"));
+            _capturer.StartCapturingFromFileNamed(file, (err) => Debug.WriteLine($"FileVideoCapturerNative failed:{err}"));
         }
 
-        public void StopCapture()
+
+        public virtual void StopCapture()
         {
             _capturer.StopCapture();
         }

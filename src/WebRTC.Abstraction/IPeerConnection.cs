@@ -13,7 +13,7 @@ namespace WebRTC.Abstraction
         void OnSetFailure(string error);
     }
     
-    public interface IPeerConnection :INativeObject, IDisposable
+    public interface IPeerConnection :INativeObject
     {
         
         IPeerConnectionFactory PeerConnectionFactory { get; }
@@ -64,6 +64,8 @@ namespace WebRTC.Abstraction
         void SetLocalDescription(SessionDescription sdp,  ISdpObserver observer);
         
         void SetRemoteDescription(SessionDescription sdp,  ISdpObserver observer);
+
+        IDataChannel CreateDataChannel(string label, DataChannelConfiguration dataChannelConfiguration);
 
         bool SetBitrate(int min, int current, int max);
         bool StartRtcEventLog(string file, int fileSizeLimitBytes);
