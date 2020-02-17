@@ -66,16 +66,15 @@
 	<key>CFBundleName</key>
 	<string>WebRTC.iOS.Demo</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-<string>Fill in a reason why your app needs access to location.</string>
-<key>NSCameraUsageDescription</key>
+	<string>Fill in a reason why your app needs access to location.</string>
+	<key>NSCameraUsageDescription</key>
 	<string>Camera access needed for video calling</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access needed for video calling</string>
-<key>NSAppTransportSecurity</key>
+	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
 </dict>
-
 </plist>

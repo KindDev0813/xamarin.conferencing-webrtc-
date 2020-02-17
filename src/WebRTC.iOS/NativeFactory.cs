@@ -20,12 +20,12 @@ namespace WebRTC.iOS
 
         public void ShutdownInternalTracer()
         {
-            RTCTracking.RTCShutdownInternalTracer();
+            //RTCTracking.RTCShutdownInternalTracer();
         }
 
         public void StopInternalTracingCapture()
         {
-            RTCTracking.RTCStopInternalCapture();
+            //RTCTracking.RTCStopInternalCapture();
         }
     }
 }

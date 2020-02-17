@@ -16,7 +16,7 @@ namespace WebRTC.iOS
 
             if (enableInternalTracer)
             {
-                RTCTracking.RTCSetupInternalTracer();
+                //RTCTracing.RTCStartInternalCapture("log.cs");
             }
             
             RTCSSLAdapter.RTCInitializeSSL();
@@ -25,7 +25,7 @@ namespace WebRTC.iOS
 
         public static void Cleanup()
         {
-            RTCTracking.RTCShutdownInternalTracer();
+            RTCTracing.RTCShutdownInternalTracer();
             RTCSSLAdapter.RTCCleanupSSL();
         }
     }

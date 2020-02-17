@@ -20,6 +20,7 @@ namespace WebRTC.iOS.Demo
             // Override point for customization after application launch.
             // If not required for your application you can safely delete this method
             H113Platform.Init();
+
             return true;
         }
 

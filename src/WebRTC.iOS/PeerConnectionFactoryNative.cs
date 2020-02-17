@@ -3,7 +3,7 @@ using WebRTC.Abstraction;
 using WebRTC.Abstraction.Extensions;
 using WebRTC.iOS.Extensions;
 using WebRTC.iOS.Binding;
-
+using System.Linq;
 
 namespace WebRTC.iOS
 {
@@ -15,6 +15,8 @@ namespace WebRTC.iOS
         {
             var decoderFactory = new RTCDefaultVideoDecoderFactory();
             var encoderFactory = new RTCDefaultVideoEncoderFactory();
+
+         
 
             NativeObject = _factory = new RTCPeerConnectionFactory(encoderFactory, decoderFactory);
         }

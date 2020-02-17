@@ -53,9 +53,9 @@
   <ItemGroup>
     <NativeReference Include="WebRTC.framework">
       <Kind>Framework</Kind>
-      <SmartLink>False</SmartLink>
       <ForceLoad>True</ForceLoad>
       <Frameworks>CoreGraphics OpenAL CoreVideo Metal MetalKit</Frameworks>
+      <SmartLink>False</SmartLink>
     </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.ObjCBinding.CSharp.targets" />

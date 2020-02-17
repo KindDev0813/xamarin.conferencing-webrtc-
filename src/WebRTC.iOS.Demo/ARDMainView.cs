@@ -151,6 +151,7 @@ namespace WebRTC.iOS.Demo
                 _roomText.AutocapitalizationType = UITextAutocapitalizationType.None;
                 _roomText.ClearButtonMode = UITextFieldViewMode.Always;
                 _roomText.Delegate = this;
+                _roomText.TextColor = UIColor.Blue;
 
                 AddSubview(_roomText);
 

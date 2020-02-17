@@ -12,16 +12,15 @@
 
 #import "RTCMacros.h"
 
+
 NS_ASSUME_NONNULL_BEGIN
 
 RTC_OBJC_EXPORT
-@interface RTCTracking : NSObject
+@interface RTCTracing : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 
-+ (void) RTCSetupInternalTracer;
-
-+ (BOOL) RTCStartInternalCapture:(NSString*) filePath;
++ (BOOL) RTCStartInternalCapture:(NSString*)filePath;
 
 + (void) RTCStopInternalCapture;
 

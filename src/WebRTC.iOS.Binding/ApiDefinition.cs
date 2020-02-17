@@ -8,16 +8,11 @@ using UIKit;
 
 namespace WebRTC.iOS.Binding
 {
-    // @interface RTCTracking : NSObject
+    // @interface RTCTracing : NSObject
     [BaseType(typeof(NSObject))]
     [DisableDefaultCtor]
-    interface RTCTracking
+    interface RTCTracing
     {
-        // +(void)RTCSetupInternalTracer;
-        [Static]
-        [Export("RTCSetupInternalTracer")]
-        void RTCSetupInternalTracer();
-
         // +(BOOL)RTCStartInternalCapture:(NSString * _Nonnull)filePath;
         [Static]
         [Export("RTCStartInternalCapture:")]
@@ -775,7 +770,7 @@ namespace WebRTC.iOS.Binding
         void StopCapture();
     }
 
-    // @interface RTCMTLVideoView : UIView<RTCVideoRenderer>
+    //// @interface RTCMTLVideoView : UIView<RTCVideoRenderer>
     //[Introduced(PlatformName.iOS, 9, 0)]
     //[BaseType(typeof(UIView))]
     //interface RTCMTLVideoView : RTCVideoRenderer
