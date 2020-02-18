@@ -26,6 +26,7 @@ namespace WebRTC.iOS
         public void RenderFrame(RTCVideoFrame frame)
         {
             Renderer?.RenderFrame(frame);
+            frame.Dispose();
         }
 
         public void SetSize(CGSize size)

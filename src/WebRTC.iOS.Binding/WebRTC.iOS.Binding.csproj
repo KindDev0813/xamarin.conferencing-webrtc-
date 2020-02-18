@@ -43,6 +43,7 @@
     <Compile Include="RTCCVPixelBuffer.cs" />
     <Compile Include="RTCDataChannel.cs" />
     <Compile Include="RTCFieldTrials.cs" />
+    <Compile Include="RTCLog.cs" />
   </ItemGroup>
   <ItemGroup>
     <ObjcBindingApiDefinition Include="ApiDefinition.cs" />

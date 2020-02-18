@@ -48,6 +48,11 @@ namespace WebRTC.iOS.Demo
             session.IsAudioEnabled = false;
         }
 
+        protected virtual void FinishConfigureAudioSessions()
+        {
+
+        }
+
         protected virtual void OnDismissVideoController()
         {
 
@@ -62,9 +67,10 @@ namespace WebRTC.iOS.Demo
         protected virtual void AudioSessionDidStopPlayOrRecord(RTCAudioSession session)
         {
             Console.WriteLine("audioSessionDidStopPlayOrRecord");
+            ConfigureAudioSession();
         }
 
-        protected void ConfigureAudioSession()
+        private void ConfigureAudioSession()
         {
             var configuration = new RTCAudioSessionConfiguration();
             configuration.Category = AVAudioSession.CategoryAmbient;
@@ -92,6 +98,7 @@ namespace WebRTC.iOS.Demo
             }
 
             session.UnlockForConfiguration();
+            FinishConfigureAudioSessions();
         }
 
 
@@ -101,8 +108,6 @@ namespace WebRTC.iOS.Demo
             // Stop playback on main queue and then configure WebRTC.
             RTCDispatcher.DispatchAsyncOnType(RTCDispatcherQueueType.Main, () =>
             {
-
-
                 Console.WriteLine("Setting isAudioEnabled to YES.");
                 session.IsAudioEnabled = true;
             });
@@ -114,7 +119,6 @@ namespace WebRTC.iOS.Demo
             // WebRTC is done with the audio session. Restart playback.
             RTCDispatcher.DispatchAsyncOnType(RTCDispatcherQueueType.Main, () =>
             {
-
                 AudioSessionDidStopPlayOrRecord(session);
             });
         }

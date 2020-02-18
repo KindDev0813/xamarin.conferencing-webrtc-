@@ -1,8 +1,11 @@
 ﻿using System;
+using AVFoundation;
 using CoreGraphics;
+using Foundation;
 using UIKit;
 using WebRTC.Abstraction;
 using WebRTC.AppRTC.Abstraction;
+using WebRTC.iOS.Binding;
 using Xamarin.Essentials;
 
 namespace WebRTC.iOS.Demo
@@ -14,8 +17,11 @@ namespace WebRTC.iOS.Demo
     }
 
 
-    public abstract class CallViewControllerBase : UIViewController, IARDVideoCallViewDelegate, IAppRTCEngineEvents
+    public abstract class CallViewControllerBase : UIViewController, IARDVideoCallViewDelegate, IAppRTCEngineEvents, IRTCAudioSessionDelegate
     {
+        private AVAudioSessionPortOverride _portOvveride;
+
+
         private ARDVideoCallView _videoCallView;
 
         private VideoRendererProxy _localRenderer;
@@ -87,7 +93,7 @@ namespace WebRTC.iOS.Demo
             var permission = await Xamarin.Essentials.Permissions.RequestAsync<Permissions.Camera>();
             if (permission == PermissionStatus.Granted)
             {
-                StartVideoCall(_localRenderer, _remoteRenderer);
+                StartVideoCallInternal(_localRenderer, _remoteRenderer);
             }
             else
             {
@@ -115,7 +121,32 @@ namespace WebRTC.iOS.Demo
 
         public void DidChangeRoute(ARDVideoCallView view)
         {
+            var @override = AVAudioSessionPortOverride.None;
+            if (_portOvveride == AVAudioSessionPortOverride.None)
+            {
+                @override = AVAudioSessionPortOverride.Speaker;
+            }
 
+            RTCDispatcher.DispatchAsyncOnType(RTCDispatcherQueueType.AudioSession, () =>
+            {
+                var session = RTCAudioSession.SharedInstance;
+                session.LockForConfiguration();
+                session.OverrideOutputAudioPort(@override, out NSError error);
+
+                if (error == null)
+                    _portOvveride = @override;
+                else
+                {
+                    Console.WriteLine("Error overriding output port:{0}", error.LocalizedDescription);
+                }
+                session.UnlockForConfiguration();
+            });
+        }
+
+        [Export("audioSession:didDetectPlayoutGlitch:")]
+        public void AudioSession(RTCAudioSession audioSession, long totalNumberOfGlitches)
+        {
+            Console.WriteLine("Audio session detected glitch, total:{0}", totalNumberOfGlitches);
         }
 
         public void DidHangup(ARDVideoCallView view)
@@ -133,6 +164,18 @@ namespace WebRTC.iOS.Demo
         protected abstract void SwitchCamera();
 
         protected abstract void StartVideoCall(IVideoRenderer localRenderer, IVideoRenderer remoteRenderer);
+
+        private void StartVideoCallInternal(IVideoRenderer localRenderer, IVideoRenderer remoteRenderer)
+        {
+
+            var session = RTCAudioSession.SharedInstance;
+
+            session.UseManualAudio = true;
+            session.IsAudioEnabled = false;
+
+
+            StartVideoCall(localRenderer, remoteRenderer);
+        }
 
     }
 

@@ -27,9 +27,6 @@ namespace WebRTC.iOS.Demo
             View = _mainView;
 
             AddSettingsBarButton();
-
-            ConfigureAudioSession();
-            SetupAudioPlayer();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -58,12 +55,6 @@ namespace WebRTC.iOS.Demo
             room = room.Trim();
 
 
-            // var settingsModel = new ARDSettingsModel();
-            var session = RTCAudioSession.SharedInstance;
-
-            // session.UseManualAudio = settingsModel.CurrentUseManualAudioConfigSettingFromStore;
-            session.IsAudioEnabled = false;
-
             var videoCallViewController = new AppRTCCallViewController(room, isLoopback)
             {
                 Delegate = this
@@ -88,6 +79,12 @@ namespace WebRTC.iOS.Demo
             }
 
             mainView.IsAudioLoopPlaying = _audioPlayer.Playing;
+        }
+
+        protected override void FinishConfigureAudioSessions()
+        {
+            base.FinishConfigureAudioSessions();
+            SetupAudioPlayer();
         }
 
         protected override void OnDismissVideoController()
@@ -132,7 +129,6 @@ namespace WebRTC.iOS.Demo
 
         private void RestartAudioPlayerIfNeeded()
         {
-            ConfigureAudioSession();
             if (_mainView.IsAudioLoopPlaying && PresentedViewController != null)
             {
                 Console.WriteLine("Starting audio loop due to WebRTC end.");
