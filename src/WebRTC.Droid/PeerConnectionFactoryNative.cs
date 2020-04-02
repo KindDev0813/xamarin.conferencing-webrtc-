@@ -31,13 +31,7 @@ namespace WebRTC.Droid
         {
             _context = context;
 
-            IEglBase eglBase;
-            if (Build.VERSION.SdkInt < BuildVersionCodes.Lollipop)
-                eglBase = EglBase.CreateEgl10(EglBase.ConfigPlain.ToArray());
-            else
-                eglBase = EglBase.Create();
-
-            EglBaseContext = eglBase.EglBaseContext;
+            EglBaseContext = EglBaseHelper.Create().EglBaseContext;
 
             _factory = CreateNativeFactory(context, EglBaseContext);
             NativeObject = _factory;

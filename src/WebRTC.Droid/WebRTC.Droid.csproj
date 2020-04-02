@@ -78,6 +78,7 @@
     <Compile Include="VideoSourceNative.cs" />
     <Compile Include="VideoTrackNative.cs" />
     <Compile Include="NativeFactory.cs" />
+    <Compile Include="EglBaseHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
