@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using WebRTC.AppRTC.Abstraction;
 
-namespace WebRTC.H113.Droid
+namespace WebRTC.H113
 {
     public interface IVideoControllerListener
     {

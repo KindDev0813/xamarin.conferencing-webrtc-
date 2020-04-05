@@ -44,7 +44,6 @@
     <ItemGroup>
         <Compile Include="AutobahnWebSocket.cs" />
         <Compile Include="H113Platform.cs" />
-        <Compile Include="IVideoControllerListener.cs" />
         <Compile Include="IVideoControllerReadyCallback.cs" />
         <Compile Include="VideoController.cs" />
         <Compile Include="VideoFragment.cs" />
