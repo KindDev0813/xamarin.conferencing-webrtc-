@@ -22,8 +22,16 @@ namespace WebRTC.AppRTC.Abstraction
         WebSocket
     }
 
+    public interface IAppRTCController
+    {
+        public void SwitchCamera();
+        public void SetVideoEnabled(bool enable);
+        public void SetAudioEnabled(bool enable);
+        void Disconnect();
+    }
+
     public abstract class AppRTCControllerBase<TConnectionParam, TSignalParam> : ISignalingEvents<TSignalParam>,
-        IPeerConnectionEvents
+        IPeerConnectionEvents,IAppRTCController
         where TSignalParam : ISignalingParameters
         where TConnectionParam : IConnectionParameters
     {

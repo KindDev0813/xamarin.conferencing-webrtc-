@@ -15,7 +15,6 @@ namespace WebRTC.H113
 
         public string WsUrl { get; }
         public string Protocol { get; }
-
         public string Phone { get; }
         public double Lat { get; }
         public double Log { get; }
