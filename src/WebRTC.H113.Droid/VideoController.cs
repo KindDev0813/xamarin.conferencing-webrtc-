@@ -1,5 +1,9 @@
 using System;
 using Android.Content;
+using Android.OS;
+using Android.Runtime;
+using Android.Util;
+using Android.Views;
 using Org.Webrtc;
 using WebRTC.Abstraction;
 using WebRTC.AppRTC.Abstraction;
@@ -8,72 +12,66 @@ using IVideoCapturer = WebRTC.Abstraction.IVideoCapturer;
 
 namespace WebRTC.H113.Droid
 {
-    public class VideoController : IAppRTCEngineEvents
+    public class VideoController : Java.Lang.Object, IAppRTCEngineEvents, RendererCommon.IRendererEvents
     {
         private readonly ConnectionParameters _connectionParameters;
         private readonly bool _frontCamera;
 
         private readonly H113Controller _controller;
 
-        private readonly VideoRendererProxyEx _videoRendererProxy;
-        
+        private readonly VideoRendererProxy _videoRendererProxy;
+
         private IVideoControllerListener _videoControllerListener;
 
-        private bool _audioEnable = true;
-        private bool _videoEnable = true;
-        public VideoController(Context context, ConnectionParameters connectionParameters, bool frontCamera)
+        private WeakReference<IEglBaseContext> _wfEglContext;
+
+        private SurfaceViewRenderer _surfaceViewRenderer;
+
+        public VideoController(ConnectionParameters connectionParameters, bool frontCamera)
         {
             _connectionParameters = connectionParameters;
             _frontCamera = frontCamera;
 
-            FullScreenRenderer = new SurfaceViewRenderer(context);
 
             _controller = new H113Controller(this);
 
-            _videoRendererProxy = new VideoRendererProxyEx
-            {
-                Renderer = FullScreenRenderer
-            };
+            _videoRendererProxy = new VideoRendererProxy();
         }
 
-        public SurfaceViewRenderer FullScreenRenderer { get; }
 
         public bool IsConnected => _controller.Connected;
 
-        public bool AudioEnable
+        internal View OnCreateView(Context context)
         {
-            get => _audioEnable;
-            set
-            {
-                if (_audioEnable == value)
-                    return;
-                _audioEnable = value;
-                _controller.SetAudioEnabled(value);
-            }
+            OnViewDestroyed();
+            _surfaceViewRenderer = new SurfaceViewRenderer(context);
+            _surfaceViewRenderer.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent,
+                ViewGroup.LayoutParams.MatchParent);
+            _surfaceViewRenderer.SetScalingType(RendererCommon.ScalingType.ScaleAspectFit);
+            _surfaceViewRenderer.SetZOrderMediaOverlay(true);
+            _surfaceViewRenderer.SetEnableHardwareScaler(true);
+            _videoRendererProxy.Renderer = _surfaceViewRenderer;
+            
+            if (_wfEglContext != null && _wfEglContext.TryGetTarget(out var eglBaseContext))
+                _surfaceViewRenderer.Init(eglBaseContext, null);
+
+            return _surfaceViewRenderer;
         }
-        
-        public bool VideoEnable
+
+        internal void OnViewDestroyed()
         {
-            get => _videoEnable;
-            set
-            {
-                if (_videoEnable == value)
-                    return;
-                _videoEnable = value;
-                _controller.SetVideoEnabled(value);
-            }
+            _videoRendererProxy.Renderer = null;
+            _surfaceViewRenderer?.Release();
         }
 
         public void Start(IVideoControllerListener videoControllerListener)
         {
+            _videoControllerListener = null;
+
+            Disconnect();
+
             _videoControllerListener = videoControllerListener;
 
-            _videoRendererProxy.Callback = () =>
-            {
-                _videoControllerListener.OnFirstFrame();
-                _videoRendererProxy.Callback = null;
-            };
-            
             _controller.Connect(_connectionParameters);
         }
 
@@ -84,14 +82,14 @@ namespace WebRTC.H113.Droid
 
         public void ToggleAudio()
         {
-            AudioEnable = !AudioEnable;
+            _controller.SetAudioEnabled(!_controller.IsAudioEnable);
         }
 
         public void ToggleVideo()
         {
-            VideoEnable = !VideoEnable;
+            _controller.SetVideoEnabled(!_controller.IsVideoEnable);
         }
-        
+
         public void Disconnect()
         {
             if (!_controller.Connected)
@@ -102,7 +100,8 @@ namespace WebRTC.H113.Droid
         void IAppRTCEngineEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
             var androidFactory = (IPeerConnectionFactoryAndroid) factory.NativeObject;
-            FullScreenRenderer.Init(androidFactory.EglBaseContext, null);
+            _wfEglContext = new WeakReference<IEglBaseContext>(androidFactory.EglBaseContext);
+            _surfaceViewRenderer?.Init(androidFactory.EglBaseContext, this);
         }
 
         void IAppRTCEngineEvents.OnDisconnect(DisconnectType disconnectType)
@@ -119,7 +118,7 @@ namespace WebRTC.H113.Droid
         {
             var isAllowed = await _videoControllerListener.RequestCameraPermissionAsync();
             if (isAllowed)
-                _controller.StartVideoCall(_videoRendererProxy, null);
+                _controller.StartVideoCall(_videoRendererProxy, new VideoRendererProxy());
         }
 
         void IAppRTCEngineEvents.OnError(string description)
@@ -127,15 +126,15 @@ namespace WebRTC.H113.Droid
             _videoControllerListener.OnError(description);
         }
 
-        private class VideoRendererProxyEx : VideoRendererProxy
+        void RendererCommon.IRendererEvents.OnFirstFrameRendered()
         {
-            public Action Callback { get; set; }
+            var handler = new Handler(Looper.MainLooper);
+            handler.Post(() => _videoControllerListener?.OnFirstFrame());
+        }
+
+        void RendererCommon.IRendererEvents.OnFrameResolutionChanged(int width, int height, int fps)
+        {
             
-            public override void OnFrame(VideoFrame p0)
-            {
-                base.OnFrame(p0);
-                Callback?.Invoke();
-            }
         }
     }
 }

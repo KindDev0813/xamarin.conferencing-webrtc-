@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Views;
@@ -13,7 +14,8 @@ using AlertDialog = Android.Support.V7.App.AlertDialog;
 
 namespace H113.Demo.Droid
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true,
+        ScreenOrientation = ScreenOrientation.Sensor)]
     public class MainActivity : AppCompatActivity, IVideoControllerReadyCallback, IVideoControllerListener
     {
         private const string Token =
@@ -38,9 +40,12 @@ namespace H113.Demo.Droid
             var fragment = VideoFragment.NewInstance(_connectionParameters, true);
             fragment.GetVideoControllerAsync(this);
 
+            HideVideoContainer(false);
+            
             SupportFragmentManager.BeginTransaction()
                 .Add(fragment, "video_fragment")
                 .CommitNow();
+            
 
             var switchCamera = FindViewById<ImageButton>(Resource.Id.btn_switch_camera);
             switchCamera.Click += (sender, args) => _videoController?.SwitchCamera();
@@ -54,7 +59,7 @@ namespace H113.Demo.Droid
                 if (_videoController.IsConnected)
                 {
                     _videoController.Disconnect();
-                    HideVideoContainer(true);
+                    
                 }
                 else
                 {

@@ -207,15 +207,13 @@ namespace WebRTC.Droid
                 {
                     throw new RuntimeException("Already has an EGLSurface");
                 }
-                else
+
+                var surfaceAttribs = new[] { 12344 };
+                _eglSurface = EGL14.EglCreateWindowSurface(_eglDisplay, _eglConfig, surface, surfaceAttribs, 0);
+                if (_eglSurface == EGL14.EglNoSurface)
                 {
-                    int[] surfaceAttribs = new int[] { 12344 };
-                    _eglSurface = EGL14.EglCreateWindowSurface(_eglDisplay, _eglConfig, surface, surfaceAttribs, 0);
-                    if (_eglSurface == EGL14.EglNoSurface)
-                    {
-                        throw new RuntimeException("Failed to create window surface: 0x" +
-                                                   Integer.ToHexString(EGL14.EglGetError()));
-                    }
+                    throw new RuntimeException("Failed to create window surface: 0x" +
+                                               Integer.ToHexString(EGL14.EglGetError()));
                 }
             }
 

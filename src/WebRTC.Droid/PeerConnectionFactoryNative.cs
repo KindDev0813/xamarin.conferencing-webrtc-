@@ -26,7 +26,6 @@ namespace WebRTC.Droid
         private readonly PeerConnectionFactory _factory;
         private readonly Context _context;
 
-
         public PeerConnectionFactoryNative(Context context)
         {
             _context = context;

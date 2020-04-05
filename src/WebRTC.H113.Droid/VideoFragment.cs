@@ -1,8 +1,11 @@
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Views;
+using Android.Widget;
 using Newtonsoft.Json;
+using Org.Webrtc;
 
 namespace WebRTC.H113.Droid
 {
@@ -13,7 +16,7 @@ namespace WebRTC.H113.Droid
 
         private VideoController _controller;
         private IVideoControllerReadyCallback _controllerReadyCallback;
-        
+
         private VideoFragment()
         {
         }
@@ -44,36 +47,24 @@ namespace WebRTC.H113.Droid
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            RetainInstance = true;
             if (_controller != null)
                 return;
             var json = Arguments.GetString(ConnectionParametersExtra);
             var connectionParameters = JsonConvert.DeserializeObject<ConnectionParameters>(json);
             var useFrontCamera = Arguments.GetBoolean(UseFrontCameraExtra);
-            _controller = new VideoController(Context, connectionParameters, useFrontCamera);
+            _controller = new VideoController(connectionParameters, useFrontCamera);
             _controllerReadyCallback?.OnReadyViewController(_controller);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return _controller.FullScreenRenderer;
+            return _controller.OnCreateView(Context);
         }
 
         public override void OnDestroyView()
         {
-            if (_controller.FullScreenRenderer.Parent is ViewGroup viewGroup)
-            {
-                viewGroup.RemoveView(_controller.FullScreenRenderer);
-            }
-
+            _controller.OnViewDestroyed();
             base.OnDestroyView();
-        }
-
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-            _controller.FullScreenRenderer.Release();
-            _controller.Disconnect();
         }
     }
 }

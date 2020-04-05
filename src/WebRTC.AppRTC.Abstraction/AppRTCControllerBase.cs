@@ -24,6 +24,8 @@ namespace WebRTC.AppRTC.Abstraction
 
     public interface IAppRTCController
     {
+        bool IsVideoEnable { get; }
+        bool IsAudioEnable { get; }
         public void SwitchCamera();
         public void SetVideoEnabled(bool enable);
         public void SetAudioEnabled(bool enable);
@@ -97,6 +99,8 @@ namespace WebRTC.AppRTC.Abstraction
             PeerConnectionClient?.ChangeCaptureFormat(width, height, framerate);
         }
 
+        public bool IsVideoEnable => PeerConnectionClient?.IsVideoEnable ?? false;
+        public bool IsAudioEnable => PeerConnectionClient?.IsAudioEnable ?? false;
         public void SwitchCamera()
         {
             PeerConnectionClient?.SwitchCamera();
@@ -119,6 +123,8 @@ namespace WebRTC.AppRTC.Abstraction
             Executor.Execute(() =>
             {
                 _signalingParameters = signalingParameters;
+
+                PeerConnectionClient?.Close();
 
                 var peerConnectionClientParams = CreatePeerConnectionParameters(signalingParameters);
                 PeerConnectionClient =

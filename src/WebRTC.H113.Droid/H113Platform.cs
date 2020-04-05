@@ -17,7 +17,7 @@ namespace WebRTC.H113.Droid
                 return;
             _wasInit = true;
             Platform.Init(activity);
-            WebSocketConnectionFactory.Factory = () => new OkHttpWebSocket();
+            WebSocketConnectionFactory.Factory = () => new AutobahnWebSocket();
             ExecutorServiceFactory.Factory = tag => new ExecutorServiceImpl(tag);
             ExecutorServiceFactory.MainExecutor = new MainExecutor();
         }

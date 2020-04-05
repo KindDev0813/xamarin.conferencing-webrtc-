@@ -178,6 +178,9 @@ namespace WebRTC.AppRTC.Abstraction
             _peerConnectionListener = new PeerConnectionListener(this);
         }
 
+        public bool IsVideoEnable => _renderVideo;
+        public bool IsAudioEnable => _enableAudio;
+
         public void SetVideoEnabled(bool enable)
         {
             _executor.Execute(() =>
@@ -204,7 +207,6 @@ namespace WebRTC.AppRTC.Abstraction
         {
             _executor.Execute(CloseInternal);
         }
-
 
         /// <summary>
         /// This function should only be called once.
@@ -498,11 +500,14 @@ namespace WebRTC.AppRTC.Abstraction
             {
                 _peerConnection.AddTrack(CreateVideoTrack(), mediaStreamLabels);
 
-                // We can add the renderers right away because we don't need to wait for an
-                // answer to get the remote track.
-                _remoteVideoTrack = GetRemoteVideoTrack();
-                _remoteVideoTrack.IsEnabled = _renderVideo;
-                _remoteVideoTrack.AddRenderer(_remoteRenderer);
+                if (_remoteRenderer != null)
+                {
+                    // We can add the renderers right away because we don't need to wait for an
+                    // answer to get the remote track.
+                    _remoteVideoTrack = GetRemoteVideoTrack();
+                    _remoteVideoTrack.IsEnabled = _renderVideo;
+                    _remoteVideoTrack.AddRenderer(_remoteRenderer);
+                }
             }
 
             _peerConnection.AddTrack(CreateAudioTrack(), mediaStreamLabels);
