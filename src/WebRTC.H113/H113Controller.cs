@@ -15,11 +15,11 @@ namespace WebRTC.H113
         {
         }
 
-        public override void Disconnect()
+        protected override void OnTearDown()
         {
             if (_dataChannel != null)
                 _dataChannel.OnMessage -= DataChannelOnOnMessage;
-            base.Disconnect();
+            base.OnTearDown();
         }
 
         protected override bool IsInitiator => true;

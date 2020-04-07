@@ -48,7 +48,7 @@ namespace WebRTC.Droid
 
         public void OnIceConnectionReceivingChange(bool p0)
         {
-            // _handler.Post(() =>_listener.ice
+            
         }
 
         public void OnIceGatheringChange(PeerConnection.IceGatheringState p0)
@@ -71,6 +71,11 @@ namespace WebRTC.Droid
             _listener.OnSignalingChange(p0.ToNet());
         }
 
+        public void OnConnectionChange(PeerConnection.PeerConnectionState newState)
+        {
+            _listener?.OnConnectionChange(newState.ToNet());
+        }
+
         private static IMediaStream[] ConvertToNative(MediaStream[] source)
         {
             var arr = new IMediaStream[source.Length];
@@ -80,6 +85,6 @@ namespace WebRTC.Droid
             }
 
             return arr;
-        }
+        }        
     }
 }

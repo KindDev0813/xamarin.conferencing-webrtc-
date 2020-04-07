@@ -12,10 +12,12 @@ namespace WebRTC.iOS
     internal class PeerConnectionNative : NativeObjectBase, IPeerConnection
     {
         private readonly RTCPeerConnection _peerConnection;
+        private IRTCPeerConnectionDelegate _peerConnectionDelegate;
 
-        public PeerConnectionNative(RTCPeerConnection peerConnection, Abstraction.RTCConfiguration configuration, IPeerConnectionFactory factory)
+        public PeerConnectionNative(RTCPeerConnection peerConnection, Abstraction.RTCConfiguration configuration, IPeerConnectionFactory factory, IRTCPeerConnectionDelegate peerConnectionDelegate)
         {
             _peerConnection = peerConnection;
+            _peerConnectionDelegate = peerConnectionDelegate;
             Configuration = configuration;
             PeerConnectionFactory = factory;
         }
@@ -46,6 +48,12 @@ namespace WebRTC.iOS
         }
 
         public Abstraction.RTCConfiguration Configuration { get; private set; }
+
+        public override void Dispose()
+        {
+            _peerConnectionDelegate = null;
+            base.Dispose();
+        }
 
         public bool SetConfiguration(Abstraction.RTCConfiguration configuration)
         {

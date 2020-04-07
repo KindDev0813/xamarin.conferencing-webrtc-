@@ -241,7 +241,7 @@ namespace WebRTC.AppRTC.Abstraction
                 catch (Exception ex)
                 {
                     ReportError("Failed to create peer connection: " + ex.Message);
-                    throw;
+                    return;
                 }
                 if(_peerConnection != null)
                     _peerConnectionEvents.OnPeerConnectionCreated(_peerConnection);

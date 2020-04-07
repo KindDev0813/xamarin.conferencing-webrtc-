@@ -29,11 +29,13 @@ namespace WebRTC.iOS
                 new NSDictionary<NSString, NSString>(new NSString("DtlsSrtpKeyAgreement"),
                     new NSString(configuration.EnableDtlsSrtp ? "false" : "true")));
 
+            var peerConnectionDelegate = new PeerConnectionListenerProxy(peerConnectionListener);
+
             var peerConnection = _factory.PeerConnectionWithConfiguration(rtcConfiguration, constraints,
-                new PeerConnectionListenerProxy(peerConnectionListener));
+                peerConnectionDelegate);
             if (peerConnection == null)
                 return null;
-            return new PeerConnectionNative(peerConnection, configuration, this);
+            return new PeerConnectionNative(peerConnection, configuration, this,peerConnectionDelegate);
         }
 
         public IAudioSource CreateAudioSource(MediaConstraints mediaConstraints)

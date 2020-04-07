@@ -10,6 +10,8 @@ namespace WebRTC.H113
         void OnDisconnect(DisconnectType disconnectType);
 
         void OnFirstFrame();
+
+        void OnConnect();
         
         Task<bool> RequestCameraPermissionAsync();
     }

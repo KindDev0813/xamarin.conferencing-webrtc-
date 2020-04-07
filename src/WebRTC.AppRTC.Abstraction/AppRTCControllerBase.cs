@@ -6,6 +6,11 @@ namespace WebRTC.AppRTC.Abstraction
     {
         void OnPeerFactoryCreated(IPeerConnectionFactory factory);
 
+        /// <summary>
+        /// Will be called when WebRTC connection it's establish
+        /// </summary>
+        void OnConnect();
+
         void OnDisconnect(DisconnectType disconnectType);
 
         IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource);
@@ -18,6 +23,7 @@ namespace WebRTC.AppRTC.Abstraction
 
     public enum DisconnectType
     {
+        UserDisconnect,
         PeerConnection,
         WebSocket
     }
@@ -28,18 +34,22 @@ namespace WebRTC.AppRTC.Abstraction
         bool IsAudioEnable { get; }
         public void SwitchCamera();
         public void SetVideoEnabled(bool enable);
+
         public void SetAudioEnabled(bool enable);
+
         void Disconnect();
     }
 
     public abstract class AppRTCControllerBase<TConnectionParam, TSignalParam> : ISignalingEvents<TSignalParam>,
-        IPeerConnectionEvents,IAppRTCController
+        IPeerConnectionEvents, IAppRTCController
         where TSignalParam : ISignalingParameters
         where TConnectionParam : IConnectionParameters
     {
         private const string TAG = nameof(AppRTCControllerBase<TConnectionParam, TSignalParam>);
 
         private TSignalParam _signalingParameters;
+
+        private bool _disconnectedFlag = true;
 
         protected AppRTCControllerBase(IAppRTCEngineEvents events, ILogger logger = null)
         {
@@ -56,7 +66,9 @@ namespace WebRTC.AppRTC.Abstraction
         protected IAppRTCCClient<TConnectionParam> RTCClient { get; private set; }
         protected PeerConnectionClient PeerConnectionClient { get; private set; }
 
-        public bool Connected { get; private set; }
+        public bool IsWebRTCConnected { get; private set; }
+
+        public bool IsWebSocketConnected { get; private set; }
 
         protected abstract bool IsInitiator { get; }
 
@@ -72,17 +84,17 @@ namespace WebRTC.AppRTC.Abstraction
 
         public void Connect(TConnectionParam connectionParameters)
         {
-            RTCClient = CreateClient();
-            RTCClient.Connect(connectionParameters);
+            Executor.Execute(() =>
+            {
+                _disconnectedFlag = false;
+                RTCClient = CreateClient();
+                RTCClient.Connect(connectionParameters);
+            });            
         }
 
-        public virtual void Disconnect()
+        public void Disconnect()
         {
-            Connected = false;
-            RTCClient?.Disconnect();
-            RTCClient = null;
-            PeerConnectionClient?.Close();
-            PeerConnectionClient = null;
+            HandleDisconnect(DisconnectType.UserDisconnect);
         }
 
         public void StartVideoCall(IVideoRenderer localRenderer, IVideoRenderer remoteRenderer)
@@ -101,6 +113,7 @@ namespace WebRTC.AppRTC.Abstraction
 
         public bool IsVideoEnable => PeerConnectionClient?.IsVideoEnable ?? false;
         public bool IsAudioEnable => PeerConnectionClient?.IsAudioEnable ?? false;
+
         public void SwitchCamera()
         {
             PeerConnectionClient?.SwitchCamera();
@@ -138,7 +151,8 @@ namespace WebRTC.AppRTC.Abstraction
 
         public void OnChannelClose()
         {
-            Executor.Execute(() => Events.OnDisconnect(DisconnectType.WebSocket));
+            IsWebSocketConnected = false;
+            HandleDisconnect(DisconnectType.WebSocket);
         }
 
         public void OnChannelError(string description)
@@ -195,18 +209,19 @@ namespace WebRTC.AppRTC.Abstraction
 
         public void OnPeerConnectionCreated(IPeerConnection peerConnection)
         {
-            Executor.Execute(()=>  OnPeerConnectionCreatedInternal(peerConnection));
+            Executor.Execute(() => OnPeerConnectionCreatedInternal(peerConnection));
         }
 
         public void OnConnected()
         {
-            Connected = true;
+            IsWebRTCConnected = true;
+            Executor.Execute(() => Events.OnConnect());
         }
 
         public void OnDisconnected()
         {
-            Connected = false;
-            Executor.Execute(() => { Events.OnDisconnect(DisconnectType.PeerConnection); });
+            IsWebRTCConnected = false;
+            HandleDisconnect(DisconnectType.PeerConnection);
         }
 
         public void OnLocalDescription(SessionDescription sdp)
@@ -253,9 +268,30 @@ namespace WebRTC.AppRTC.Abstraction
             return Events.CreateVideoCapturer(factory, videoSource);
         }
 
+        protected virtual void OnTearDown()
+        {
+            IsWebSocketConnected = false;
+            IsWebRTCConnected = false;
+            RTCClient?.Disconnect();
+            RTCClient = null;
+            PeerConnectionClient?.Close();
+            PeerConnectionClient = null;
+        }
+
         protected virtual void OnPeerConnectionCreatedInternal(IPeerConnection peerConnection)
         {
-            
+        }
+
+        private void HandleDisconnect(DisconnectType disconnectType)
+        {
+            Executor.Execute(() =>
+            {
+                if (_disconnectedFlag)
+                    return;
+                _disconnectedFlag = true;
+                Events.OnDisconnect(disconnectType);
+                OnTearDown();
+            });
         }
     }
 }

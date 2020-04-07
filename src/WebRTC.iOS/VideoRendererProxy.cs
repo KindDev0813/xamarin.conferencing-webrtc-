@@ -23,9 +23,13 @@ namespace WebRTC.iOS
             }
         }
 
+        public Action OnFirstFrame { get; set; }
+       
         public void RenderFrame(RTCVideoFrame frame)
         {
             Renderer?.RenderFrame(frame);
+            OnFirstFrame?.Invoke();
+            OnFirstFrame = null;
             frame.Dispose();
         }
 

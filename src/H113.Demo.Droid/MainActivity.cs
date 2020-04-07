@@ -104,6 +104,11 @@ namespace H113.Demo.Droid
             HideVideoContainer(false);
         }
 
+        public void OnConnect()
+        {
+            
+        }
+
         public async Task<bool> RequestCameraPermissionAsync()
         {
             var permission = await Xamarin.Essentials.Permissions.RequestAsync<Permissions.Camera>();

@@ -39,7 +39,7 @@ namespace WebRTC.H113.Droid
         }
 
 
-        public bool IsConnected => _controller.Connected;
+        public bool IsConnected => _controller.IsWebRTCConnected;
 
         internal View OnCreateView(Context context)
         {
@@ -92,8 +92,6 @@ namespace WebRTC.H113.Droid
 
         public void Disconnect()
         {
-            if (!_controller.Connected)
-                return;
             _controller.Disconnect();
         }
 
@@ -104,10 +102,14 @@ namespace WebRTC.H113.Droid
             _surfaceViewRenderer?.Init(androidFactory.EglBaseContext, this);
         }
 
+        public void OnConnect()
+        {
+            _videoControllerListener.OnConnect();
+        }
+
         void IAppRTCEngineEvents.OnDisconnect(DisconnectType disconnectType)
         {
             _videoControllerListener.OnDisconnect(disconnectType);
-            _controller.Disconnect();
         }
 
         IVideoCapturer IAppRTCEngineEvents.
@@ -132,7 +134,7 @@ namespace WebRTC.H113.Droid
             handler.Post(() => _videoControllerListener?.OnFirstFrame());
         }
 
-        void RendererCommon.IRendererEvents.OnFrameResolutionChanged(int width, int height, int fps)
+        void RendererCommon.IRendererEvents.OnFrameResolutionChanged(int width, int height, int rotation)
         {
             
         }
