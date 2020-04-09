@@ -8,7 +8,7 @@ using Org.Webrtc;
 
 namespace WebRTC.Droid
 {
-    internal static class EglBaseHelper
+    public static class EglBaseHelper
     {
         private static int[] CreateConfigAttributes()
         {
@@ -65,7 +65,7 @@ namespace WebRTC.Droid
                 _eglConfig = GetEglConfig(_eglDisplay, configAttributes);
 
                 int openGlesVersion = GetOpenGlesVersionFromConfig(configAttributes);
-                Logging.D("EglBase14Impl", "Using OpenGL ES version " + openGlesVersion);
+                Logging.D("EglBaseHelper", "Using OpenGL ES version " + openGlesVersion);
                 _eglContext = CreateEglContext(sharedContext, _eglDisplay, _eglConfig, openGlesVersion);
             }
 

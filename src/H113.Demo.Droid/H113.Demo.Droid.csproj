@@ -62,6 +62,7 @@
         <None Include="Resources\AboutResources.txt" />
         <None Include="Properties\AndroidManifest.xml" />
         <None Include="Assets\AboutAssets.txt" />
+        <None Include="proguard.cfg" />
     </ItemGroup>
     <ItemGroup>
         <AndroidResource Include="Resources\layout\activity_main.axml">
@@ -89,9 +90,6 @@
         <Project>{08a22b07-c006-4289-9b21-5cf643a31c4d}</Project>
         <Name>WebRTC.H113</Name>
       </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="proguard.cfg" />
     </ItemGroup>
     <ItemGroup>
       <AndroidEnvironment Include="environment.txt" />

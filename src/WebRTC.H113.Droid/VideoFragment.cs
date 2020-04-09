@@ -1,11 +1,11 @@
+using System;
 using Android.Content;
-using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Views;
-using Android.Widget;
 using Newtonsoft.Json;
 using Org.Webrtc;
+using WebRTC.Droid;
 
 namespace WebRTC.H113.Droid
 {
@@ -17,7 +17,7 @@ namespace WebRTC.H113.Droid
         private VideoController _controller;
         private IVideoControllerReadyCallback _controllerReadyCallback;
 
-        private VideoFragment()
+        protected VideoFragment()
         {
         }
 
@@ -49,22 +49,39 @@ namespace WebRTC.H113.Droid
             base.OnCreate(savedInstanceState);
             if (_controller != null)
                 return;
+            
+            
             var json = Arguments.GetString(ConnectionParametersExtra);
             var connectionParameters = JsonConvert.DeserializeObject<ConnectionParameters>(json);
             var useFrontCamera = Arguments.GetBoolean(UseFrontCameraExtra);
             _controller = new VideoController(connectionParameters, useFrontCamera);
             _controllerReadyCallback?.OnReadyViewController(_controller);
+            
+            Platform.EglFactory = _ => _controller.EglBase;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return _controller.OnCreateView(Context);
+            var surfaceViewRenderer = new SurfaceViewRenderer(Context);
+            surfaceViewRenderer.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent,
+                ViewGroup.LayoutParams.MatchParent);
+            surfaceViewRenderer.SetScalingType(RendererCommon.ScalingType.ScaleAspectFit);
+            surfaceViewRenderer.SetEnableHardwareScaler(false);
+            _controller.OnViewCreated(surfaceViewRenderer);
+            return surfaceViewRenderer;
         }
 
         public override void OnDestroyView()
         {
             _controller.OnViewDestroyed();
             base.OnDestroyView();
+        }
+
+        public override void OnDestroy()
+        {
+            Platform.EglFactory = null;
+            _controller.EglBase.Release();
+            base.OnDestroy();
         }
     }
 }

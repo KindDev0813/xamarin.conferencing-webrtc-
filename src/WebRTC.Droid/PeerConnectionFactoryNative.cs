@@ -30,14 +30,17 @@ namespace WebRTC.Droid
         {
             _context = context;
 
-            EglBaseContext = EglBaseHelper.Create().EglBaseContext;
+            if (Platform.EglFactory != null)
+                EglBase = Platform.EglFactory(this);
+            else
+                EglBase = EglBaseHelper.Create();
 
             _factory = CreateNativeFactory(context, EglBaseContext);
             NativeObject = _factory;
         }
 
-        public IEglBaseContext EglBaseContext { get; }
-
+        public IEglBase EglBase { get; }
+        public IEglBaseContext EglBaseContext => EglBase.EglBaseContext;
 
         public override void Dispose()
         {
