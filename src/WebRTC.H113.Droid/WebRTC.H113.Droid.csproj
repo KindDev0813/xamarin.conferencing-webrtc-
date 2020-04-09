@@ -45,6 +45,7 @@
         <Compile Include="AutobahnWebSocket.cs" />
         <Compile Include="H113Platform.cs" />
         <Compile Include="IVideoControllerReadyCallback.cs" />
+        <Compile Include="VideoConfig.cs" />
         <Compile Include="VideoController.cs" />
         <Compile Include="VideoFragment.cs" />
         <Compile Include="Resources\Resource.Designer.cs" />
@@ -58,6 +59,7 @@
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Resources\drawable\" />
+        <Folder Include="Resources\layout" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="Square.OkHttp3" Version="4.2.2" />

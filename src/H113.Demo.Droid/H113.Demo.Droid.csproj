@@ -54,9 +54,12 @@
         <Reference Include="Mono.Android" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="BaseMainActivity.cs" />
         <Compile Include="MainActivity.cs" />
+        <Compile Include="MainActivityWithConfiguration.cs" />
         <Compile Include="Resources\Resource.Designer.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="SplashActivity.cs" />
     </ItemGroup>
     <ItemGroup>
         <None Include="Resources\AboutResources.txt" />
@@ -68,6 +71,7 @@
         <AndroidResource Include="Resources\layout\activity_main.axml">
             <SubType>Designer</SubType>
         </AndroidResource>
+        <AndroidResource Include="Resources\layout\activity_splash.xml" />
         <AndroidResource Include="Resources\values\colors.xml" />
         <AndroidResource Include="Resources\values\ic_launcher_background.xml" />
         <AndroidResource Include="Resources\values\strings.xml" />

@@ -11,13 +11,6 @@ using WebRTC.iOS.Binding;
 
 namespace WebRTC.H113.iOS
 {
-    public enum ScalingType
-    {
-        AspectFit,
-        AspectFill,
-        AspectBalanced
-    }
-
     public partial class VideoViewController : UIViewController, IAppRTCEngineEvents
     {
         private readonly VideoRendererProxy _localRenderer = new VideoRendererProxy();
