@@ -101,6 +101,9 @@ namespace WebRTC.AppRTC.Abstraction
         public const string VideoTrackType = "video";
 
         private const string TAG = nameof(PeerConnectionClient);
+        
+        private static int BPSInKBPS = 1000;
+
 
         private const string AudioEchoCancellationConstraint = "googEchoCancellation";
         private const string AudioAutoGainControlConstraint = "googAutoGainControl";
@@ -385,24 +388,26 @@ namespace WebRTC.AppRTC.Abstraction
                 if (_peerConnection == null || _localVideoSender == null || _isError) {
                     return;
                 }
-                _logger.Debug(TAG, "Requested max video bitrate: " + maxBitrateKbps);
+                _logger.Debug(TAG, $"Requested max video bitrate: {maxBitrateKbps}");
                 if (_localVideoSender == null) {
                     _logger.Warning(TAG, "Sender is not ready.");
                     return;
                 }
-                var parameters = _localVideoSender.getParameters();
-                if (parameters.encodings.size() == 0) {
-                    Log.w(TAG, "RtpParameters are not ready.");
+                var parameters = _localVideoSender.Parameters;
+                if (parameters.Encodings.Length == 0) {
+                    _logger.Warning(TAG, "RtpParameters are not ready.");
                     return;
                 }
-                for (RtpParameters.Encoding encoding : parameters.encodings) {
-                    // Null value means no limit.
-                    encoding.maxBitrateBps = maxBitrateKbps == null ? null : maxBitrateKbps * BPS_IN_KBPS;
+
+                foreach (var encoding in parameters.Encodings)
+                {
+                    encoding.MaxBitrateBps = maxBitrateKbps * BPSInKBPS;
                 }
-                if (!localVideoSender.setParameters(parameters)) {
-                    Log.e(TAG, "RtpSender.setParameters failed.");
+               
+                if (!_localVideoSender.SetParameters(parameters)) {
+                    _logger.Error(TAG, "RtpSender.setParameters failed.");
                 }
-                Log.d(TAG, "Configured max video bitrate to: " + maxBitrateKbps);
+                _logger.Debug(TAG, $"Configured max video bitrate to: {maxBitrateKbps}");
             });
         }
 

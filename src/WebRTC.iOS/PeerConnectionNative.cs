@@ -91,9 +91,7 @@ namespace WebRTC.iOS
         public IRtpSender AddTrack(IMediaStreamTrack track, string[] streamIds)
         {
             var rtpSender = _peerConnection.AddTrack(track.ToNative<RTCMediaStreamTrack>(), streamIds);
-            if (rtpSender == null)
-                return null;
-            return new RtpSenderNative(rtpSender);
+            return rtpSender == null ? null : new RtpSenderNative(rtpSender);
         }
 
         public bool RemoveTrack(IRtpSender sender)
@@ -104,9 +102,7 @@ namespace WebRTC.iOS
         public IRtpTransceiver AddTransceiverWithTrack(IMediaStreamTrack track)
         {
             var rtpTransceiver = _peerConnection.AddTransceiverWithTrack(track.ToNative<RTCMediaStreamTrack>());
-            if (rtpTransceiver == null)
-                return null;
-            return new RtpTransceiverNative(rtpTransceiver);
+            return rtpTransceiver == null ? null : new RtpTransceiverNative(rtpTransceiver);
         }
 
         public IRtpTransceiver AddTransceiverWithTrack(IMediaStreamTrack track, IRtpTransceiverInit init)

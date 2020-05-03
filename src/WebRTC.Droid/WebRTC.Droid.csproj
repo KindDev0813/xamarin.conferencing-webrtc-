@@ -71,8 +71,11 @@
     <Compile Include="PeerConnectionListenerProxy.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RptSenderNative.cs" />
     <Compile Include="RTCAudioManager.cs" />
+    <Compile Include="RtcpParameters.cs" />
+    <Compile Include="RtpEncodingParametersNative.cs" />
+    <Compile Include="RtpHeaderExtensionNative.cs" />
+    <Compile Include="RtpParametersNative.cs" />
     <Compile Include="RtpReceiverNative.cs" />
     <Compile Include="RtpSenderNative.cs" />
     <Compile Include="RtpTransceiverNative.cs" />

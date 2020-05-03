@@ -1,5 +1,6 @@
 using WebRTC.Abstraction;
 using Org.Webrtc;
+using WebRTC.Abstraction.Extensions;
 using WebRTC.Droid.Extensions;
 
 namespace WebRTC.Droid
@@ -18,6 +19,12 @@ namespace WebRTC.Droid
         {
             get => _rtpSender.Track().ToNet();
             set => _rtpSender.SetTrack(value.ToNative(), true);
+        }
+
+        public IRtpParameters Parameters => new RtpParametersNative(_rtpSender.Parameters);
+        public bool SetParameters(IRtpParameters parameters)
+        {
+            return _rtpSender.SetParameters(parameters.ToNative<RtpParameters>());
         }
     }
 }
