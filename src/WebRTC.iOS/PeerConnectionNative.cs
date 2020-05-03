@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Foundation;
 using WebRTC.Abstraction;
@@ -12,6 +13,9 @@ namespace WebRTC.iOS
     internal class PeerConnectionNative : NativeObjectBase, IPeerConnection
     {
         private readonly RTCPeerConnection _peerConnection;
+        private readonly List<object> _csharpObjects = new List<object>();
+        // ReSharper disable once NotAccessedField.Local
+        // C# will dispose this object...
         private IRTCPeerConnectionDelegate _peerConnectionDelegate;
 
         public PeerConnectionNative(RTCPeerConnection peerConnection, Abstraction.RTCConfiguration configuration, IPeerConnectionFactory factory, IRTCPeerConnectionDelegate peerConnectionDelegate)
@@ -122,21 +126,21 @@ namespace WebRTC.iOS
 
         public void CreateOffer(MediaConstraints constraints, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer,this);
 
             _peerConnection.OfferForConstraints(constraints.ToNative(), sdpCallbacksHelper.CreateSdp);
         }
 
         public void CreateAnswer(MediaConstraints constraints, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer,this);
 
             _peerConnection.AnswerForConstraints(constraints.ToNative(), sdpCallbacksHelper.CreateSdp);
         }
 
         public void SetLocalDescription(SessionDescription sdp, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer,this);
 
             _peerConnection.SetLocalDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
 
@@ -144,7 +148,7 @@ namespace WebRTC.iOS
 
         public void SetRemoteDescription(SessionDescription sdp, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer,this);
 
             _peerConnection.SetRemoteDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
         }
@@ -173,10 +177,13 @@ namespace WebRTC.iOS
         private class SdpCallbackHelper
         {
             private readonly ISdpObserver _observer;
+            private readonly PeerConnectionNative _peerConnectionNative;
 
-            public SdpCallbackHelper(ISdpObserver observer)
+            public SdpCallbackHelper(ISdpObserver observer, PeerConnectionNative peerConnectionNative)
             {
                 _observer = observer;
+                _peerConnectionNative = peerConnectionNative;
+                _peerConnectionNative._csharpObjects.Add(this);
             }
 
             public void SetSdp(NSError error)
@@ -185,11 +192,11 @@ namespace WebRTC.iOS
                     _observer?.OnSetFailure(error.LocalizedDescription);
                 else
                     _observer?.OnSetSuccess();
+                Clear();
             }
 
             public void CreateSdp(RTCSessionDescription sdp, NSError error)
             {
-
                 if (error != null)
                 {
                     _observer?.OnCreateFailure(error.LocalizedDescription);
@@ -198,6 +205,12 @@ namespace WebRTC.iOS
                 {
                     _observer?.OnCreateSuccess(sdp.ToNet());
                 }
+                Clear();
+            }
+
+            private void Clear()
+            {
+                _peerConnectionNative._csharpObjects.Remove(this);
             }
         }
     }
