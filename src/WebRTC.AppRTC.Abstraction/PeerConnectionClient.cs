@@ -378,6 +378,34 @@ namespace WebRTC.AppRTC.Abstraction
            
         }
 
+        public void SetVideoMaxBitrate(int? maxBitrateKbps)
+        {
+            _executor.Execute(() =>
+            {
+                if (_peerConnection == null || _localVideoSender == null || _isError) {
+                    return;
+                }
+                _logger.Debug(TAG, "Requested max video bitrate: " + maxBitrateKbps);
+                if (_localVideoSender == null) {
+                    _logger.Warning(TAG, "Sender is not ready.");
+                    return;
+                }
+                var parameters = _localVideoSender.getParameters();
+                if (parameters.encodings.size() == 0) {
+                    Log.w(TAG, "RtpParameters are not ready.");
+                    return;
+                }
+                for (RtpParameters.Encoding encoding : parameters.encodings) {
+                    // Null value means no limit.
+                    encoding.maxBitrateBps = maxBitrateKbps == null ? null : maxBitrateKbps * BPS_IN_KBPS;
+                }
+                if (!localVideoSender.setParameters(parameters)) {
+                    Log.e(TAG, "RtpSender.setParameters failed.");
+                }
+                Log.d(TAG, "Configured max video bitrate to: " + maxBitrateKbps);
+            });
+        }
+
         private void CloseInternal()
         {
             if (_factory != null && _parameters.AecDump)

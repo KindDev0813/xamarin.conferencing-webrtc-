@@ -1,4 +1,5 @@
 using WebRTC.Abstraction;
+using Xamarin.Essentials;
 
 namespace WebRTC.AppRTC.Abstraction
 {
@@ -12,6 +13,9 @@ namespace WebRTC.AppRTC.Abstraction
         void OnConnect();
 
         void OnDisconnect(DisconnectType disconnectType);
+
+        //jls
+        void ShowNotification(int type, string title, string message);
 
         IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource);
 
@@ -89,7 +93,7 @@ namespace WebRTC.AppRTC.Abstraction
                 _disconnectedFlag = false;
                 RTCClient = CreateClient();
                 RTCClient.Connect(connectionParameters);
-            });            
+            });
         }
 
         public void Disconnect()
@@ -292,6 +296,17 @@ namespace WebRTC.AppRTC.Abstraction
                 Events.OnDisconnect(disconnectType);
                 OnTearDown();
             });
+        }
+
+        //jls
+        public void ShowNotification(int type, string title, string message)
+        {
+            Events.ShowNotification(type, title, message);
+        }
+
+        public virtual void SendLocation(Location location)
+        {
+            // RTCClient?.SendLocation(location);
         }
     }
 }

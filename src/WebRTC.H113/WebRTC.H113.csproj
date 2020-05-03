@@ -9,4 +9,7 @@
       <ProjectReference Include="..\WebRTC.AppRTC.Abstraction\WebRTC.AppRTC.Abstraction.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Xamarin.Essentials" Version="1.5.3.1" />
+    </ItemGroup>
 </Project>

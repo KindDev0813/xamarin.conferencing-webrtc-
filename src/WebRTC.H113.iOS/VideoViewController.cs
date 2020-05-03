@@ -8,6 +8,7 @@ using WebRTC.Abstraction;
 using WebRTC.AppRTC.Abstraction;
 using WebRTC.iOS;
 using WebRTC.iOS.Binding;
+using Xamarin.Essentials;
 
 namespace WebRTC.H113.iOS
 {
@@ -124,6 +125,16 @@ namespace WebRTC.H113.iOS
         void IAppRTCEngineEvents.OnConnect()
         {
             _videoControllerListener.OnConnect();
+        }
+
+        public void ShowNotification(int type, string title, string message)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+                      {
+                          var alertDialog = UIAlertController.Create("Error", message, UIAlertControllerStyle.Alert);
+                          alertDialog.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Destructive, null));
+                          PresentViewController(alertDialog, true, null);
+                      });
         }
 
         private class VideoView : UIView, IRTCVideoViewDelegate

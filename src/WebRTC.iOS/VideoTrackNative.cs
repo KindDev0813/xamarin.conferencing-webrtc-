@@ -23,7 +23,6 @@ namespace WebRTC.iOS
         public void RemoveRenderer(IVideoRenderer videoRenderer)
         {
             _videoTrack.RemoveRenderer(videoRenderer.ToNative<IRTCVideoRenderer>());
-
         }
     }
 }

@@ -17,7 +17,7 @@ namespace WebRTC.iOS
             get => _renderer;
             set
             {
-                if (_renderer == this)
+                if (Equals(_renderer, this))
                     throw new InvalidOperationException("You can set renderer to self");
                 _renderer = value;
             }

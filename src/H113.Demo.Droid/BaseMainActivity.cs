@@ -84,7 +84,7 @@ namespace H113.Demo.Droid
                 .SetCancelable(false)
                 .SetNeutralButton("OK", ((sender, args) =>
                 {
-                    var dialog = (AlertDialog) sender;
+                    var dialog = (AlertDialog)sender;
                     dialog.Cancel();
                     _videoController.Disconnect();
                 }))
@@ -99,7 +99,7 @@ namespace H113.Demo.Droid
 
         public virtual void OnConnect()
         {
-            Toast.MakeText(this,"Connected",ToastLength.Short).Show();
+            Toast.MakeText(this, "Connected", ToastLength.Short).Show();
         }
 
         public async Task<bool> RequestCameraPermissionAsync()
@@ -110,7 +110,7 @@ namespace H113.Demo.Droid
 
         public virtual void OnDisconnect(DisconnectType disconnectType)
         {
-            Toast.MakeText(this,$"Disconnect {disconnectType.ToString()}",ToastLength.Short).Show();
+            Toast.MakeText(this, $"Disconnect {disconnectType.ToString()}", ToastLength.Short).Show();
             _videoController?.Disconnect();
         }
 

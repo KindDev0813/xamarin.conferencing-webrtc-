@@ -164,11 +164,6 @@ namespace WebRTC.iOS
             return _peerConnection.SetBweMinBitrateBps(new NSNumber(min), new NSNumber(current), new NSNumber(max));
         }
 
-        public bool StartRtcEventLogWithFilePath(string filePath, long maxSizeInBytes)
-        {
-            return _peerConnection.StartRtcEventLogWithFilePath(filePath, maxSizeInBytes);
-        }
-
         public void StopRtcEventLog()
         {
             _peerConnection.StopRtcEventLog();
@@ -176,10 +171,8 @@ namespace WebRTC.iOS
 
         public bool StartRtcEventLog(string file, int fileSizeLimitBytes)
         {
-            throw new NotImplementedException();
+            return _peerConnection.StartRtcEventLogWithFilePath(file, fileSizeLimitBytes);
         }
-
-
 
         private class SdpCallbackHelper
         {

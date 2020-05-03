@@ -16,11 +16,10 @@ namespace H113.Demo.iOS
     public partial class ViewController : UIViewController, IVideoControllerListener
     {
 
-        private const string Token =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiaGplbHAxMTMiLCJ2ZXIiOjEsImlhdCI6MTU4NTMwMDYwNH0.LLXkD0PEOyXVb6wZEGWm2R9V8C0yG8Ihqn-rMsPgNVQ";
+        private const string Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCBhcHAiLCJpYXQiOjE1ODY5MzkyMzJ9.JG6Djn83RlmsiFAdaVz-I_Mj1JV804rww0b2ks3gkVU";
 
         private readonly ConnectionParameters _connectionParameters =
-            new ConnectionParameters("wss://video.h113.no/ws", Token, "98056391", 23, 23);
+            new ConnectionParameters("wss://video.h113dev.no/ws", Token, "98056391", 23, 23);
 
         private VideoViewController _videoViewController;
 

@@ -3,13 +3,15 @@ using System.Text;
 using WebRTC.Abstraction;
 using WebRTC.AppRTC.Abstraction;
 using WebRTC.H113.Extensions;
+using Xamarin.Essentials;
 
 namespace WebRTC.H113
 {
-    public class H113Controller : AppRTCControllerBase<ConnectionParameters,RegisteredMessage>
+    public class H113Controller : AppRTCControllerBase<ConnectionParameters, RegisteredMessage>
     {
         private const string SwitchCameraCommand = "flip cam";
-        
+        private const string ActivateAppCommand = "notify";
+
         private IDataChannel _dataChannel;
         public H113Controller(IAppRTCEngineEvents events, ILogger logger = null) : base(events, logger)
         {
@@ -23,8 +25,8 @@ namespace WebRTC.H113
         }
 
         protected override bool IsInitiator => true;
-        protected override IAppRTCCClient<ConnectionParameters> CreateClient() => new H113RTCClient(this,Logger);
-        
+        protected override IAppRTCCClient<ConnectionParameters> CreateClient() => new H113RTCClient(this, Logger);
+
         protected override PeerConnectionParameters CreatePeerConnectionParameters(RegisteredMessage signalingParameters)
         {
             var registeredMessage = signalingParameters;
@@ -43,7 +45,7 @@ namespace WebRTC.H113
         {
             base.OnPeerConnectionCreatedInternal(peerConnection);
             _dataChannel = peerConnection.CreateDataChannel("sendChannel", new DataChannelConfiguration());
-            if(_dataChannel != null)
+            if (_dataChannel != null)
                 _dataChannel.OnMessage += DataChannelOnOnMessage;
         }
 
@@ -55,7 +57,15 @@ namespace WebRTC.H113
                 case SwitchCameraCommand:
                     SwitchCamera();
                     break;
+                case ActivateAppCommand:
+                    ShowNotification(1, "Title", "Message body");
+                    break;
             }
+        }
+
+        public override void SendLocation(Location location)
+        {
+            (RTCClient as H113RTCClient).UpdateInfoMessage(location);
         }
     }
 }

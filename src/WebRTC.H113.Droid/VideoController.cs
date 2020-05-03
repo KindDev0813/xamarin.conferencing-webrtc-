@@ -15,7 +15,7 @@ namespace WebRTC.H113.Droid
         private readonly H113Controller _controller;
 
         private readonly VideoRendererProxy _videoRendererProxy;
-        
+
         private IVideoControllerListener _videoControllerListener;
 
         public VideoController(ConnectionParameters connectionParameters, bool frontCamera)
@@ -31,7 +31,7 @@ namespace WebRTC.H113.Droid
         internal IEglBase EglBase { get; }
 
         public bool IsConnected => _controller.IsWebRTCConnected;
-        
+
         public void Start(IVideoControllerListener videoControllerListener)
         {
             _videoControllerListener = null;
@@ -66,7 +66,7 @@ namespace WebRTC.H113.Droid
         internal void OnViewCreated(SurfaceViewRenderer surfaceViewRenderer)
         {
             _videoRendererProxy.Renderer = surfaceViewRenderer;
-            surfaceViewRenderer.Init(EglBase.EglBaseContext,this);
+            surfaceViewRenderer.Init(EglBase.EglBaseContext, this);
         }
 
         internal void OnViewDestroyed()
@@ -76,7 +76,7 @@ namespace WebRTC.H113.Droid
 
         void IAppRTCEngineEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
-          
+
         }
 
         public void OnConnect()
@@ -113,7 +113,12 @@ namespace WebRTC.H113.Droid
 
         void RendererCommon.IRendererEvents.OnFrameResolutionChanged(int width, int height, int rotation)
         {
-            
+
+        }
+
+        public void ShowNotification(int type, string title, string message)
+        {
+
         }
     }
 }
