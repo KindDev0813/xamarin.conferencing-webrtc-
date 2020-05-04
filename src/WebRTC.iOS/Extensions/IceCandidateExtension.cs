@@ -9,7 +9,7 @@ namespace WebRTC.iOS.Extensions
     {
         public static RTCIceCandidate ToNative(this IceCandidate self)
         {
-            return new RTCIceCandidate(self.SdpMid,self.SdpMLineIndex,self.Sdp);
+            return new RTCIceCandidate(self.Sdp,self.SdpMLineIndex,self.SdpMid);
         }
         
         public static IEnumerable<RTCIceCandidate> ToNative(this IEnumerable<IceCandidate> self)

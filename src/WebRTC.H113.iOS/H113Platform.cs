@@ -5,6 +5,7 @@ using Foundation;
 using ObjCRuntime;
 using Square.SocketRocket;
 using WebRTC.AppRTC.Abstraction;
+using WebRTC.iOS.Binding;
 
 namespace WebRTC.H113.iOS
 {
@@ -18,7 +19,7 @@ namespace WebRTC.H113.iOS
 
             ExecutorServiceFactory.MainExecutor = new MainExecutor();
 
-            //RTCLog.SetMinDebugLogLevel(RTCLoggingSeverity.Error);
+            RTCLog.SetMinDebugLogLevel(RTCLoggingSeverity.Error);
 
             ExecutorServiceFactory.Factory = (tag) => new ExecutorService(tag);
         }
