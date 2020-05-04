@@ -76,7 +76,6 @@ namespace H113.Demo.iOS
                     {
                         _videoViewController.ScalingType = scaleType;
                     }));
-
                 }
 
                 PresentViewController(alertDialog, true, null);

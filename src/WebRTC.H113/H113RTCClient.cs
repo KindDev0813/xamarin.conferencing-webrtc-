@@ -26,7 +26,7 @@ namespace WebRTC.H113
         }
 
         private string _socketId;
-        private string _ReconnectinId;
+        private string _reconnectinId;
 
         public ConnectionState State { get; private set; }
 
@@ -82,10 +82,7 @@ namespace WebRTC.H113
         public void SendLocalIceCandidateRemovals(IceCandidate[] candidates)
         {
             //TODO: impl in feature?
-            _executor.Execute(() =>
-            {
-
-            });
+            _executor.Execute(() => { });
         }
 
         public void OnWebSocketClose()
@@ -103,7 +100,7 @@ namespace WebRTC.H113
                     return;
                 }
 
-                var message = new UpdateInfoMessage("app-update-info", _ReconnectinId, location)
+                var message = new UpdateInfoMessage("app-update-info", _reconnectinId, location)
                 {
                     SocketId = _socketId,
                     MessageType = SignalingMessageType.UpdateInfo
@@ -125,7 +122,7 @@ namespace WebRTC.H113
 
             var msg = SignalingMessage.FromJson(message);
 
-            if (msg == null)  //jls
+            if (msg == null) //jls
                 return;
 
             switch (msg.MessageType)
@@ -139,22 +136,22 @@ namespace WebRTC.H113
                     _logger.Error(TAG, $"Got wrong message type: {msg.MessageType}");
                     break;
                 case SignalingMessageType.Registered:
-                    var registerMessage = (RegisteredMessage)msg;
+                    var registerMessage = (RegisteredMessage) msg;
                     SignalingParametersReady(registerMessage);
                     break;
                 case SignalingMessageType.ReceivedAnswer:
-                    var answerMessage = (SessionDescriptionMessage)msg;
+                    var answerMessage = (SessionDescriptionMessage) msg;
                     _signalingEvents.OnRemoteDescription(answerMessage.Description);
                     break;
                 case SignalingMessageType.ReceiveCandidate:
-                    var candidateMessage = (IceCandidateMessage)msg;
+                    var candidateMessage = (IceCandidateMessage) msg;
                     var iceCandidate = candidateMessage.IceCandidate;
                     _signalingEvents.OnRemoteIceCandidate(new IceCandidate(iceCandidate.Sdp, iceCandidate.SdpMid,
                         iceCandidate.SdpMLineIndex));
                     break;
                 case SignalingMessageType.Reconnecting:
-                    var reconnectingMessage = (ReconnectingMessage)msg;
-                    _ReconnectinId = reconnectingMessage.Id;
+                    var reconnectingMessage = (ReconnectingMessage) msg;
+                    _reconnectinId = reconnectingMessage.Id;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -178,21 +175,19 @@ namespace WebRTC.H113
         public void DoReconnect()
         {
             _executor.Execute(() =>
-                       {
-                           _wsClient.Connect(_connectionParameters.WsUrl, _connectionParameters.Protocol);
+            {
+                _wsClient.Connect(_connectionParameters.WsUrl, _connectionParameters.Protocol);
 
-                           var message = new DoReconnectMessage("app-reconnecting-ws", _connectionParameters.Phone, _ReconnectinId)
-                           {
-                               SocketId = _socketId,
-                               MessageType = SignalingMessageType.UpdateInfo
-                           };
+                var message = new DoReconnectMessage("app-reconnecting-ws", _connectionParameters.Phone, _reconnectinId)
+                {
+                    SocketId = _socketId,
+                    MessageType = SignalingMessageType.UpdateInfo
+                };
 
-                           _logger.Debug(TAG, message.ToString());
+                _logger.Debug(TAG, message.ToString());
 
-                           _wsClient.Send(message.ToJson());
-                       });
-
-
+                _wsClient.Send(message.ToJson());
+            });
         }
 
         private void DisconnectInternal()

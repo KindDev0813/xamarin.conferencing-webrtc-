@@ -39,7 +39,7 @@ namespace WebRTC.H113.iOS
         private class ExecutorService : IExecutorService
         {
             [DllImport(Constants.libcLibrary)]
-            extern static IntPtr dispatch_release(IntPtr o);
+            private static extern IntPtr dispatch_release(IntPtr o);
 
             private readonly DispatchQueue _dispatchQueue;
 
@@ -60,6 +60,7 @@ namespace WebRTC.H113.iOS
             public void Release()
             {
                 dispatch_release(_dispatchQueue.Handle);
+                _dispatchQueue.Dispose();
             }
         }
 

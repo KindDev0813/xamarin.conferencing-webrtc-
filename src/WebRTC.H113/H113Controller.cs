@@ -65,7 +65,7 @@ namespace WebRTC.H113
 
         public override void SendLocation(Location location)
         {
-            (RTCClient as H113RTCClient).UpdateInfoMessage(location);
+            (RTCClient as H113RTCClient)?.UpdateInfoMessage(location);
         }
     }
 }
