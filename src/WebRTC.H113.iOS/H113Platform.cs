@@ -42,7 +42,7 @@ namespace WebRTC.H113.iOS
             [DllImport(Constants.libcLibrary)]
             private static extern IntPtr dispatch_release(IntPtr o);
 
-            private readonly DispatchQueue _dispatchQueue;
+            private DispatchQueue _dispatchQueue;
 
             public ExecutorService(string tag)
             {
@@ -61,14 +61,13 @@ namespace WebRTC.H113.iOS
             public void Release()
             {
                 dispatch_release(_dispatchQueue.Handle);
-                _dispatchQueue.Dispose();
+                _dispatchQueue = null;
             }
         }
 
         private class WebSocketConnection : IWebSocketConnection
         {
             private WebSocket _webSocket;
-
 
             public event EventHandler OnOpened;
             public event EventHandler<(int code, string reason)> OnClosed;

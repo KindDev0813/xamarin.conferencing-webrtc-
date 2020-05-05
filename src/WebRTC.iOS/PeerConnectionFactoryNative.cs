@@ -16,7 +16,6 @@ namespace WebRTC.iOS
             var decoderFactory = new RTCDefaultVideoDecoderFactory();
             var encoderFactory = new RTCDefaultVideoEncoderFactory();
 
-         
 
             NativeObject = _factory = new RTCPeerConnectionFactory(encoderFactory, decoderFactory);
         }

@@ -14,11 +14,13 @@ namespace WebRTC.iOS
     {
         private readonly RTCPeerConnection _peerConnection;
         private readonly List<object> _csharpObjects = new List<object>();
+
         // ReSharper disable once NotAccessedField.Local
         // C# will dispose this object...
         private IRTCPeerConnectionDelegate _peerConnectionDelegate;
 
-        public PeerConnectionNative(RTCPeerConnection peerConnection, Abstraction.RTCConfiguration configuration, IPeerConnectionFactory factory, IRTCPeerConnectionDelegate peerConnectionDelegate)
+        public PeerConnectionNative(RTCPeerConnection peerConnection, Abstraction.RTCConfiguration configuration,
+            IPeerConnectionFactory factory, IRTCPeerConnectionDelegate peerConnectionDelegate) : base(peerConnection)
         {
             _peerConnection = peerConnection;
             _peerConnectionDelegate = peerConnectionDelegate;
@@ -46,8 +48,10 @@ namespace WebRTC.iOS
             get
             {
                 if (Configuration.SdpSemantics != SdpSemantics.UnifiedPlan)
-                    throw new InvalidOperationException("GetTransceivers is only supported with Unified Plan SdpSemantics.");
-                return _peerConnection.Transceivers.Select(t => new RtpTransceiverNative(t)).Cast<IRtpTransceiver>().ToArray();
+                    throw new InvalidOperationException(
+                        "GetTransceivers is only supported with Unified Plan SdpSemantics.");
+                return _peerConnection.Transceivers.Select(t => new RtpTransceiverNative(t)).Cast<IRtpTransceiver>()
+                    .ToArray();
             }
         }
 
@@ -55,8 +59,8 @@ namespace WebRTC.iOS
 
         public override void Dispose()
         {
-            _peerConnectionDelegate = null;
             base.Dispose();
+            _peerConnectionDelegate = null;
         }
 
         public bool SetConfiguration(Abstraction.RTCConfiguration configuration)
@@ -126,29 +130,28 @@ namespace WebRTC.iOS
 
         public void CreateOffer(MediaConstraints constraints, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer,this);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer, this);
 
             _peerConnection.OfferForConstraints(constraints.ToNative(), sdpCallbacksHelper.CreateSdp);
         }
 
         public void CreateAnswer(MediaConstraints constraints, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer,this);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer, this);
 
             _peerConnection.AnswerForConstraints(constraints.ToNative(), sdpCallbacksHelper.CreateSdp);
         }
 
         public void SetLocalDescription(SessionDescription sdp, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer,this);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer, this);
 
             _peerConnection.SetLocalDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
-
         }
 
         public void SetRemoteDescription(SessionDescription sdp, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer,this);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer, this);
 
             _peerConnection.SetRemoteDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
         }
@@ -205,6 +208,7 @@ namespace WebRTC.iOS
                 {
                     _observer?.OnCreateSuccess(sdp.ToNet());
                 }
+
                 Clear();
             }
 

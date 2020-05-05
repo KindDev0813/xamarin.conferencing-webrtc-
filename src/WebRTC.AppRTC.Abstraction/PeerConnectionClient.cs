@@ -10,7 +10,7 @@ namespace WebRTC.AppRTC.Abstraction
         void OnPeerFactoryCreated(IPeerConnectionFactory factory);
 
         void OnPeerConnectionCreated(IPeerConnection peerConnection);
-        
+
         /// <summary>
         /// Callback fired once DTLS connection is established (PeerConnectionState is CONNECTED).
         /// </summary>
@@ -71,7 +71,7 @@ namespace WebRTC.AppRTC.Abstraction
         }
 
         public IceServer[] IceServers { get; }
-        
+
         public bool IsScreencast { get; set; }
 
         public bool VideoCallEnabled { get; set; }
@@ -101,7 +101,7 @@ namespace WebRTC.AppRTC.Abstraction
         public const string VideoTrackType = "video";
 
         private const string TAG = nameof(PeerConnectionClient);
-        
+
         private static int BPSInKBPS = 1000;
 
 
@@ -122,7 +122,7 @@ namespace WebRTC.AppRTC.Abstraction
 
         private readonly IPeerConnectionEvents _peerConnectionEvents;
 
-        private readonly IExecutorService _executor;
+        private static IExecutorService _executor;
 
         private readonly ILogger _logger;
 
@@ -173,7 +173,7 @@ namespace WebRTC.AppRTC.Abstraction
         {
             _parameters = parameters;
             _peerConnectionEvents = peerConnectionEvents;
-            _executor = ExecutorServiceFactory.CreateExecutorService(TAG);
+            _executor ??= ExecutorServiceFactory.CreateExecutorService(TAG);
 
             _logger = logger ?? new ConsoleLogger();
 
@@ -246,7 +246,8 @@ namespace WebRTC.AppRTC.Abstraction
                     ReportError("Failed to create peer connection: " + ex.Message);
                     return;
                 }
-                if(_peerConnection != null)
+
+                if (_peerConnection != null)
                     _peerConnectionEvents.OnPeerConnectionCreated(_peerConnection);
             });
         }
@@ -371,30 +372,35 @@ namespace WebRTC.AppRTC.Abstraction
             {
                 if (!IsVideoCallEnabled || _isError || _videoCapturer == null)
                 {
-                    _logger.Error(TAG,$"Failed to change capture format. Video: {IsVideoCallEnabled}. Error : {_isError}");
+                    _logger.Error(TAG,
+                        $"Failed to change capture format. Video: {IsVideoCallEnabled}. Error : {_isError}");
                     return;
                 }
-                
-                _logger.Debug(TAG,$"ChangeCaptureFormat: {width}x{height}@{framerate}");
-                _videoSource.AdaptOutputFormat(width,height,framerate);
+
+                _logger.Debug(TAG, $"ChangeCaptureFormat: {width}x{height}@{framerate}");
+                _videoSource.AdaptOutputFormat(width, height, framerate);
             });
-           
         }
 
         public void SetVideoMaxBitrate(int? maxBitrateKbps)
         {
             _executor.Execute(() =>
             {
-                if (_peerConnection == null || _localVideoSender == null || _isError) {
+                if (_peerConnection == null || _localVideoSender == null || _isError)
+                {
                     return;
                 }
+
                 _logger.Debug(TAG, $"Requested max video bitrate: {maxBitrateKbps}");
-                if (_localVideoSender == null) {
+                if (_localVideoSender == null)
+                {
                     _logger.Warning(TAG, "Sender is not ready.");
                     return;
                 }
+
                 var parameters = _localVideoSender.Parameters;
-                if (parameters.Encodings.Length == 0) {
+                if (parameters.Encodings.Length == 0)
+                {
                     _logger.Warning(TAG, "RtpParameters are not ready.");
                     return;
                 }
@@ -403,10 +409,12 @@ namespace WebRTC.AppRTC.Abstraction
                 {
                     encoding.MaxBitrateBps = maxBitrateKbps * BPSInKBPS;
                 }
-               
-                if (!_localVideoSender.SetParameters(parameters)) {
+
+                if (!_localVideoSender.SetParameters(parameters))
+                {
                     _logger.Error(TAG, "RtpSender.setParameters failed.");
                 }
+
                 _logger.Debug(TAG, $"Configured max video bitrate to: {maxBitrateKbps}");
             });
         }
@@ -418,12 +426,18 @@ namespace WebRTC.AppRTC.Abstraction
                 _factory.StopAecDump();
             }
 
-            _logger.Debug(TAG, "Closing peer connection.");
             if (_rtcEventLog != null)
             {
                 // RtcEventLog should stop before the peer connection is disposed.
                 _rtcEventLog.Stop();
                 _rtcEventLog = null;
+            }
+
+            _logger.Debug(TAG, "Closing peer connection.");
+            if (_peerConnection != null)
+            {
+                _peerConnection.Dispose();
+                _peerConnection = null;
             }
 
             _logger.Debug(TAG, "Closing audio source.");
@@ -436,7 +450,15 @@ namespace WebRTC.AppRTC.Abstraction
             _logger.Debug(TAG, "Stopping capturer.");
             if (_videoCapturer != null)
             {
-                _videoCapturer.StopCapture();
+                try
+                {
+                    _videoCapturer.StopCapture();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(TAG, "Failed to stop capture", ex);
+                }
+
                 _videoCapturer.Dispose();
                 _videoCapturerStopped = true;
                 _videoCapturer = null;
@@ -462,8 +484,6 @@ namespace WebRTC.AppRTC.Abstraction
             _peerConnectionEvents.OnPeerConnectionClosed();
             PeerConnectionFactory.StopInternalTracingCapture();
             PeerConnectionFactory.ShutdownInternalTracer();
-
-            _executor.Release();
         }
 
         private void CreateMediaConstraintsInternal()
@@ -662,13 +682,11 @@ namespace WebRTC.AppRTC.Abstraction
         {
             private readonly PeerConnectionClient _peerConnectionClient;
             private readonly ILogger _logger;
-            private readonly IExecutor _executor;
             private readonly IPeerConnectionEvents _events;
 
             public PeerConnectionListener(PeerConnectionClient peerConnectionClient)
             {
                 _peerConnectionClient = peerConnectionClient;
-                _executor = _peerConnectionClient._executor;
                 _events = _peerConnectionClient._peerConnectionEvents;
                 _logger = _peerConnectionClient._logger;
             }
@@ -764,7 +782,6 @@ namespace WebRTC.AppRTC.Abstraction
         {
             private readonly PeerConnectionClient _peerConnectionClient;
             private readonly IPeerConnectionEvents _events;
-            private readonly IExecutor _executor;
             private readonly ILogger _logger;
 
             private bool IsError => _peerConnectionClient._isError;
@@ -781,7 +798,6 @@ namespace WebRTC.AppRTC.Abstraction
             public SdpObserver(PeerConnectionClient peerConnectionClient)
             {
                 _peerConnectionClient = peerConnectionClient;
-                _executor = peerConnectionClient._executor;
                 _logger = _peerConnectionClient._logger;
                 _events = _peerConnectionClient._peerConnectionEvents;
             }
@@ -860,9 +876,9 @@ namespace WebRTC.AppRTC.Abstraction
 
             public void OnSetFailure(string error)
             {
-                ReportError($"setSDP error: {error}");   
+                ReportError($"setSDP error: {error}");
             }
-            
+
             private void ReportError(string description)
             {
                 _peerConnectionClient.ReportError(description);
