@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina6_1" orientation="landscape" appearance="light"/>
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -15,28 +15,28 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="BSZ-3f-pux">
-                                <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <subviews>
                                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OjF-LF-E1H">
-                                        <rect key="frame" x="0.0" y="0.0" width="0.0" height="414"/>
+                                        <rect key="frame" x="0.0" y="44" width="414" height="0.0"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P5F-aP-7Hc">
-                                                <rect key="frame" x="0.0" y="0.0" width="0.0" height="414"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="414" height="0.0"/>
                                                 <color key="backgroundColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QSe-Ob-Sfa">
-                                                <rect key="frame" x="0.0" y="0.0" width="0.0" height="414"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="414" height="0.0"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mgc-du-WcE">
-                                                        <rect key="frame" x="-78" y="368" width="62" height="30"/>
+                                                        <rect key="frame" x="336" y="-46" width="62" height="30"/>
                                                         <state key="normal" title="CAMERA"/>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YFt-de-sPZ">
-                                                        <rect key="frame" x="-15" y="368" width="30" height="30"/>
+                                                        <rect key="frame" x="192" y="-46" width="30" height="30"/>
                                                         <state key="normal" title="MIC"/>
                                                     </button>
                                                 </subviews>
@@ -62,14 +62,18 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2GE-z8-hir">
-                                        <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                         <subviews>
                                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="QXi-nf-c8Z">
-                                                <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                             </mapView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YR8-qa-Kzt">
-                                                <rect key="frame" x="816" y="334" width="64" height="30"/>
+                                                <rect key="frame" x="334" y="816" width="64" height="30"/>
                                                 <state key="normal" title="Start Call"/>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZu-ta-lz5">
+                                                <rect key="frame" x="266" y="792" width="46" height="24"/>
+                                                <state key="normal" title="Button"/>
                                             </button>
                                         </subviews>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
@@ -77,9 +81,11 @@
                                             <constraint firstAttribute="trailing" secondItem="QXi-nf-c8Z" secondAttribute="trailing" id="HDL-80-Jeb"/>
                                             <constraint firstItem="QXi-nf-c8Z" firstAttribute="top" secondItem="2GE-z8-hir" secondAttribute="top" id="Oa1-fm-ymE"/>
                                             <constraint firstAttribute="bottom" secondItem="QXi-nf-c8Z" secondAttribute="bottom" id="Xc0-gy-kqV"/>
+                                            <constraint firstAttribute="bottom" secondItem="PZu-ta-lz5" secondAttribute="bottom" constant="50" id="ZcX-Z2-fk4"/>
                                             <constraint firstItem="QXi-nf-c8Z" firstAttribute="leading" secondItem="2GE-z8-hir" secondAttribute="leading" id="bau-nT-phm"/>
                                             <constraint firstAttribute="trailing" secondItem="YR8-qa-Kzt" secondAttribute="trailing" constant="16" id="fU8-xU-ptM"/>
                                             <constraint firstAttribute="bottom" secondItem="YR8-qa-Kzt" secondAttribute="bottom" constant="50" id="tJX-Mg-8yo"/>
+                                            <constraint firstItem="YR8-qa-Kzt" firstAttribute="leading" secondItem="PZu-ta-lz5" secondAttribute="trailing" constant="22" id="zRK-MP-zWi"/>
                                         </constraints>
                                     </view>
                                 </subviews>
@@ -97,6 +103,7 @@
                     </view>
                     <connections>
                         <outlet property="CameraButton" destination="Mgc-du-WcE" id="WOX-c9-eOm"/>
+                        <outlet property="DialButton" destination="PZu-ta-lz5" id="eeI-s8-arH"/>
                         <outlet property="MicButton" destination="YFt-de-sPZ" id="Hjd-ht-Tqi"/>
                         <outlet property="StackView" destination="BSZ-3f-pux" id="9p5-aX-5hl"/>
                         <outlet property="StartCallButton" destination="YR8-qa-Kzt" id="RSM-f1-Kis"/>

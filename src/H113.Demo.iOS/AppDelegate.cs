@@ -1,5 +1,6 @@
 ﻿using Foundation;
 using UIKit;
+using UserNotifications;
 
 namespace H113.Demo.iOS
 {
@@ -17,6 +18,15 @@ namespace H113.Demo.iOS
         {
             // Override point for customization after application launch.
             // If not required for your application you can safely delete this method
+            
+            // Request notification permissions from the user
+            UNUserNotificationCenter.Current.RequestAuthorization (UNAuthorizationOptions.Alert, (approved, err) => {
+                // Handle approval
+            });
+            
+            // Watch for notifications while the app is active
+            UNUserNotificationCenter.Current.Delegate = new UNUserNotificationCenterDelegate();
+            
             return true;
         }
 

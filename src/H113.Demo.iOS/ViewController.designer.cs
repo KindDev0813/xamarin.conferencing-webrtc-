@@ -1,7 +1,8 @@
-// WARNING
+﻿// WARNING
 //
-// This file has been generated automatically by Visual Studio to store outlets and
-// actions made in the UI designer. If it is removed, they will be lost.
+// This file has been generated automatically by Rider IDE
+//   to store outlets and actions made in Xcode.
+// If it is removed, they will be lost.
 // Manual changes to this file may not be handled correctly.
 //
 using Foundation;
@@ -14,6 +15,9 @@ namespace H113.Demo.iOS
 	{
 		[Outlet]
 		UIKit.UIButton CameraButton { get; set; }
+
+		[Outlet]
+		UIKit.UIButton DialButton { get; set; }
 
 		[Outlet]
 		UIKit.UIButton MicButton { get; set; }
@@ -29,14 +33,9 @@ namespace H113.Demo.iOS
 
 		[Outlet]
 		UIKit.UIView VideoControllerContainer { get; set; }
-		
+
 		void ReleaseDesignerOutlets ()
 		{
-			if (StackView != null) {
-				StackView.Dispose ();
-				StackView = null;
-			}
-
 			if (CameraButton != null) {
 				CameraButton.Dispose ();
 				CameraButton = null;
@@ -45,6 +44,11 @@ namespace H113.Demo.iOS
 			if (MicButton != null) {
 				MicButton.Dispose ();
 				MicButton = null;
+			}
+
+			if (StackView != null) {
+				StackView.Dispose ();
+				StackView = null;
 			}
 
 			if (StartCallButton != null) {
@@ -61,6 +65,12 @@ namespace H113.Demo.iOS
 				VideoControllerContainer.Dispose ();
 				VideoControllerContainer = null;
 			}
+
+			if (DialButton != null) {
+				DialButton.Dispose ();
+				DialButton = null;
+			}
+
 		}
 	}
 }
