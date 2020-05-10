@@ -75,7 +75,10 @@ namespace WebRTC.AppRTC.Abstraction
         public bool IsScreencast { get; set; }
 
         public bool VideoCallEnabled { get; set; }
+
+        public bool AudioCallEnabled { get; set; }
         public bool Loopback { get; set; }
+
         public bool Tracing { get; set; }
         public int VideoWidth { get; set; }
         public int VideoHeight { get; set; }
@@ -167,6 +170,7 @@ namespace WebRTC.AppRTC.Abstraction
         private bool _isError;
 
         private bool IsVideoCallEnabled => _parameters.VideoCallEnabled;
+        private bool IsAudioCallEnabled => _parameters.AudioCallEnabled;
 
         public PeerConnectionClient(PeerConnectionParameters parameters, IPeerConnectionEvents peerConnectionEvents,
             ILogger logger = null)
@@ -505,18 +509,22 @@ namespace WebRTC.AppRTC.Abstraction
                 _logger.Debug(TAG, $"Capturing format: {_videoWidth}x{_videoHeight}@{_fps}");
             }
 
-            _audioConstraints = new MediaConstraints();
-            if (_parameters.NoAudioProcessing)
+            if (IsAudioCallEnabled)
             {
-                _logger.Debug(TAG, "Disabling audio processing");
-                _audioConstraints.Mandatory.Add(AudioEchoCancellationConstraint, "false");
-                _audioConstraints.Mandatory.Add(AudioAutoGainControlConstraint, "false");
-                _audioConstraints.Mandatory.Add(AudioHighPassFilterConstraint, "false");
-                _audioConstraints.Mandatory.Add(AudioNoiseSuppressionConstraint, "false");
+                _audioConstraints = new MediaConstraints();
+                if (_parameters.NoAudioProcessing)
+                {
+                    _logger.Debug(TAG, "Disabling audio processing");
+                    _audioConstraints.Mandatory.Add(AudioEchoCancellationConstraint, "false");
+                    _audioConstraints.Mandatory.Add(AudioAutoGainControlConstraint, "false");
+                    _audioConstraints.Mandatory.Add(AudioHighPassFilterConstraint, "false");
+                    _audioConstraints.Mandatory.Add(AudioNoiseSuppressionConstraint, "false");
+                }
             }
 
             _sdpMediaConstraints = new MediaConstraints();
-            _sdpMediaConstraints.Mandatory.Add("OfferToReceiveAudio", "true");
+            if (IsAudioCallEnabled)
+                _sdpMediaConstraints.Mandatory.Add("OfferToReceiveAudio", "true");
             _sdpMediaConstraints.Mandatory.Add("OfferToReceiveVideo", _parameters.VideoCallEnabled ? "true" : "false");
         }
 
@@ -563,7 +571,10 @@ namespace WebRTC.AppRTC.Abstraction
                 }
             }
 
-            _peerConnection.AddTrack(CreateAudioTrack(), mediaStreamLabels);
+            if (IsAudioCallEnabled)
+            {
+                _peerConnection.AddTrack(CreateAudioTrack(), mediaStreamLabels);
+            }
 
             if (IsVideoCallEnabled)
             {
@@ -597,7 +608,7 @@ namespace WebRTC.AppRTC.Abstraction
             _rtcEventLog.Start();
         }
 
-        private string CreateRtcEventLogOutputFile()
+        private static string CreateRtcEventLogOutputFile()
         {
             var date = DateTime.Now;
             return $"event_log_{date:yyyyMMdd_hhmm_ss}";

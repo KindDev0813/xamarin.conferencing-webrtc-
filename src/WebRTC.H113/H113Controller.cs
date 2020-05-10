@@ -32,7 +32,8 @@ namespace WebRTC.H113
             var registeredMessage = signalingParameters;
             return new PeerConnectionParameters(registeredMessage.GetIceServers())
             {
-                VideoCallEnabled = true
+                VideoCallEnabled = true,
+                AudioCallEnabled = false
             };
         }
 
