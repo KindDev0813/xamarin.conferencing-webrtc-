@@ -83,6 +83,10 @@
       <Project>{15baf860-547f-4e5f-ac88-97f4b47c5e4b}</Project>
       <Name>WebRTC.Abstraction</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WebRTC.iOS.Binding\WebRTC.iOS.Binding.csproj">
+      <Project>{98BCCC65-7E7D-45AE-90CB-952CE4E641AC}</Project>
+      <Name>WebRTC.iOS.Binding</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
