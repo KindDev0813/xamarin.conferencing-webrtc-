@@ -97,7 +97,7 @@ namespace H113.Demo.Droid
             HideVideoContainer(false);
         }
 
-        public virtual void OnConnect()
+        public virtual void OnConnect(DisconnectType disconnectType)
         {
             Toast.MakeText(this, "Connected", ToastLength.Short).Show();
         }
@@ -118,6 +118,11 @@ namespace H113.Demo.Droid
         {
             var container = FindViewById(Resource.Id.fl_video_container);
             container.Visibility = hide ? ViewStates.Gone : ViewStates.Visible;
+        }
+
+        public void ShowNotification(int type, string title, string message)
+        {
+
         }
     }
 }

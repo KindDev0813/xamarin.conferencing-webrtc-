@@ -10,7 +10,7 @@ namespace H113.Demo.Droid
     public class MainActivity : BaseMainActivity
     {
         private const string IsConnectedExtra = "is_connected";
-        
+
         private bool _isConnected;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -34,12 +34,12 @@ namespace H113.Demo.Droid
         protected override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
-            outState.PutBoolean(IsConnectedExtra,_isConnected);
+            outState.PutBoolean(IsConnectedExtra, _isConnected);
         }
-        
-        public override void OnConnect()
+
+        public override void OnConnect(DisconnectType disconnectType)
         {
-            base.OnConnect();
+            base.OnConnect(disconnectType);
             _isConnected = true;
         }
 
@@ -49,6 +49,6 @@ namespace H113.Demo.Droid
             _isConnected = false;
         }
 
-       
+
     }
 }

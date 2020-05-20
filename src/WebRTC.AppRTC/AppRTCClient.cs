@@ -40,8 +40,8 @@ namespace WebRTC.AppRTC
         }
 
         public ConnectionState State { get; private set; }
-        
-       
+
+
         public void Connect(RoomConnectionParameters connectionParameters)
         {
             _connectionParameters = connectionParameters;
@@ -65,7 +65,7 @@ namespace WebRTC.AppRTC
 
                 var json = ARDSignalingMessage.CreateJson(sdp);
 
-                SendPostMessage(MessageType.Message,_messageUrl,json);
+                SendPostMessage(MessageType.Message, _messageUrl, json);
 
                 if (_connectionParameters.IsLoopback)
                 {
@@ -82,13 +82,13 @@ namespace WebRTC.AppRTC
             {
                 if (_connectionParameters.IsLoopback)
                 {
-                    _logger.Error(TAG,"Sending answer in loopback mode.");
+                    _logger.Error(TAG, "Sending answer in loopback mode.");
                     return;
                 }
 
                 var json = ARDSignalingMessage.CreateJson(sdp);
 
-               
+
                 _wsClient.Send(json);
             });
         }
@@ -105,8 +105,8 @@ namespace WebRTC.AppRTC
                         ReportError("Sending ICE candidate in non connected state.");
                         return;
                     }
-                    
-                    SendPostMessage(MessageType.Message,_messageUrl,json);
+
+                    SendPostMessage(MessageType.Message, _messageUrl, json);
                 }
                 else
                 {
@@ -128,8 +128,8 @@ namespace WebRTC.AppRTC
                         ReportError("Sending ICE candidate removals in non connected state.");
                         return;
                     }
-                    
-                    SendPostMessage(MessageType.Message,_messageUrl,json);
+
+                    SendPostMessage(MessageType.Message, _messageUrl, json);
                     if (_connectionParameters.IsLoopback)
                     {
                         _signalingEvents.OnRemoteIceCandidatesRemoved(candidates);
@@ -142,6 +142,11 @@ namespace WebRTC.AppRTC
             });
         }
 
+        public void OnWebSocketOpen()
+        {
+            // _signalingEvents.OnChannelConnected(SignalingParameters.);
+        }
+
         public void OnWebSocketClose()
         {
             _signalingEvents.OnChannelClose();
@@ -151,7 +156,7 @@ namespace WebRTC.AppRTC
         {
             if (_wsClient.State != WebSocketConnectionState.Registered)
             {
-                _logger.Error(TAG,"Got WebSocket message in non registered state.");
+                _logger.Error(TAG, "Got WebSocket message in non registered state.");
                 return;
             }
 
@@ -160,17 +165,17 @@ namespace WebRTC.AppRTC
             switch (msg.Type)
             {
                 case ARDSignalingMessageType.Candidate:
-                    var candidate = (ARDICECandidateMessage) msg;
+                    var candidate = (ARDICECandidateMessage)msg;
                     _signalingEvents.OnRemoteIceCandidate(candidate.Candidate);
                     break;
                 case ARDSignalingMessageType.CandidateRemoval:
-                    var candidates = (ARDICECandidateRemovalMessage) msg;
+                    var candidates = (ARDICECandidateRemovalMessage)msg;
                     _signalingEvents.OnRemoteIceCandidatesRemoved(candidates.Candidates);
                     break;
                 case ARDSignalingMessageType.Offer:
                     if (!_initiator)
                     {
-                        var sdp = (ARDSessionDescriptionMessage) msg;
+                        var sdp = (ARDSessionDescriptionMessage)msg;
                         _signalingEvents.OnRemoteDescription(sdp.Description);
                     }
                     else
@@ -181,7 +186,7 @@ namespace WebRTC.AppRTC
                 case ARDSignalingMessageType.Answer:
                     if (_initiator)
                     {
-                        var sdp = (ARDSessionDescriptionMessage) msg;
+                        var sdp = (ARDSessionDescriptionMessage)msg;
                         _signalingEvents.OnRemoteDescription(sdp.Description);
                     }
                     else
@@ -209,9 +214,9 @@ namespace WebRTC.AppRTC
             _logger.Debug(TAG, $"Connect to room: {connectionUrl}");
 
             State = ConnectionState.New;
-            _wsClient = new WebSocketChannelClient(_executor,this,_logger);
-            
-            var roomParametersFetcher = new RoomParametersFetcher(connectionUrl,null,_logger);
+            _wsClient = new WebSocketChannelClient(_executor, this, _logger);
+
+            var roomParametersFetcher = new RoomParametersFetcher(connectionUrl, null, _logger);
             roomParametersFetcher.MakeRequest((parameters, description) =>
             {
                 _executor.Execute(() =>
@@ -231,7 +236,8 @@ namespace WebRTC.AppRTC
         private void DisconnectFromRoomInternal()
         {
             _logger.Debug(TAG, "Disconnect. Room state: " + State);
-            if (State == ConnectionState.Connected) {
+            if (State == ConnectionState.Connected)
+            {
                 _logger.Debug(TAG, "Closing room.");
                 SendPostMessage(MessageType.Leave, _leaveUrl, null);
             }
@@ -243,47 +249,47 @@ namespace WebRTC.AppRTC
         private void SendPostMessage(MessageType messageType, string url, string message)
         {
             var logInfo = url;
-            
+
             if (message != null)
                 logInfo += $". Message: {message}";
-            
-            _logger.Debug(TAG,$"C->GAE: {logInfo}");
-            
-            var httpConnection = new AsyncHttpURLConnection(MethodType.Post,url,message,((response, errorMessage) =>
-            {
-                _executor.Execute(() =>
-                {
-                    if (errorMessage != null)
-                    {
-                        ReportError($"GAE POST error : {errorMessage}");
-                        return;
-                    }
 
-                    if (messageType != MessageType.Message) 
-                        return;
-                    try
-                    {
-                        var msg = JsonConvert.DeserializeObject<ARDMessageResponse>(response);
-                        if (msg.Type != ARDMessageResultType.Success)
-                        {
-                            ReportError($"GAE POST error : {response}");
-                        }
-                    }
-                    catch (JsonException e)
-                    {
-                        ReportError($"GAE POST JSON error: {e.Message}");
-                    }
-                });
-            }));
+            _logger.Debug(TAG, $"C->GAE: {logInfo}");
+
+            var httpConnection = new AsyncHttpURLConnection(MethodType.Post, url, message, ((response, errorMessage) =>
+               {
+                   _executor.Execute(() =>
+                   {
+                       if (errorMessage != null)
+                       {
+                           ReportError($"GAE POST error : {errorMessage}");
+                           return;
+                       }
+
+                       if (messageType != MessageType.Message)
+                           return;
+                       try
+                       {
+                           var msg = JsonConvert.DeserializeObject<ARDMessageResponse>(response);
+                           if (msg.Type != ARDMessageResultType.Success)
+                           {
+                               ReportError($"GAE POST error : {response}");
+                           }
+                       }
+                       catch (JsonException e)
+                       {
+                           ReportError($"GAE POST JSON error: {e.Message}");
+                       }
+                   });
+               }));
             httpConnection.Send();
         }
 
         private void SignalingParametersReady(SignalingParameters signalingParameters)
         {
-            _logger.Debug(TAG,"Room connection completed.");
+            _logger.Debug(TAG, "Room connection completed.");
 
             if (_connectionParameters.IsLoopback &&
-                (!signalingParameters.IsInitiator || signalingParameters.OfferSdp !=null))
+                (!signalingParameters.IsInitiator || signalingParameters.OfferSdp != null))
             {
                 ReportError("Loopback room is busy.");
                 return;
@@ -292,24 +298,24 @@ namespace WebRTC.AppRTC
             if (!_connectionParameters.IsLoopback && !signalingParameters.IsInitiator &&
                 signalingParameters.OfferSdp == null)
             {
-                _logger.Warning(TAG,"No offer SDP in room response.");
+                _logger.Warning(TAG, "No offer SDP in room response.");
             }
 
             _initiator = signalingParameters.IsInitiator;
             _messageUrl = GetMessageUrl(_connectionParameters, signalingParameters);
             _leaveUrl = GetLeaveUrl(_connectionParameters, signalingParameters);
-            
-            _logger.Debug(TAG,$"Message URL: {_messageUrl}");
-            _logger.Debug(TAG,$"Leave URL: {_leaveUrl}");
+
+            _logger.Debug(TAG, $"Message URL: {_messageUrl}");
+            _logger.Debug(TAG, $"Leave URL: {_leaveUrl}");
 
             State = ConnectionState.Connected;
-            
+
             _signalingEvents.OnChannelConnected(signalingParameters);
 
             _wsClient.Connect(signalingParameters.WssUrl, signalingParameters.WssPostUrl);
             _wsClient.Register(_connectionParameters.RoomId, signalingParameters.ClientId);
         }
-        
+
         private void ReportError(string errorMessage)
         {
             _logger.Error(TAG, errorMessage);
@@ -346,5 +352,7 @@ namespace WebRTC.AppRTC
         {
             return roomConnectionParameters.UrlParameters != null ? $"?{roomConnectionParameters.UrlParameters}" : "";
         }
+
+
     }
 }

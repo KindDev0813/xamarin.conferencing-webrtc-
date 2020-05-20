@@ -79,9 +79,9 @@ namespace WebRTC.H113.Droid
 
         }
 
-        public void OnConnect()
+        public void OnConnect(DisconnectType disconnectType)
         {
-            _videoControllerListener.OnConnect();
+            _videoControllerListener.OnConnect(disconnectType);
         }
 
         void IAppRTCEngineEvents.OnDisconnect(DisconnectType disconnectType)

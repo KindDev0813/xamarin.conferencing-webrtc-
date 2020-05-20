@@ -10,7 +10,7 @@ namespace WebRTC.AppRTC.Abstraction
         /// <summary>
         /// Will be called when WebRTC connection it's establish
         /// </summary>
-        void OnConnect();
+        void OnConnect(DisconnectType disconnectType);
 
         void OnDisconnect(DisconnectType disconnectType);
 
@@ -219,7 +219,7 @@ namespace WebRTC.AppRTC.Abstraction
         public void OnConnected()
         {
             IsWebRTCConnected = true;
-            Executor.Execute(() => Events.OnConnect());
+            Executor.Execute(() => Events.OnConnect(DisconnectType.PeerConnection));
         }
 
         public void OnDisconnected()
@@ -307,6 +307,16 @@ namespace WebRTC.AppRTC.Abstraction
         public virtual void SendLocation(Location location)
         {
             // RTCClient?.SendLocation(location);
+        }
+
+        public void OnWebSocketOpen()
+        {
+
+        }
+
+        public void OnWebSocketClose()
+        {
+
         }
     }
 }

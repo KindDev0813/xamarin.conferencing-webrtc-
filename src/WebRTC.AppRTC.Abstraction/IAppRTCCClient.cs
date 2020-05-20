@@ -14,7 +14,7 @@ namespace WebRTC.AppRTC.Abstraction
         where TConnectionParam : IConnectionParameters
     {
         ConnectionState State { get; }
-        
+
         void Connect(TConnectionParam connectionParameters);
 
         void Disconnect();
@@ -33,6 +33,9 @@ namespace WebRTC.AppRTC.Abstraction
     {
         void OnChannelConnected(TSignalParam signalingParameters);
 
+
+        void OnWebSocketClose();
+        void OnWebSocketOpen();
         void OnChannelClose();
         void OnChannelError(string description);
 

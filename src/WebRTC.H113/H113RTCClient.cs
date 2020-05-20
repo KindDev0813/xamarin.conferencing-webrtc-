@@ -87,7 +87,8 @@ namespace WebRTC.H113
 
         public void OnWebSocketClose()
         {
-            _signalingEvents.OnChannelClose();
+            _signalingEvents.OnWebSocketClose();
+            //    _signalingEvents.OnChannelClose();
         }
 
         public void UpdateInfoMessage(Location location)
@@ -136,22 +137,25 @@ namespace WebRTC.H113
                     _logger.Error(TAG, $"Got wrong message type: {msg.MessageType}");
                     break;
                 case SignalingMessageType.Registered:
-                    var registerMessage = (RegisteredMessage) msg;
+                    var registerMessage = (RegisteredMessage)msg;
                     SignalingParametersReady(registerMessage);
                     break;
                 case SignalingMessageType.ReceivedAnswer:
-                    var answerMessage = (SessionDescriptionMessage) msg;
+                    var answerMessage = (SessionDescriptionMessage)msg;
                     _signalingEvents.OnRemoteDescription(answerMessage.Description);
                     break;
                 case SignalingMessageType.ReceiveCandidate:
-                    var candidateMessage = (IceCandidateMessage) msg;
+                    var candidateMessage = (IceCandidateMessage)msg;
                     var iceCandidate = candidateMessage.IceCandidate;
                     _signalingEvents.OnRemoteIceCandidate(new IceCandidate(iceCandidate.Sdp, iceCandidate.SdpMid,
                         iceCandidate.SdpMLineIndex));
                     break;
                 case SignalingMessageType.Reconnecting:
-                    var reconnectingMessage = (ReconnectingMessage) msg;
+                    var reconnectingMessage = (ReconnectingMessage)msg;
                     _reconnectinId = reconnectingMessage.Id;
+                    break;
+                case SignalingMessageType.CloseConnection:
+                    //    Disconnect();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -230,6 +234,11 @@ namespace WebRTC.H113
                 State = ConnectionState.Error;
                 _signalingEvents.OnChannelError(errorMessage);
             });
+        }
+
+        public void OnWebSocketOpen()
+        {
+            _signalingEvents.OnWebSocketOpen();
         }
     }
 }

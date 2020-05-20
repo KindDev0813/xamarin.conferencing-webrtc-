@@ -19,6 +19,8 @@ namespace H113.Demo.iOS
 {
     public partial class ViewController : UIViewController, IVideoControllerListener
     {
+        private Timer sendLocationTimer;
+
         private const string Token =
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCBhcHAiLCJpYXQiOjE1ODY5MzkyMzJ9.JG6Djn83RlmsiFAdaVz-I_Mj1JV804rww0b2ks3gkVU";
 
@@ -31,7 +33,7 @@ namespace H113.Demo.iOS
         {
         }
 
-        public void OnConnect()
+        public void OnConnect(WebRTC.AppRTC.Abstraction.DisconnectType disconnectType)
         {
             StartCallButton.SetTitle("Disconnect", UIControlState.Normal);
         }
@@ -59,6 +61,16 @@ namespace H113.Demo.iOS
         {
             var permission = await Xamarin.Essentials.Permissions.RequestAsync<Permissions.Camera>();
             return permission == PermissionStatus.Granted;
+        }
+
+        public void ShowNotification(int type, string title, string message)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                var alertDialog = UIAlertController.Create("Error", message, UIAlertControllerStyle.Alert);
+                alertDialog.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Destructive, null));
+                PresentViewController(alertDialog, true, null);
+            });
         }
 
         public override void ViewDidLoad()
@@ -102,9 +114,10 @@ namespace H113.Demo.iOS
 
         private void DialButtonOnTouchUpInside(object sender, EventArgs e)
         {
-            //PhoneDialer.Open("92345545");
-            UIApplication.SharedApplication.OpenUrl(new NSUrl("http://www.google.com"));
-            ShowNotification();
+            sendLocationTimer = new Timer((ee) => ShowNotification(), null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5));
+            PhoneDialer.Open("92232988");
+            // UIApplication.SharedApplication.OpenUrl(new NSUrl("http://www.google.com"));
+            //     ShowNotification();
         }
 
         private void ShowNotification()

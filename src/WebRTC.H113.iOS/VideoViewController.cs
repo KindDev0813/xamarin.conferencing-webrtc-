@@ -122,19 +122,14 @@ namespace WebRTC.H113.iOS
             _videoControllerListener.OnError(description);
         }
 
-        void IAppRTCEngineEvents.OnConnect()
+        void IAppRTCEngineEvents.OnConnect(DisconnectType disconnectType)
         {
-            _videoControllerListener.OnConnect();
+            _videoControllerListener.OnConnect(disconnectType);
         }
 
         public void ShowNotification(int type, string title, string message)
         {
-            MainThread.BeginInvokeOnMainThread(() =>
-                      {
-                          var alertDialog = UIAlertController.Create("Error", message, UIAlertControllerStyle.Alert);
-                          alertDialog.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Destructive, null));
-                          PresentViewController(alertDialog, true, null);
-                      });
+            _videoControllerListener.ShowNotification(type, title, message);
         }
 
         private class VideoView : UIView, IRTCVideoViewDelegate

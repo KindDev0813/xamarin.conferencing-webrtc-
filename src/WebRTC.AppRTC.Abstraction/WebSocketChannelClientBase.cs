@@ -15,11 +15,12 @@ namespace WebRTC.AppRTC.Abstraction
 
     public interface IWebSocketChannelEvents
     {
+        void OnWebSocketOpen();
         void OnWebSocketClose();
         void OnWebSocketMessage(string message);
         void OnWebSocketError(string description);
     }
-    
+
     public abstract class WebSocketChannelClientBase
     {
         private const string TAG = nameof(WebSocketChannelClientBase);
@@ -32,7 +33,7 @@ namespace WebRTC.AppRTC.Abstraction
 
         private ManualResetEvent _mre;
         private string _wsUrl;
-        
+
         protected WebSocketChannelClientBase(IExecutor executor, IWebSocketChannelEvents events, ILogger logger = null)
         {
             _executor = executor;
@@ -126,8 +127,10 @@ namespace WebRTC.AppRTC.Abstraction
 
         protected abstract void SendByeMessage();
 
-        protected abstract void OnConnectionOpen();
-
+        protected virtual void OnConnectionOpen()
+        {
+            _events.OnWebSocketOpen();
+        }
 
         protected virtual void OnMessageReceived(string message)
         {

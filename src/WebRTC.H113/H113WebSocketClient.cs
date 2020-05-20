@@ -5,14 +5,14 @@ namespace WebRTC.H113
     public class H113WebSocketClient : WebSocketChannelClientBase
     {
         private const string TAG = nameof(H113WebSocketClient);
-        
+
         private string _registerMessage;
 
-        
+
         public H113WebSocketClient(IExecutor executor, IWebSocketChannelEvents events, ILogger logger = null) : base(executor, events, logger)
         {
         }
-        
+
         public void Register(string message)
         {
             CheckIfCalledOnValidThread();
@@ -37,7 +37,7 @@ namespace WebRTC.H113
             WsSendQueue.Clear();
             _registerMessage = null;
         }
-        
+
 
         protected override void SendByeMessage()
         {
@@ -46,6 +46,7 @@ namespace WebRTC.H113
 
         protected override void OnConnectionOpen()
         {
+            base.OnConnectionOpen();
             Register(_registerMessage);
         }
     }
