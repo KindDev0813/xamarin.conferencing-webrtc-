@@ -36,6 +36,8 @@ namespace WebRTC.H113
         [EnumMember(Value = "app-reconnecting-ws")]
         DoReconnect,
 
+        [EnumMember(Value = "app-close-connection")]
+        CloseConnection,
     }
 
     public class SignalingMessage
@@ -54,9 +56,10 @@ namespace WebRTC.H113
         public const string ReceivedAnswer = "receive-answer";
         public const string ReceiveCandidate = "receive-candidate";
         public const string SendCandidate = "amk-send-candidate";
-        public const string Reconnecting = "app-connection-id"; //jls
-        public const string UpdateInfo = "app-update-info"; //jls
-        public const string DoReconnect = "app-reconnecting-ws"; //jls
+        public const string Reconnecting = "app-connection-id";
+        public const string UpdateInfo = "app-update-info";
+        public const string DoReconnect = "app-reconnecting-ws";
+        public const string CloseConnection = "app-close-connection";
 
         [JsonProperty("type")] public SignalingMessageType MessageType { get; set; }
 
@@ -84,6 +87,8 @@ namespace WebRTC.H113
                         return JsonConvert.DeserializeObject<IceCandidateMessage>(json, _settings);
                     case Reconnecting:
                         return JsonConvert.DeserializeObject<ReconnectingMessage>(json, _settings);
+                    case CloseConnection:
+                        return JsonConvert.DeserializeObject<CloseConnectiongMessage>(json, _settings);
                 }
             }
 
@@ -168,6 +173,13 @@ namespace WebRTC.H113
         [JsonProperty("altitudeAccuracy")] public double AltitudeAccuracy { get; }
     }
 
+    public class CloseConnectiongMessage : SignalingMessage
+    {
+        public CloseConnectiongMessage()
+        {
+            MessageType = SignalingMessageType.CloseConnection;
+        }
+    }
 
     public class ReconnectingMessage : SignalingMessage
     {
