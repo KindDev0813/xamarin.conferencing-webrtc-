@@ -40,6 +40,9 @@
         <Reference Include="System.Core" />
         <Reference Include="System.Xml.Linq" />
         <Reference Include="System.Xml" />
+        <Reference Include="Autobahn.Binding">
+          <HintPath>..\..\libs\autobahn\Autobahn.Binding.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="AutobahnWebSocket.cs" />
@@ -66,10 +69,6 @@
       <PackageReference Include="Xamarin.Android.Support.Fragment" Version="28.0.0.3" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Autobahn.Binding\Autobahn.Binding.csproj">
-        <Project>{b2eddef4-6d29-488b-98ea-ee8cfe85f5e2}</Project>
-        <Name>Autobahn.Binding</Name>
-      </ProjectReference>
       <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
         <Project>{15baf860-547f-4e5f-ac88-97f4b47c5e4b}</Project>
         <Name>WebRTC.Abstraction</Name>
