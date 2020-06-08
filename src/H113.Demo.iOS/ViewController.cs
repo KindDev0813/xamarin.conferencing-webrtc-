@@ -1,12 +1,10 @@
-﻿using CoreGraphics;
-using Foundation;
-using H113.Demo.iOS.Extensions;
+﻿using H113.Demo.iOS.Extensions;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreFoundation;
+using DemoConfig;
 using UIKit;
 using UserNotifications;
 using WebRTC.Abstraction;
@@ -19,11 +17,9 @@ namespace H113.Demo.iOS
 {
     public partial class ViewController : UIViewController, IVideoControllerListener
     {
-        private const string Token =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCBhcHAiLCJpYXQiOjE1ODY5MzkyMzJ9.JG6Djn83RlmsiFAdaVz-I_Mj1JV804rww0b2ks3gkVU";
-
+   
         private readonly ConnectionParameters _connectionParameters =
-            new ConnectionParameters("wss://video.h113dev.no/ws", Token, "98056391");
+            new ConnectionParameters(Config.WssUrl, Config.Token, Config.Phone);
 
         private VideoViewController _videoViewController;
 
@@ -36,7 +32,7 @@ namespace H113.Demo.iOS
             StartCallButton.SetTitle("Disconnect", UIControlState.Normal);
         }
 
-        public void OnDisconnect(WebRTC.AppRTC.Abstraction.DisconnectType disconnectType)
+        public void OnDisconnect(DisconnectType disconnectType)
         {
             VideoContainer.Hidden = true;
             StartCallButton.SetTitle("Start Call", UIControlState.Normal);

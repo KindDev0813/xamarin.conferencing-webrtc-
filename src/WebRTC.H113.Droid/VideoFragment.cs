@@ -1,9 +1,9 @@
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
-using Android.Support.V4.App;
 using Android.Views;
 using Android.Widget;
+using AndroidX.Fragment.App;
 using Newtonsoft.Json;
 using Org.Webrtc;
 using WebRTC.Droid;
@@ -68,6 +68,7 @@ namespace WebRTC.H113.Droid
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var frameLayout = new FrameLayout(Context);
+            
             var surfaceViewRenderer = new SurfaceViewRenderer(Context);
             frameLayout.AddView(surfaceViewRenderer,
                 new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent,

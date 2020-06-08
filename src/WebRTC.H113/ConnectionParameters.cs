@@ -1,8 +1,7 @@
-using WebRTC.AppRTC.Abstraction;
 
 namespace WebRTC.H113
 {
-    public class ConnectionParameters : IConnectionParameters
+    public class ConnectionParameters 
     {
         public ConnectionParameters(string wsUrl, string protocol, string phone)
         {

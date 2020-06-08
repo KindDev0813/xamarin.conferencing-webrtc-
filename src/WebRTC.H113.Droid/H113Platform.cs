@@ -2,8 +2,9 @@
 using System;
 using Android.App;
 using Android.OS;
-using WebRTC.AppRTC.Abstraction;
 using WebRTC.Droid;
+using WebRTC.H113.Schedulers;
+using WebRTC.H113.Signaling.WebSocket;
 
 namespace WebRTC.H113.Droid
 {
@@ -22,7 +23,7 @@ namespace WebRTC.H113.Droid
             ExecutorServiceFactory.MainExecutor = new MainExecutor();
         }
 
-        private class MainExecutor : AppRTC.Abstraction.IExecutor
+        private class MainExecutor : IExecutor
         {
             private readonly Handler _handler = new Handler(Looper.MainLooper);
             public bool IsCurrentExecutor => Looper.MainLooper == Looper.MyLooper();

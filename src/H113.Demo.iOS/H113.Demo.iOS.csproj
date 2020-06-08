@@ -138,6 +138,10 @@
         <Compile Include="Extensions\UIViewControllerExtensions.cs" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\DemoConfig\DemoConfig.csproj">
+        <Project>{86b56d46-7ff6-4e20-ac1a-39663f15210d}</Project>
+        <Name>DemoConfig</Name>
+      </ProjectReference>
       <ProjectReference Include="..\WebRTC.H113.iOS\WebRTC.H113.iOS.csproj">
         <Project>{81D3FAC8-19BC-47A6-BA79-CB0FBA664851}</Project>
         <Name>WebRTC.H113.iOS</Name>
@@ -149,10 +153,6 @@
       <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
         <Project>{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}</Project>
         <Name>WebRTC.Abstraction</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\WebRTC.AppRTC.Abstraction\WebRTC.AppRTC.Abstraction.csproj">
-        <Project>{E8C64D72-8A0B-4322-81DD-3D52E3BD96A5}</Project>
-        <Name>WebRTC.AppRTC.Abstraction</Name>
       </ProjectReference>
       <ProjectReference Include="..\WebRTC.iOS\WebRTC.iOS.csproj">
         <Project>{928F96AA-9E37-4254-8399-5D680CCAF2C7}</Project>

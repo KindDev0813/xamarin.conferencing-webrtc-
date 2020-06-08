@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using IO.Crossbar.Autobahn.Websocket;
 using IO.Crossbar.Autobahn.Websocket.Interfaces;
 using IO.Crossbar.Autobahn.Websocket.Types;
-using WebRTC.AppRTC.Abstraction;
+using WebRTC.H113.Signaling.WebSocket;
 using WebSocketConnectionHandler = IO.Crossbar.Autobahn.Websocket.WebSocketConnectionHandler;
 
 namespace WebRTC.H113.Droid
@@ -27,17 +27,20 @@ namespace WebRTC.H113.Droid
             _webSocket.Dispose();
         }
 
+        public bool IsConnected => _webSocket.IsConnected;
+
         public void Open(string url, string protocol = null, string authToken = null)
         {
             try
             {
                 var options = new WebSocketOptions();
                 options.SetTLSEnabledProtocols(new[] {"TLSv1.1", "TLSv1.2"});
-                _webSocket.Connect(url,null, new WebSocketObserver(this), options,new Dictionary<string, string>
+                options.ReconnectInterval = 1000;
+                options.AutoPingInterval = 500;
+                _webSocket.Connect(url, null, new WebSocketObserver(this), options, new Dictionary<string, string>
                 {
                     ["Sec-WebSocket-Protocol"] = protocol
                 });
-                
             }
             catch (Exception ex)
             {
@@ -96,7 +99,8 @@ namespace WebRTC.H113.Droid
 
             public void OnClose(int p0, string p1)
             {
-                if (p0 == WebSocketConnectionHandler.InterfaceConsts.CloseServerError)
+                if (p0 == WebSocketConnectionHandler.InterfaceConsts.CloseServerError ||
+                    p0 == WebSocketConnectionHandler.InterfaceConsts.CloseCannotConnect)
                 {
                     _webSocketConnectionEx.SendOnError(new Exception(p1));
                 }

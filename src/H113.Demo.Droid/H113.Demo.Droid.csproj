@@ -33,6 +33,7 @@
         <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
         <AndroidLinkMode>None</AndroidLinkMode>
         <EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
+        <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a;x86_64</AndroidSupportedAbis>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <DebugSymbols>True</DebugSymbols>
@@ -78,17 +79,15 @@
         <AndroidResource Include="Resources\values\styles.xml" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.3" />
         <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
+        <PackageReference Include="Xamarin.Kotlin.StdLib">
+          <Version>1.3.50.1</Version>
+        </PackageReference>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\DemoConfig\DemoConfig.csproj">
           <Project>{86b56d46-7ff6-4e20-ac1a-39663f15210d}</Project>
           <Name>DemoConfig</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\WebRTC.AppRTC.Abstraction\WebRTC.AppRTC.Abstraction.csproj">
-            <Project>{e8c64d72-8a0b-4322-81dd-3d52e3bd96a5}</Project>
-            <Name>WebRTC.AppRTC.Abstraction</Name>
         </ProjectReference>
         <ProjectReference Include="..\WebRTC.H113.Droid\WebRTC.H113.Droid.csproj">
             <Project>{1575306c-42e6-4ba2-9db2-1fee212e486d}</Project>
@@ -100,8 +99,8 @@
         </ProjectReference>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.2.0" />
-        <PackageReference Include="Xamarin.Google.Android.Material" Version="1.0.0" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.2.0.1" />
+        <PackageReference Include="Xamarin.Google.Android.Material" Version="1.0.0.1" />
     </ItemGroup>
     <ItemGroup>
         <AndroidEnvironment Include="environment.txt" />

@@ -1,18 +1,17 @@
 using Android.OS;
 using Org.Webrtc;
 using WebRTC.Abstraction;
-using WebRTC.AppRTC.Abstraction;
 using WebRTC.Droid;
 using IVideoCapturer = WebRTC.Abstraction.IVideoCapturer;
 
 namespace WebRTC.H113.Droid
 {
-    public class VideoController : Java.Lang.Object, IH113AppRTCEngineEvents, RendererCommon.IRendererEvents
+    public class VideoController : Java.Lang.Object, IAppClientEvents, RendererCommon.IRendererEvents
     {
         private readonly ConnectionParameters _connectionParameters;
         private readonly bool _frontCamera;
 
-        private readonly H113Controller _controller;
+        private readonly AppClient _client;
 
         private readonly VideoRendererProxy _videoRendererProxy;
 
@@ -22,7 +21,7 @@ namespace WebRTC.H113.Droid
         {
             _connectionParameters = connectionParameters;
             _frontCamera = frontCamera;
-            _controller = new H113Controller(this);
+            _client = new AppClient(this);
             _videoRendererProxy = new VideoRendererProxy();
 
             EglBase = EglBaseHelper.Create();
@@ -30,7 +29,7 @@ namespace WebRTC.H113.Droid
 
         internal IEglBase EglBase { get; }
 
-        public bool IsConnected => _controller.IsWebRTCConnected;
+        public bool IsConnected => _client.ConnectionState == ConnectionState.Connected;
 
         public void Start(IVideoControllerListener videoControllerListener)
         {
@@ -40,27 +39,27 @@ namespace WebRTC.H113.Droid
 
             _videoControllerListener = videoControllerListener;
 
-            _controller.Connect(_connectionParameters);
+            _client.Connect(_connectionParameters);
         }
 
         public void SwitchCamera()
         {
-            _controller.SwitchCamera();
+            _client.SwitchCamera();
         }
 
         public void ToggleAudio()
         {
-            _controller.SetAudioEnabled(!_controller.IsAudioEnable);
+            _client.SetAudioEnabled(!_client.IsAudioEnable);
         }
 
         public void ToggleVideo()
         {
-            _controller.SetVideoEnabled(!_controller.IsVideoEnable);
+            _client.SetVideoEnabled(!_client.IsVideoEnable);
         }
 
         public void Disconnect()
         {
-            _controller.Disconnect();
+            _client.Disconnect();
         }
 
         internal void OnViewCreated(SurfaceViewRenderer surfaceViewRenderer)
@@ -74,33 +73,33 @@ namespace WebRTC.H113.Droid
             _videoRendererProxy.Renderer = null;
         }
 
-        void IAppRTCEngineEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
+        void IAppClientEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
 
         }
 
-        public void OnConnect()
+        void IAppClientEvents.OnConnected()
         {
             _videoControllerListener.OnConnect();
         }
 
-        void IAppRTCEngineEvents.OnDisconnect(DisconnectType disconnectType)
+        void IAppClientEvents.OnDisconnect(DisconnectType disconnectType)
         {
             _videoControllerListener.OnDisconnect(disconnectType);
         }
 
-        IVideoCapturer IAppRTCEngineEvents.
+        IVideoCapturer IAppClientEvents.
             CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource) =>
             factory.CreateCameraCapturer(videoSource, _frontCamera);
 
-        async void IAppRTCEngineEvents.ReadyToStart()
+        async void IAppClientEvents.ReadyToStart()
         {
             var isAllowed = await _videoControllerListener.RequestCameraPermissionAsync();
             if (isAllowed)
-                _controller.StartVideoCall(_videoRendererProxy, null);
+                _client.StartVideoCall(_videoRendererProxy, null);
         }
 
-        void IAppRTCEngineEvents.OnError(string description)
+        void IAppClientEvents.OnError(string description)
         {
             _videoControllerListener.OnError(description);
         }
@@ -116,7 +115,7 @@ namespace WebRTC.H113.Droid
 
         }
 
-        public void ShowNotification(int type, string title, string message)
+        void IAppClientEvents.ShowNotification(int type, string title, string message)
         {
 
         }

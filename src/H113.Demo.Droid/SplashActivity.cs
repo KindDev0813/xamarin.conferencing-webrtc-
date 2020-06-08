@@ -1,7 +1,7 @@
 using Android.App;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Widget;
+using AndroidX.AppCompat.App;
 
 namespace H113.Demo.Droid
 {

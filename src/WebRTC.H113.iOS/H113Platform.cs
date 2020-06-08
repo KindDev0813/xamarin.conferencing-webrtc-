@@ -4,7 +4,8 @@ using CoreFoundation;
 using Foundation;
 using ObjCRuntime;
 using Square.SocketRocket;
-using WebRTC.AppRTC.Abstraction;
+using WebRTC.H113.Schedulers;
+using WebRTC.H113.Signaling.WebSocket;
 using WebRTC.iOS.Binding;
 
 namespace WebRTC.H113.iOS
@@ -28,7 +29,6 @@ namespace WebRTC.H113.iOS
         {
             WebRTC.iOS.Platform.Cleanup();
         }
-
 
         private class MainExecutor : IExecutor
         {
@@ -83,6 +83,9 @@ namespace WebRTC.H113.iOS
                 _webSocket = null;
             }
 
+            public bool IsConnected => _webSocket.ReadyState == ReadyState.Connecting ||
+                                       _webSocket.ReadyState == ReadyState.Open;
+
             public void Open(string url, string protocol = null, string authToken = null)
             {
                 if (_webSocket != null)
@@ -94,7 +97,7 @@ namespace WebRTC.H113.iOS
 
                 var nsUrl = NSUrl.FromString(url);
                 _webSocket = !string.IsNullOrEmpty(protocol)
-                    ? new WebSocket(nsUrl, new NSObject[] { new NSString(protocol) })
+                    ? new WebSocket(nsUrl, new NSObject[] {new NSString(protocol)})
                     : new WebSocket(nsUrl);
                 Wire(_webSocket);
                 _webSocket.Open();
@@ -143,7 +146,7 @@ namespace WebRTC.H113.iOS
 
             private void WebSocketDidClose(object sender, WebSocketClosedEventArgs e)
             {
-                OnClosed?.Invoke(this, ((int)e.Code, e.Reason));
+                OnClosed?.Invoke(this, ((int) e.Code, e.Reason));
             }
         }
     }

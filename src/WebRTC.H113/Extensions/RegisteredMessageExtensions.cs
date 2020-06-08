@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using WebRTC.Abstraction;
+using WebRTC.H113.Signaling.Models;
 
 namespace WebRTC.H113.Extensions
 {

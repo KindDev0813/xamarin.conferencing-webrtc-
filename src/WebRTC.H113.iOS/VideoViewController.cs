@@ -1,32 +1,29 @@
 ﻿using System;
-using AVFoundation;
 using CoreFoundation;
 using CoreGraphics;
 using Foundation;
 using UIKit;
 using WebRTC.Abstraction;
-using WebRTC.AppRTC.Abstraction;
 using WebRTC.iOS;
 using WebRTC.iOS.Binding;
-using Xamarin.Essentials;
 
 namespace WebRTC.H113.iOS
 {
-    public partial class VideoViewController : UIViewController, IH113AppRTCEngineEvents
+    public partial class VideoViewController : UIViewController, IAppClientEvents
     {
         private readonly VideoRendererProxy _localRenderer = new VideoRendererProxy();
 
-        private readonly H113Controller _controller;
+        private readonly AppClient _controller;
 
         private IVideoControllerListener _videoControllerListener;
 
         private VideoView _videoView;
 
 
-        public VideoViewController() : base()
+        public VideoViewController()
         {
             H113Platform.Init();
-            _controller = new H113Controller(this);
+            _controller = new AppClient(this);
         }
 
         public Func<IVideoSource, FileVideoCapturer> FileVideoCapturerFactory { get; set; }
@@ -93,36 +90,36 @@ namespace WebRTC.H113.iOS
         }
 
 
-        void IAppRTCEngineEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
+        void IAppClientEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
 
         }
 
-        void IAppRTCEngineEvents.OnDisconnect(DisconnectType disconnectType)
+        void IAppClientEvents.OnDisconnect(DisconnectType disconnectType)
         {
             _videoControllerListener.OnDisconnect(disconnectType);
         }
 
-        IVideoCapturer IAppRTCEngineEvents.CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource)
+        IVideoCapturer IAppClientEvents.CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource)
         {
             if (FileVideoCapturerFactory != null)
                 return FileVideoCapturerFactory(videoSource);
             return factory.CreateCameraCapturer(videoSource, UseFrontCamera);
         }
 
-        async void IAppRTCEngineEvents.ReadyToStart()
+        async void IAppClientEvents.ReadyToStart()
         {
             var isAllowed = await _videoControllerListener.RequestCameraPermissionAsync();
             if (isAllowed)
                 _controller.StartVideoCall(_localRenderer, null);
         }
 
-        void IAppRTCEngineEvents.OnError(string description)
+        void IAppClientEvents.OnError(string description)
         {
             _videoControllerListener.OnError(description);
         }
 
-        void IAppRTCEngineEvents.OnConnect()
+        void IAppClientEvents.OnConnected()
         {
             _videoControllerListener.OnConnect();
         }
@@ -132,10 +129,9 @@ namespace WebRTC.H113.iOS
             _videoControllerListener.ShowNotification(type, title, message);
         }
 
-        private class VideoView : UIView, IRTCVideoViewDelegate
+        private sealed class VideoView : UIView, IRTCVideoViewDelegate
         {
             private static float BalancedVisibleFraction = 0.56f;
-
 
             private readonly RTCEAGLVideoView _localVideoView;
 

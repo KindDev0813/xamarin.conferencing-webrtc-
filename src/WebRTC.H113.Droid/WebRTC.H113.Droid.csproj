@@ -48,6 +48,7 @@
         <Compile Include="AutobahnWebSocket.cs" />
         <Compile Include="H113Platform.cs" />
         <Compile Include="IVideoControllerReadyCallback.cs" />
+        <Compile Include="OkHttpWebSocket.cs" />
         <Compile Include="VideoConfig.cs" />
         <Compile Include="VideoController.cs" />
         <Compile Include="VideoFragment.cs" />
@@ -65,17 +66,14 @@
         <Folder Include="Resources\layout" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="Square.OkHttp3" Version="4.2.2" />
-      <PackageReference Include="Xamarin.Android.Support.Fragment" Version="28.0.0.3" />
+      <PackageReference Include="Xamarin.AndroidX.Fragment">
+        <Version>1.2.4.1</Version>
+      </PackageReference>
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
         <Project>{15baf860-547f-4e5f-ac88-97f4b47c5e4b}</Project>
         <Name>WebRTC.Abstraction</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\WebRTC.AppRTC.Abstraction\WebRTC.AppRTC.Abstraction.csproj">
-        <Project>{e8c64d72-8a0b-4322-81dd-3d52e3bd96a5}</Project>
-        <Name>WebRTC.AppRTC.Abstraction</Name>
       </ProjectReference>
       <ProjectReference Include="..\WebRTC.Droid.Binding\WebRTC.Droid.Binding.csproj">
         <Project>{7a7ca35c-13fc-4e57-a0e3-8619974bb41b}</Project>

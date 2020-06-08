@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.App;
 using DemoConfig;
-using WebRTC.AppRTC.Abstraction;
 using WebRTC.H113;
 using WebRTC.H113.Droid;
 using Xamarin.Essentials;
@@ -88,6 +87,7 @@ namespace H113.Demo.Droid
                 .Create()
                 .Show();
         }
+        
 
         public virtual void OnFirstFrame()
         {
