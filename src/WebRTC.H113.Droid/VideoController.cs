@@ -7,7 +7,7 @@ using IVideoCapturer = WebRTC.Abstraction.IVideoCapturer;
 
 namespace WebRTC.H113.Droid
 {
-    public class VideoController : Java.Lang.Object, IAppRTCEngineEvents, RendererCommon.IRendererEvents
+    public class VideoController : Java.Lang.Object, IH113AppRTCEngineEvents, RendererCommon.IRendererEvents
     {
         private readonly ConnectionParameters _connectionParameters;
         private readonly bool _frontCamera;
@@ -79,9 +79,9 @@ namespace WebRTC.H113.Droid
 
         }
 
-        public void OnConnect(DisconnectType disconnectType)
+        public void OnConnect()
         {
-            _videoControllerListener.OnConnect(disconnectType);
+            _videoControllerListener.OnConnect();
         }
 
         void IAppRTCEngineEvents.OnDisconnect(DisconnectType disconnectType)

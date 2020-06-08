@@ -82,6 +82,10 @@
         <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\DemoConfig\DemoConfig.csproj">
+          <Project>{86b56d46-7ff6-4e20-ac1a-39663f15210d}</Project>
+          <Name>DemoConfig</Name>
+        </ProjectReference>
         <ProjectReference Include="..\WebRTC.AppRTC.Abstraction\WebRTC.AppRTC.Abstraction.csproj">
             <Project>{e8c64d72-8a0b-4322-81dd-3d52e3bd96a5}</Project>
             <Name>WebRTC.AppRTC.Abstraction</Name>

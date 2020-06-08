@@ -1,3 +1,4 @@
+using Polly;
 using WebRTC.AppRTC.Abstraction;
 
 namespace WebRTC.H113
@@ -5,37 +6,31 @@ namespace WebRTC.H113
     public class H113WebSocketClient : WebSocketChannelClientBase
     {
         private const string TAG = nameof(H113WebSocketClient);
+        private bool _didRegister;
 
-        private string _registerMessage;
-
-
-        public H113WebSocketClient(IExecutor executor, IWebSocketChannelEvents events, ILogger logger = null) : base(executor, events, logger)
+        public H113WebSocketClient(IExecutor executor, IWebSocketChannelEvents events, ILogger logger = null) : base(
+            executor, events, logger)
         {
         }
-
-        public void Register(string message)
+        public void Register(RegisterMessage message)
         {
             CheckIfCalledOnValidThread();
-            _registerMessage = message;
+            _didRegister = true;
             if (State != WebSocketConnectionState.Connected)
             {
                 Logger.Warning(TAG, $"WebSocket register() in state {State}");
-                return;
             }
-
-            Logger.Debug(TAG, $"C->WSS: {message}");
-
-            Send(message);
-
-            State = WebSocketConnectionState.Registered;
-
-            foreach (var sendMessage in WsSendQueue)
+            else
             {
-                Send(sendMessage);
+                State = WebSocketConnectionState.Registered;
             }
+            Send(message);
+        }
 
-            WsSendQueue.Clear();
-            _registerMessage = null;
+        public void Send(SignalingMessage message)
+        {
+            if (message != null)
+                Send(message.ToJson());
         }
 
 
@@ -46,8 +41,17 @@ namespace WebRTC.H113
 
         protected override void OnConnectionOpen()
         {
+            if (_didRegister)
+            {
+                State = WebSocketConnectionState.Registered;
+            }
+
             base.OnConnectionOpen();
-            Register(_registerMessage);
+        }
+
+        protected override bool ShouldIgnoreDisconnect(int code, string reason)
+        {
+            return true;
         }
     }
 }

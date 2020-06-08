@@ -50,6 +50,11 @@ namespace WebRTC.AppRTC.Abstraction
         void OnIceDisconnected();
 
         /// <summary>
+        /// Callback fired when IceConnection status change to failed
+        /// </summary>
+        bool OnIceFailedHandle();
+
+        /// <summary>
         /// Callback fired once peer connection is closed.
         /// </summary>
         void OnPeerConnectionClosed();
@@ -105,7 +110,7 @@ namespace WebRTC.AppRTC.Abstraction
 
         private const string TAG = nameof(PeerConnectionClient);
 
-        private static int BPSInKBPS = 1000;
+        private const int BPSInKBPS = 1000;
 
 
         private const string AudioEchoCancellationConstraint = "googEchoCancellation";
@@ -133,7 +138,6 @@ namespace WebRTC.AppRTC.Abstraction
 
         private IPeerConnection _peerConnection;
         private List<IceCandidate> _queuedRemoteCandidates;
-
 
         private bool _renderVideo = true;
         private bool _enableAudio = true;
@@ -187,7 +191,7 @@ namespace WebRTC.AppRTC.Abstraction
 
         public bool IsVideoEnable => _renderVideo;
         public bool IsAudioEnable => _enableAudio;
-
+        
         public void SetVideoEnabled(bool enable)
         {
             _executor.Execute(() =>
@@ -277,6 +281,26 @@ namespace WebRTC.AppRTC.Abstraction
                 _logger.Debug(TAG, "PC create ANSWER");
                 _isInitiator = false;
                 _peerConnection.CreateAnswer(_sdpMediaConstraints, _observer);
+            });
+        }
+        
+        public void ResetIceConnection()
+        {
+            _executor.Execute(() =>
+            {
+                if (_peerConnection == null || _isError)
+                    return;
+                var constraints = new MediaConstraints();
+                constraints.Mandatory.Add("IceRestart", "true");
+                _logger.Debug(TAG, "Resetting ICE connection");
+                if (_isInitiator)
+                {
+                    _peerConnection.CreateOffer(constraints, _observer);
+                }
+                else
+                {
+                    _peerConnection.CreateAnswer(constraints, _observer);
+                }
             });
         }
 
@@ -721,7 +745,8 @@ namespace WebRTC.AppRTC.Abstraction
                             _events.OnIceDisconnected();
                             break;
                         case IceConnectionState.Failed:
-                            _peerConnectionClient.ReportError("Ice connection failed.");
+                            if(!_events.OnIceFailedHandle())
+                                _peerConnectionClient.ReportError("Ice connection failed.");
                             break;
                     }
                 });

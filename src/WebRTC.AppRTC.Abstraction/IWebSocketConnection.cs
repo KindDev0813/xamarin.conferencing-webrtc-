@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace WebRTC.AppRTC.Abstraction
 {
@@ -10,9 +11,9 @@ namespace WebRTC.AppRTC.Abstraction
         event EventHandler<(int code, string reason)> OnClosed;
         event EventHandler<Exception> OnError;
         event EventHandler<string> OnMessage;
-
         void Open(string url, string protocol = null, string authToken = null);
         void Close();
+        
         void Send(string message);
     }
 }

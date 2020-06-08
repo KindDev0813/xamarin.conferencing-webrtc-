@@ -88,7 +88,7 @@ namespace WebRTC.H113
                     case Reconnecting:
                         return JsonConvert.DeserializeObject<ReconnectingMessage>(json, _settings);
                     case CloseConnection:
-                        return JsonConvert.DeserializeObject<CloseConnectiongMessage>(json, _settings);
+                        return JsonConvert.DeserializeObject<CloseConnectionMessage>(json, _settings);
                 }
             }
 
@@ -102,26 +102,20 @@ namespace WebRTC.H113
             return new SessionDescriptionMessage
             {
                 MessageType = SignalingMessageType.ReceivedAnswer,
-                Description = new SessionDescription(SdpType.Answer, values["sdp"])
+                Description = new SessionDescription(SdpType.Answer, values?["sdp"])
             };
         }
     }
 
     public class RegisterMessage : SignalingMessage
     {
-        public RegisterMessage(string phoneNumber, double longitude, double latitude)
+        public RegisterMessage(string phoneNumber)
         {
             PhoneNumber = phoneNumber;
-            Longitude = longitude;
-            Latitude = latitude;
             MessageType = SignalingMessageType.Register;
         }
 
         [JsonProperty("phoneNumber")] public string PhoneNumber { get; }
-
-        [JsonProperty("longitude")] public double Longitude { get; }
-
-        [JsonProperty("latitude")] public double Latitude { get; }
     }
 
     public class DoReconnectMessage : SignalingMessage
@@ -142,11 +136,9 @@ namespace WebRTC.H113
 
     public class UpdateInfoMessage : SignalingMessage
     {
-        public UpdateInfoMessage(string type, string id, Location location)
-        {
-            Type = type;
+        public UpdateInfoMessage(string id, Location location)
+        { 
             Id = id;
-
             Latitude = location.Latitude;
             Longitude = location.Longitude;
             if (location.Accuracy != null)
@@ -161,8 +153,7 @@ namespace WebRTC.H113
 
             MessageType = SignalingMessageType.UpdateInfo;
         }
-
-        [JsonProperty("type")] public string Type { get; }
+        
         [JsonProperty("id")] public string Id { get; }
         [JsonProperty("latitude")] public double Latitude { get; }
         [JsonProperty("longitude")] public double Longitude { get; }
@@ -173,9 +164,9 @@ namespace WebRTC.H113
         [JsonProperty("altitudeAccuracy")] public double AltitudeAccuracy { get; }
     }
 
-    public class CloseConnectiongMessage : SignalingMessage
+    public class CloseConnectionMessage : SignalingMessage
     {
-        public CloseConnectiongMessage()
+        public CloseConnectionMessage()
         {
             MessageType = SignalingMessageType.CloseConnection;
         }
@@ -183,15 +174,12 @@ namespace WebRTC.H113
 
     public class ReconnectingMessage : SignalingMessage
     {
-        public ReconnectingMessage(string type, string id, string phoneNumber)
+        public ReconnectingMessage(string id, string phoneNumber)
         {
-            Type = type;
             Id = id;
             PhoneNumber = phoneNumber;
             MessageType = SignalingMessageType.Reconnecting;
         }
-
-        [JsonProperty("type")] public string Type { get; }
 
         [JsonProperty("id")] public string Id { get; }
 

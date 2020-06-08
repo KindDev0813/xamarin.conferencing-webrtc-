@@ -37,9 +37,9 @@ namespace H113.Demo.Droid
             outState.PutBoolean(IsConnectedExtra, _isConnected);
         }
 
-        public override void OnConnect(DisconnectType disconnectType)
+        public override void OnConnect()
         {
-            base.OnConnect(disconnectType);
+            base.OnConnect();
             _isConnected = true;
         }
 
@@ -48,7 +48,5 @@ namespace H113.Demo.Droid
             base.OnDisconnect(disconnectType);
             _isConnected = false;
         }
-
-
     }
 }

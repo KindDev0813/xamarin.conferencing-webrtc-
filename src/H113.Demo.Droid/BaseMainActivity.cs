@@ -3,6 +3,7 @@ using Android.OS;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
+using DemoConfig;
 using WebRTC.AppRTC.Abstraction;
 using WebRTC.H113;
 using WebRTC.H113.Droid;
@@ -12,14 +13,10 @@ namespace H113.Demo.Droid
 {
     public class BaseMainActivity : AppCompatActivity, IVideoControllerReadyCallback, IVideoControllerListener
     {
-        private const string Token =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiaGplbHAxMTMiLCJ2ZXIiOjEsImlhdCI6MTU4NTMwMDYwNH0.LLXkD0PEOyXVb6wZEGWm2R9V8C0yG8Ihqn-rMsPgNVQ";
-
         private readonly ConnectionParameters _connectionParameters =
-            new ConnectionParameters("wss://video.h113.no/ws", Token, "98056391", 23, 23);
+            new ConnectionParameters(Config.WssUrl, Config.Token, Config.Phone);
 
         private VideoController _videoController;
-
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -84,7 +81,7 @@ namespace H113.Demo.Droid
                 .SetCancelable(false)
                 .SetNeutralButton("OK", ((sender, args) =>
                 {
-                    var dialog = (AlertDialog)sender;
+                    var dialog = (AlertDialog) sender;
                     dialog.Cancel();
                     _videoController.Disconnect();
                 }))
@@ -97,7 +94,7 @@ namespace H113.Demo.Droid
             HideVideoContainer(false);
         }
 
-        public virtual void OnConnect(DisconnectType disconnectType)
+        public virtual void OnConnect()
         {
             Toast.MakeText(this, "Connected", ToastLength.Short).Show();
         }
@@ -122,7 +119,6 @@ namespace H113.Demo.Droid
 
         public void ShowNotification(int type, string title, string message)
         {
-
         }
     }
 }

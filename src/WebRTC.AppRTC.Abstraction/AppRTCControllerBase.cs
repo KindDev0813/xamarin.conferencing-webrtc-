@@ -1,5 +1,4 @@
 using WebRTC.Abstraction;
-using Xamarin.Essentials;
 
 namespace WebRTC.AppRTC.Abstraction
 {
@@ -10,12 +9,9 @@ namespace WebRTC.AppRTC.Abstraction
         /// <summary>
         /// Will be called when WebRTC connection it's establish
         /// </summary>
-        void OnConnect(DisconnectType disconnectType);
+        void OnConnect();
 
         void OnDisconnect(DisconnectType disconnectType);
-
-        //jls
-        void ShowNotification(int type, string title, string message);
 
         IVideoCapturer CreateVideoCapturer(IPeerConnectionFactory factory, IVideoSource videoSource);
 
@@ -219,7 +215,7 @@ namespace WebRTC.AppRTC.Abstraction
         public void OnConnected()
         {
             IsWebRTCConnected = true;
-            Executor.Execute(() => Events.OnConnect(DisconnectType.PeerConnection));
+            Executor.Execute(() => Events.OnConnect());
         }
 
         public void OnDisconnected()
@@ -250,13 +246,15 @@ namespace WebRTC.AppRTC.Abstraction
             Executor.Execute(() => { RTCClient?.SendLocalIceCandidateRemovals(candidates); });
         }
 
-        public void OnIceConnected()
+        public virtual void OnIceConnected()
         {
         }
 
-        public void OnIceDisconnected()
+        public virtual void OnIceDisconnected()
         {
         }
+
+        public virtual bool OnIceFailedHandle() => false;
 
         public void OnPeerConnectionClosed()
         {
@@ -296,27 +294,6 @@ namespace WebRTC.AppRTC.Abstraction
                 Events.OnDisconnect(disconnectType);
                 OnTearDown();
             });
-        }
-
-        //jls
-        public void ShowNotification(int type, string title, string message)
-        {
-            Events.ShowNotification(type, title, message);
-        }
-
-        public virtual void SendLocation(Location location)
-        {
-            // RTCClient?.SendLocation(location);
-        }
-
-        public void OnWebSocketOpen()
-        {
-
-        }
-
-        public void OnWebSocketClose()
-        {
-
         }
     }
 }

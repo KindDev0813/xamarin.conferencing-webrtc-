@@ -23,8 +23,6 @@ namespace WebRTC.AppRTC.Abstraction
 
         private RtcEventLogState _state;
 
-      
-        
         public RtcEventLog(IPeerConnection peerConnection,string file, ILogger logger = null)
         {
             _peerConnection = peerConnection ?? throw new ArgumentNullException(nameof(peerConnection), "The peer connection is null.");

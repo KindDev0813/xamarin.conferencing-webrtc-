@@ -9,7 +9,7 @@ namespace WebRTC.H113
     {
         private const string TAG = nameof(H113RTCClient);
 
-        private readonly ISignalingEvents<RegisteredMessage> _signalingEvents;
+        private readonly IH113SignalingEvents _signalingEvents;
         private readonly IExecutorService _executor;
         private readonly ILogger _logger;
 
@@ -17,16 +17,15 @@ namespace WebRTC.H113
 
         private ConnectionParameters _connectionParameters;
 
-        public H113RTCClient(ISignalingEvents<RegisteredMessage> signalingEvents, ILogger logger = null)
+        private string _socketId;
+
+        public H113RTCClient(IH113SignalingEvents signalingEvents, ILogger logger = null)
         {
             _signalingEvents = signalingEvents;
             _executor = ExecutorServiceFactory.CreateExecutorService(nameof(H113RTCClient));
             _logger = logger ?? new ConsoleLogger();
             State = ConnectionState.New;
         }
-
-        private string _socketId;
-        private string _reconnectinId;
 
         public ConnectionState State { get; private set; }
 
@@ -57,7 +56,7 @@ namespace WebRTC.H113
                     SocketId = _socketId,
                     MessageType = SignalingMessageType.Offer
                 };
-                _wsClient.Send(offerMessage.ToJson());
+                _wsClient.Send(offerMessage);
             });
         }
 
@@ -75,7 +74,7 @@ namespace WebRTC.H113
                     SocketId = _socketId,
                     MessageType = SignalingMessageType.SendCandidate
                 };
-                _wsClient.Send(iceCandidate.ToJson());
+                _wsClient.Send(iceCandidate);
             });
         }
 
@@ -84,13 +83,7 @@ namespace WebRTC.H113
             //TODO: impl in feature?
             _executor.Execute(() => { });
         }
-
-        public void OnWebSocketClose()
-        {
-            _signalingEvents.OnWebSocketClose();
-            //    _signalingEvents.OnChannelClose();
-        }
-
+        
         public void UpdateInfoMessage(Location location)
         {
             _executor.Execute(() =>
@@ -98,10 +91,11 @@ namespace WebRTC.H113
                 if (State != ConnectionState.Connected)
                 {
                     ReportError("Sending UpdateInfoMessage in non connected state.");
+
                     return;
                 }
 
-                var message = new UpdateInfoMessage("app-update-info", _reconnectinId, location)
+                var message = new UpdateInfoMessage(_socketId, location)
                 {
                     SocketId = _socketId,
                     MessageType = SignalingMessageType.UpdateInfo
@@ -109,8 +103,19 @@ namespace WebRTC.H113
 
                 _logger.Debug(TAG, message.ToString());
 
-                _wsClient.Send(message.ToJson());
+                _wsClient.Send(message);
             });
+        }
+
+        public void OnWebSocketOpen()
+        {
+            _logger.Debug(TAG, "Websocket open...");
+        }
+
+        public void OnWebSocketClose()
+        {
+            _logger.Debug(TAG, "Websocket closed...");
+            _executor.Execute(() => _signalingEvents.OnChannelClose());
         }
 
         public void OnWebSocketMessage(string message)
@@ -137,25 +142,25 @@ namespace WebRTC.H113
                     _logger.Error(TAG, $"Got wrong message type: {msg.MessageType}");
                     break;
                 case SignalingMessageType.Registered:
-                    var registerMessage = (RegisteredMessage)msg;
+                    var registerMessage = (RegisteredMessage) msg;
                     SignalingParametersReady(registerMessage);
                     break;
                 case SignalingMessageType.ReceivedAnswer:
-                    var answerMessage = (SessionDescriptionMessage)msg;
+                    var answerMessage = (SessionDescriptionMessage) msg;
                     _signalingEvents.OnRemoteDescription(answerMessage.Description);
                     break;
                 case SignalingMessageType.ReceiveCandidate:
-                    var candidateMessage = (IceCandidateMessage)msg;
+                    var candidateMessage = (IceCandidateMessage) msg;
                     var iceCandidate = candidateMessage.IceCandidate;
                     _signalingEvents.OnRemoteIceCandidate(new IceCandidate(iceCandidate.Sdp, iceCandidate.SdpMid,
                         iceCandidate.SdpMLineIndex));
                     break;
                 case SignalingMessageType.Reconnecting:
-                    var reconnectingMessage = (ReconnectingMessage)msg;
-                    _reconnectinId = reconnectingMessage.Id;
+                    var reconnectingMessage = (ReconnectingMessage) msg;
+                    _socketId = reconnectingMessage.Id;
                     break;
                 case SignalingMessageType.CloseConnection:
-                    //    Disconnect();
+                    OnRequestCloseConnection();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -172,26 +177,7 @@ namespace WebRTC.H113
             State = ConnectionState.New;
             _wsClient = new H113WebSocketClient(_executor, this, _logger);
             _wsClient.Connect(_connectionParameters.WsUrl, _connectionParameters.Protocol);
-            _wsClient.Register(new RegisterMessage(_connectionParameters.Phone, _connectionParameters.Log,
-                _connectionParameters.Lat).ToJson());
-        }
-
-        public void DoReconnect()
-        {
-            _executor.Execute(() =>
-            {
-                _wsClient.Connect(_connectionParameters.WsUrl, _connectionParameters.Protocol);
-
-                var message = new DoReconnectMessage("app-reconnecting-ws", _connectionParameters.Phone, _reconnectinId)
-                {
-                    SocketId = _socketId,
-                    MessageType = SignalingMessageType.UpdateInfo
-                };
-
-                _logger.Debug(TAG, message.ToString());
-
-                _wsClient.Send(message.ToJson());
-            });
+            _wsClient.Register(new RegisterMessage(_connectionParameters.Phone));
         }
 
         private void DisconnectInternal()
@@ -224,6 +210,12 @@ namespace WebRTC.H113
             _signalingEvents.OnChannelConnected(registeredMessage);
         }
 
+        private void OnRequestCloseConnection()
+        {
+            _logger.Debug(TAG, "Received close command...");
+            _executor.Execute(() => _signalingEvents.OnRequestCloseConnection());
+        }
+
         private void ReportError(string errorMessage)
         {
             _logger.Error(TAG, errorMessage);
@@ -234,11 +226,6 @@ namespace WebRTC.H113
                 State = ConnectionState.Error;
                 _signalingEvents.OnChannelError(errorMessage);
             });
-        }
-
-        public void OnWebSocketOpen()
-        {
-            _signalingEvents.OnWebSocketOpen();
         }
     }
 }

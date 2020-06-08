@@ -26,14 +26,16 @@ namespace WebRTC.AppRTC.Abstraction
         private const string TAG = nameof(WebSocketChannelClientBase);
 
         private const int CloseTimeout = 1000;
-
+        
+        private readonly Queue<string> _queue = new Queue<string>();
 
         private readonly IExecutor _executor;
         private readonly IWebSocketChannelEvents _events;
 
         private ManualResetEvent _mre;
         private string _wsUrl;
-
+        
+        
         protected WebSocketChannelClientBase(IExecutor executor, IWebSocketChannelEvents events, ILogger logger = null)
         {
             _executor = executor;
@@ -48,11 +50,9 @@ namespace WebRTC.AppRTC.Abstraction
 
         protected IWebSocketConnection WebSocketConnection { get; }
 
-        protected readonly List<string> WsSendQueue = new List<string>();
-
         public WebSocketConnectionState State { get; protected set; }
 
-        public virtual void Connect(string wsUrl, string protocol)
+        public void Connect(string wsUrl, string protocol)
         {
             CheckIfCalledOnValidThread();
             WireEvents();
@@ -65,6 +65,7 @@ namespace WebRTC.AppRTC.Abstraction
         public void Disconnect(bool waitForComplete)
         {
             CheckIfCalledOnValidThread();
+            UnWireEvents();
             Logger.Debug(TAG, $"Disconnect WebSocket. State: {State}");
             if (State == WebSocketConnectionState.Registered)
             {
@@ -92,13 +93,11 @@ namespace WebRTC.AppRTC.Abstraction
                     }
                 }
             }
-
-            UnWireEvents();
-
+            State = WebSocketConnectionState.Closed;
             Logger.Debug(TAG, "Disconnecting WebSocket done.");
         }
 
-        public virtual void Send(string message)
+        protected void Send(string message)
         {
             CheckIfCalledOnValidThread();
             switch (State)
@@ -106,14 +105,13 @@ namespace WebRTC.AppRTC.Abstraction
                 case WebSocketConnectionState.New:
                 case WebSocketConnectionState.Connected:
                     Logger.Debug(TAG, $"WS ACC: {message}");
-                    WsSendQueue.Add(message);
+                    _queue.Enqueue(message);
                     break;
                 case WebSocketConnectionState.Closed:
                 case WebSocketConnectionState.Error:
                     Logger.Error(TAG, $"WebSocket send() in error or closed state: {message}");
                     break;
                 case WebSocketConnectionState.Registered:
-                    message = GetRegisterMessage(message);
                     Logger.Debug(TAG, $"C->WSS: {message}");
                     WebSocketConnection.Send(message);
                     break;
@@ -122,22 +120,25 @@ namespace WebRTC.AppRTC.Abstraction
             }
         }
 
-        protected virtual string GetRegisterMessage(string message) => message;
-
-
         protected abstract void SendByeMessage();
 
         protected virtual void OnConnectionOpen()
         {
+            while (_queue.Count > 0)
+            {
+                var msg = _queue.Dequeue();
+                Send(msg);
+            }
             _events.OnWebSocketOpen();
         }
 
-        protected virtual void OnMessageReceived(string message)
+        protected void OnMessageReceived(string message)
         {
             _events.OnWebSocketMessage(message);
         }
 
-
+        protected virtual bool ShouldIgnoreDisconnect(int code, string reason) => false;
+        
         protected void CheckIfCalledOnValidThread()
         {
             if (!_executor.IsCurrentExecutor)
@@ -199,8 +200,12 @@ namespace WebRTC.AppRTC.Abstraction
 
         private void WebSocketConnectionOnOnClosed(object sender, (int code, string reason) e)
         {
-            Logger.Debug(TAG, $"WebSocket connection closed. Code: {e.code}. Reason: {e.reason}. State: {State}");
+            var (code, reason) = e;
+            Logger.Debug(TAG, $"WebSocket connection closed. Code: {code}. Reason: {reason}. State: {State}");
             _mre?.Set();
+
+            if (ShouldIgnoreDisconnect(code, reason))
+                return;
             _executor.Execute(() =>
             {
                 if (State == WebSocketConnectionState.Closed)

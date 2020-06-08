@@ -19,13 +19,11 @@ namespace H113.Demo.iOS
 {
     public partial class ViewController : UIViewController, IVideoControllerListener
     {
-        private Timer sendLocationTimer;
-
         private const string Token =
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCBhcHAiLCJpYXQiOjE1ODY5MzkyMzJ9.JG6Djn83RlmsiFAdaVz-I_Mj1JV804rww0b2ks3gkVU";
 
         private readonly ConnectionParameters _connectionParameters =
-            new ConnectionParameters("wss://video.h113dev.no/ws", Token, "98056391", 23, 23);
+            new ConnectionParameters("wss://video.h113dev.no/ws", Token, "98056391");
 
         private VideoViewController _videoViewController;
 
@@ -33,7 +31,7 @@ namespace H113.Demo.iOS
         {
         }
 
-        public void OnConnect(WebRTC.AppRTC.Abstraction.DisconnectType disconnectType)
+        public void OnConnect()
         {
             StartCallButton.SetTitle("Disconnect", UIControlState.Normal);
         }
@@ -114,10 +112,7 @@ namespace H113.Demo.iOS
 
         private void DialButtonOnTouchUpInside(object sender, EventArgs e)
         {
-            sendLocationTimer = new Timer((ee) => ShowNotification(), null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5));
-            PhoneDialer.Open("92232988");
-            // UIApplication.SharedApplication.OpenUrl(new NSUrl("http://www.google.com"));
-            //     ShowNotification();
+          
         }
 
         private void ShowNotification()

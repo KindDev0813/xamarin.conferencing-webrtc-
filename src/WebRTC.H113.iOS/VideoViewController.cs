@@ -12,7 +12,7 @@ using Xamarin.Essentials;
 
 namespace WebRTC.H113.iOS
 {
-    public partial class VideoViewController : UIViewController, IAppRTCEngineEvents
+    public partial class VideoViewController : UIViewController, IH113AppRTCEngineEvents
     {
         private readonly VideoRendererProxy _localRenderer = new VideoRendererProxy();
 
@@ -122,9 +122,9 @@ namespace WebRTC.H113.iOS
             _videoControllerListener.OnError(description);
         }
 
-        void IAppRTCEngineEvents.OnConnect(DisconnectType disconnectType)
+        void IAppRTCEngineEvents.OnConnect()
         {
-            _videoControllerListener.OnConnect(disconnectType);
+            _videoControllerListener.OnConnect();
         }
 
         public void ShowNotification(int type, string title, string message)

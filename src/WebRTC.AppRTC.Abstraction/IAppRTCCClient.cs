@@ -32,11 +32,9 @@ namespace WebRTC.AppRTC.Abstraction
         where TSignalParam : ISignalingParameters
     {
         void OnChannelConnected(TSignalParam signalingParameters);
-
-
-        void OnWebSocketClose();
-        void OnWebSocketOpen();
+        
         void OnChannelClose();
+        
         void OnChannelError(string description);
 
         void OnRemoteDescription(SessionDescription sdp);
