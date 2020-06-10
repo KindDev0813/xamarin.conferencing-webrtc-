@@ -87,7 +87,7 @@ namespace H113.Demo.Droid
                 .Create()
                 .Show();
         }
-        
+
 
         public virtual void OnFirstFrame()
         {
@@ -109,6 +109,7 @@ namespace H113.Demo.Droid
         {
             Toast.MakeText(this, $"Disconnect {disconnectType.ToString()}", ToastLength.Short).Show();
             _videoController?.Disconnect();
+            HideVideoContainer(true);
         }
 
         protected void HideVideoContainer(bool hide)

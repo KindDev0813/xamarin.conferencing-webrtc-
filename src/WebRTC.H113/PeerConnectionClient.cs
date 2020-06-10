@@ -466,6 +466,7 @@ namespace WebRTC.H113
             _logger.Debug(TAG, "Closing peer connection.");
             if (_peerConnection != null)
             {
+                _peerConnection.Close();
                 _peerConnection.Dispose();
                 _peerConnection = null;
             }

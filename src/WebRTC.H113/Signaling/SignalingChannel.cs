@@ -39,6 +39,9 @@ namespace WebRTC.H113.Signaling
             get => _state;
             private set
             {
+                if (_state == value)
+                    return;
+                _logger.Debug(TAG, $"Changing state {_state} -> {value}");
                 _state = value;
                 _signalingChannelEvents.ChannelDidChangeState(this, value);
             }
@@ -71,7 +74,6 @@ namespace WebRTC.H113.Signaling
                     AddToQueue(message);
                     break;
                 case SignalingChannelState.Registered:
-                    _logger.Debug(TAG, $"C->WSS: {message}");
                     if (!_isDrainingQueue)
                         DrainQueue();
                     _webSocketClient.Send(message.ToJson());
@@ -87,23 +89,24 @@ namespace WebRTC.H113.Signaling
 
         void IWebSocketChannelEvents.OnWebSocketOpen()
         {
-            if (State == SignalingChannelState.Reconnecting)
-            {
-                _logger.Debug(TAG, "Reconnected to WS");
-                State = SignalingChannelState.Registered;
-                _webSocketClient.Send(new ReconnectingMessage(_socketId, _connectionParameters.Phone).ToJson());
-            }
-            else
-            {
-                State = SignalingChannelState.Open;
-                _logger.Debug(TAG, "Connected to WS");
-                _completionSourceConnect.TrySetResult(true);
-                _completionSourceConnect = null;
-            }
+            State = SignalingChannelState.Open;
+            _logger.Debug(TAG, "Connected to WS");
+            _completionSourceConnect.TrySetResult(true);
+            _completionSourceConnect = null;
 
             DrainQueue();
         }
-
+        
+        void IWebSocketChannelEvents.OnWebSocketReconnected()
+        {
+            _logger.Debug(TAG, "Reconnected to WS");
+            var message = new ReconnectingMessage(_socketId, _connectionParameters.Phone);
+            _logger.Debug(TAG, $"C->WSS: {message}");
+            _webSocketClient.Send(message.ToJson());
+            State = SignalingChannelState.Registered;
+            DrainQueue();
+        }
+        
         void IWebSocketChannelEvents.OnWebSocketClose(int code, string reason)
         {
             if (code == WebSocketClient.CloseReconnect)

@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 
 namespace WebRTC.H113.Signaling.WebSocket
 {
@@ -25,6 +27,8 @@ namespace WebRTC.H113.Signaling.WebSocket
         private bool _prevConnected;
         private bool _onCloseCalled;
 
+        private int _retries;
+
         public WebSocketClient(IWebSocketChannelEvents events, ILogger logger = null)
         {
             _events = events;
@@ -45,6 +49,7 @@ namespace WebRTC.H113.Signaling.WebSocket
             _wsUrl = wsUrl;
             _protocol = protocol;
             _active = true;
+            _onCloseCalled = false;
             _logger.Debug(TAG, $"Connecting WebSocket to:{wsUrl}. Protocol :{protocol}");
             _webSocketConnection.Open(wsUrl, protocol);
         }
@@ -91,7 +96,7 @@ namespace WebRTC.H113.Signaling.WebSocket
                     break;
                 case WebSocketConnectionState.Closed:
                 case WebSocketConnectionState.Error:
-                    _logger.Error(TAG, $"WebSocket send() in error or closed state: {message}");
+                    _logger.Error(TAG, $"WebSocket send() in error or closed state: {State} -> {message}");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -100,6 +105,15 @@ namespace WebRTC.H113.Signaling.WebSocket
 
         private void OnConnectionOpen()
         {
+            _retries = 0;
+            _onCloseCalled = false;
+
+            if (_prevConnected)
+            {
+                _events.OnWebSocketReconnected();
+                return;
+            }
+
             _prevConnected = true;
             _events.OnWebSocketOpen();
         }
@@ -156,38 +170,42 @@ namespace WebRTC.H113.Signaling.WebSocket
         private void WebSocketConnectionOnOnClosed(object sender, (int code, string reason) e)
         {
             var (code, reason) = e;
-            if (ScheduleReconnect())
-            {
-                State = WebSocketConnectionState.Closed;
-                _events.OnWebSocketClose(CloseReconnect,reason);
-                return;
-            }
             _logger.Debug(TAG, $"WebSocket connection closed. Code: {code}. Reason: {reason}. State: {State}");
             _mre?.Set();
-            if (State == WebSocketConnectionState.Closed)
+            var reconnecting = ScheduleReconnect();
+            if (State == WebSocketConnectionState.Closed && !reconnecting)
+            {
+                _events.OnWebSocketClose(code, reason);
                 return;
+            }
             State = WebSocketConnectionState.Closed;
-            _events.OnWebSocketClose(code, reason);
+            _events.OnWebSocketClose(reconnecting ? CloseReconnect : code, reason);
             _onCloseCalled = true;
         }
 
         private void Reconnect()
         {
-            if (IsConnected || string.IsNullOrEmpty(_wsUrl) || _onCloseCalled)
+            if (IsConnected || string.IsNullOrEmpty(_wsUrl))
+            {
+                _logger.Debug(TAG, $"Ignore reconnect because IsConnected -> {IsConnected} or wsUrl is null or empty.");
                 return;
+            }
+
+            _logger.Debug(TAG, $"Reconnecting {_retries - 1}");
             Connect(_wsUrl, _protocol);
         }
 
         private bool ScheduleReconnect()
         {
-            var need = _active && _prevConnected;
+            var haveValidConnection = Connectivity.ConnectionProfiles.Any();
+            var need = _active && _prevConnected && haveValidConnection && _retries <= 3;
             if (!need)
                 return false;
             _logger.Debug(TAG, "Reconnection scheduled");
+            _retries++;
             Task.Run(async () =>
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(500));
-                _logger.Debug(TAG, "Reconnecting...");
+                await Task.Delay(TimeSpan.FromMilliseconds(500 * _retries));
                 Reconnect();
             });
             return true;

@@ -356,6 +356,7 @@ namespace WebRTC.H113
             if (_disconnectInProgress)
                 return;
             _disconnectInProgress = true;
+            _logger.Debug(TAG, $"Disconnecting {disconnectType}.");
             _appClientEvents.OnDisconnect(disconnectType);
             ClearAppState();
             _disconnectInProgress = false;
@@ -363,7 +364,7 @@ namespace WebRTC.H113
 
         private void ClearAppState()
         {
-            _logger.Debug(TAG, "Disconnect.");
+            _logger.Debug(TAG, "Clearing app state.");
 
             CloseWebSocket();
 

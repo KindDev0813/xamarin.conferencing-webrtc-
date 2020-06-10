@@ -4,12 +4,19 @@ using IO.Crossbar.Autobahn.Websocket;
 using IO.Crossbar.Autobahn.Websocket.Interfaces;
 using IO.Crossbar.Autobahn.Websocket.Types;
 using WebRTC.H113.Signaling.WebSocket;
-using WebSocketConnectionHandler = IO.Crossbar.Autobahn.Websocket.WebSocketConnectionHandler;
 
 namespace WebRTC.H113.Droid
 {
     internal class AutobahnWebSocket : IWebSocketConnection
     {
+        public const int CloseCannotConnect = 2;
+        public const int CloseConnectionLost = 3;
+        public const int CloseInternalError = 5;
+        public const int CloseNormal = 1;
+        public const int CloseProtocolError = 4;
+        public const int CloseReconnect = 7;
+        public const int CloseServerError = 6;
+
         private readonly WebSocketConnection _webSocket;
 
         public AutobahnWebSocket()
@@ -35,8 +42,7 @@ namespace WebRTC.H113.Droid
             {
                 var options = new WebSocketOptions();
                 options.SetTLSEnabledProtocols(new[] {"TLSv1.1", "TLSv1.2"});
-                options.ReconnectInterval = 1000;
-                options.AutoPingInterval = 500;
+                options.ReconnectInterval = 0;
                 _webSocket.Connect(url, null, new WebSocketObserver(this), options, new Dictionary<string, string>
                 {
                     ["Sec-WebSocket-Protocol"] = protocol
@@ -97,17 +103,9 @@ namespace WebRTC.H113.Droid
                 _webSocketConnectionEx = webSocketConnectionEx;
             }
 
-            public void OnClose(int p0, string p1)
+            public void OnClose(int code, string reason)
             {
-                if (p0 == WebSocketConnectionHandler.InterfaceConsts.CloseServerError ||
-                    p0 == WebSocketConnectionHandler.InterfaceConsts.CloseCannotConnect)
-                {
-                    _webSocketConnectionEx.SendOnError(new Exception(p1));
-                }
-                else
-                {
-                    _webSocketConnectionEx.SendOnClose(p0, p1);
-                }
+                _webSocketConnectionEx.SendOnClose(code, reason);
             }
 
             public void OnConnect(ConnectionResponse p0)

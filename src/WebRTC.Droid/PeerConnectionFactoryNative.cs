@@ -54,9 +54,7 @@ namespace WebRTC.Droid
             var nativeConfiguration = configuration.ToNative();
             var peerConnection = _factory.CreatePeerConnection(nativeConfiguration,
                 new PeerConnectionListenerProxy(peerConnectionListener));
-            if (peerConnection == null)
-                return null;
-            return new PeerConnectionNative(peerConnection, configuration, this);
+            return peerConnection == null ? null : new PeerConnectionNative(peerConnection, configuration, this);
         }
 
         public IAudioSource CreateAudioSource(MediaConstraints mediaConstraints)
