@@ -4,7 +4,6 @@ using Android.App;
 using Android.OS;
 using WebRTC.Droid;
 using WebRTC.H113.Schedulers;
-using WebRTC.H113.Signaling.WebSocket;
 
 namespace WebRTC.H113.Droid
 {
@@ -18,7 +17,6 @@ namespace WebRTC.H113.Droid
                 return;
             _wasInit = true;
             Platform.Init(activity);
-            WebSocketConnectionFactory.Factory = () => new AutobahnWebSocket();
             ExecutorServiceFactory.Factory = tag => new ExecutorServiceImpl(tag);
             ExecutorServiceFactory.MainExecutor = new MainExecutor();
         }

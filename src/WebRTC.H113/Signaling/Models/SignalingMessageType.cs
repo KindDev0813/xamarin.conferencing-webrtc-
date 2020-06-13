@@ -31,7 +31,7 @@ namespace WebRTC.H113.Signaling.Models
 
         [EnumMember(Value = "app-close-connection")]
         CloseConnection,
-        
+
         [EnumMember(Value = "app-amk-stop-video")]
         StopVideo,
     }

@@ -13,6 +13,7 @@ namespace WebRTC.H113
         private const string TAG = nameof(AppClient);
 
         private readonly IAppClientEvents _appClientEvents;
+        private readonly ILocationService _locationService;
         private readonly ILogger _logger;
         private readonly IExecutor _executor;
 
@@ -24,9 +25,10 @@ namespace WebRTC.H113
 
         private bool _disconnectInProgress;
 
-        public AppClient(IAppClientEvents appClientEvents, ILogger logger = null)
+        public AppClient(IAppClientEvents appClientEvents, ILocationService locationService, ILogger logger = null)
         {
             _appClientEvents = appClientEvents;
+            _locationService = locationService;
             _logger = logger ?? new ConsoleLogger();
 
             _executor = ExecutorServiceFactory.MainExecutor;
@@ -59,7 +61,10 @@ namespace WebRTC.H113
                     return;
                 }
 
-                _signalingChannel.SendMessage(new RegisterMessage(connectionParameters.Phone));
+                var lastLocation = await _locationService.GetLastLocationAsync();
+
+                _signalingChannel.SendMessage(new RegisterMessage(connectionParameters.Phone, lastLocation.Longitude,
+                    lastLocation.Latitude));
             });
         }
 
@@ -107,17 +112,13 @@ namespace WebRTC.H113
                     case SignalingChannelState.New:
                     case SignalingChannelState.Closed:
                     case SignalingChannelState.Error:
+                    case SignalingChannelState.Connecting:
+                    case SignalingChannelState.Reconnecting:
                         IsWebSocketConnected = false;
                         break;
                     case SignalingChannelState.Open:
                     case SignalingChannelState.Registered:
                         IsWebSocketConnected = true;
-                        break;
-                    case SignalingChannelState.Reconnecting:
-                        if (IsWebRTCConnected)
-                        {
-                            _peerConnectionClient.ResetIceConnection();
-                        }
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(state), state, null);
@@ -181,16 +182,19 @@ namespace WebRTC.H113
             ReportError($"WebSocket failed - {description}");
         }
 
+        void ISignalingChannelEvents.ChannelDidReconnect(SignalingChannel channel)
+        {
+            _executor.Execute(() =>
+            {
+                _logger.Debug(TAG,"WebSocket reconnected resetting IceCandidates");
+                _peerConnectionClient.ResetIceConnection();
+            });
+        }
+
         void ISignalingChannelEvents.ChannelDidClose(SignalingChannel channel, int code, string reason)
         {
             _executor.Execute(() =>
             {
-                if (ConnectionState == ConnectionState.Connected)
-                {
-                    TryRemakeConnection();
-                    return;
-                }
-
                 DisconnectInternal(DisconnectType.WebSocket);
             });
         }
@@ -305,8 +309,9 @@ namespace WebRTC.H113
 
         private Task<bool> CreateSignalingChannelAsync(ConnectionParameters connectionParameters)
         {
-            _signalingChannel = new SignalingChannel(this, _logger);
-            return _signalingChannel.ConnectAsync(connectionParameters);
+            _signalingChannel =
+                new SignalingChannel(this, connectionParameters.WsUrl, connectionParameters.Protocol, _logger);
+            return _signalingChannel.ConnectAsync();
         }
 
         private void SignalingParametersReady(RegisteredMessage registeredMessage)
@@ -318,7 +323,6 @@ namespace WebRTC.H113
                 VideoCallEnabled = true,
                 AudioCallEnabled = false
             };
-
             _peerConnectionClient = new PeerConnectionClient(peerConnectionParameters, this, _logger);
             _peerConnectionClient.CreatePeerConnectionFactory();
             _appClientEvents.ReadyToStart();
@@ -346,11 +350,7 @@ namespace WebRTC.H113
 
             _peerConnectionClient.AddRemoteIceCandidate(iceCandidate);
         }
-
-        private void TryRemakeConnection()
-        {
-        }
-
+        
         private void DisconnectInternal(DisconnectType disconnectType)
         {
             if (_disconnectInProgress)

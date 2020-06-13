@@ -40,6 +40,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ILocationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VideoViewController.cs" />
     <Compile Include="H113Platform.cs" />
@@ -61,11 +62,6 @@
       <Project>{928F96AA-9E37-4254-8399-5D680CCAF2C7}</Project>
       <Name>WebRTC.iOS</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Square.SocketRocket">
-      <Version>0.5.1.1</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

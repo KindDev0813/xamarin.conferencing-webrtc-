@@ -23,7 +23,7 @@ namespace WebRTC.H113.iOS
         public VideoViewController()
         {
             H113Platform.Init();
-            _controller = new AppClient(this);
+            _controller = new AppClient(this, LocationService.Current);
         }
 
         public Func<IVideoSource, FileVideoCapturer> FileVideoCapturerFactory { get; set; }
@@ -44,6 +44,7 @@ namespace WebRTC.H113.iOS
             {
                 H113Platform.Cleanup();
             }
+
             base.Dispose(disposing);
         }
 
@@ -92,7 +93,6 @@ namespace WebRTC.H113.iOS
 
         void IAppClientEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
-
         }
 
         void IAppClientEvents.OnDisconnect(DisconnectType disconnectType)
@@ -171,7 +171,8 @@ namespace WebRTC.H113.iOS
                 {
                     var videoAspectRatio = _localVideoSize.Width / _localVideoSize.Height;
 
-                    var size = GetDisplaySize(ConvertScalingTypeToVisibleFraction(ScalingType), videoAspectRatio, bounds.Width, bounds.Height);
+                    var size = GetDisplaySize(ConvertScalingTypeToVisibleFraction(ScalingType), videoAspectRatio,
+                        bounds.Width, bounds.Height);
                     _localVideoView.Frame = new CGRect(CGPoint.Empty, size);
                     _localVideoView.Center = new CGPoint(bounds.GetMidX(), bounds.GetMidY());
                 }
@@ -203,20 +204,19 @@ namespace WebRTC.H113.iOS
                 }
             }
 
-            private static CGSize GetDisplaySize(nfloat minVisibleFraction, nfloat videoAspectRatio, nfloat maxDisplayWidth, nfloat maxDisplayHeight)
+            private static CGSize GetDisplaySize(nfloat minVisibleFraction, nfloat videoAspectRatio,
+                nfloat maxDisplayWidth, nfloat maxDisplayHeight)
             {
                 // If there is no constraint on the amount of cropping, fill the allowed display area.
                 if (minVisibleFraction == 0 || videoAspectRatio == 0)
                     return new CGSize(maxDisplayWidth, maxDisplayHeight);
                 // Each dimension is constrained on max display size and how much we are allowed to crop.
                 var width = Math.Min(maxDisplayWidth,
-                    (int)(maxDisplayHeight / minVisibleFraction * videoAspectRatio));
+                    (int) (maxDisplayHeight / minVisibleFraction * videoAspectRatio));
                 var height = Math.Min(maxDisplayHeight,
-                    (int)(maxDisplayWidth / minVisibleFraction / videoAspectRatio));
+                    (int) (maxDisplayWidth / minVisibleFraction / videoAspectRatio));
                 return new CGSize(width, height);
             }
-
         }
     }
 }
-

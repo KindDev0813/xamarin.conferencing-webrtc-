@@ -11,8 +11,10 @@ namespace WebRTC.H113.Signaling.Models
             MessageType = SignalingMessageType.Reconnecting;
         }
 
-        [JsonProperty("id")] public string Id { get; }
+        [JsonProperty("id")]
+        public string Id { get; }
 
-        [JsonProperty("phoneNumber")] public string PhoneNumber { get; }
+        [JsonProperty("phoneNumber")]
+        public string PhoneNumber { get; }
     }
 }

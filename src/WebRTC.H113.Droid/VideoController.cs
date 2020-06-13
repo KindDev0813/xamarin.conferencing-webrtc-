@@ -21,7 +21,7 @@ namespace WebRTC.H113.Droid
         {
             _connectionParameters = connectionParameters;
             _frontCamera = frontCamera;
-            _client = new AppClient(this);
+            _client = new AppClient(this, LocationService.Current);
             _videoRendererProxy = new VideoRendererProxy();
 
             EglBase = EglBaseHelper.Create();
@@ -75,7 +75,6 @@ namespace WebRTC.H113.Droid
 
         void IAppClientEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
         {
-
         }
 
         void IAppClientEvents.OnConnected()
@@ -112,12 +111,10 @@ namespace WebRTC.H113.Droid
 
         void RendererCommon.IRendererEvents.OnFrameResolutionChanged(int width, int height, int rotation)
         {
-
         }
 
         void IAppClientEvents.ShowNotification(int type, string title, string message)
         {
-
         }
     }
 }

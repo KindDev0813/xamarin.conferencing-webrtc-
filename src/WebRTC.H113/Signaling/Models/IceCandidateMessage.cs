@@ -21,7 +21,8 @@ namespace WebRTC.H113.Signaling.Models
             };
         }
 
-        [JsonProperty("candidate")] public IceCandidateEx IceCandidate { get; set; }
+        [JsonProperty("candidate")]
+        public IceCandidateEx IceCandidate { get; set; }
 
         public class IceCandidateEx
         {

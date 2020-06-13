@@ -182,7 +182,8 @@ namespace WebRTC.H113
         {
             _parameters = parameters;
             _peerConnectionEvents = peerConnectionEvents;
-            _executor = ExecutorServiceFactory.CreateExecutorService(TAG);
+            
+            _executor ??= ExecutorServiceFactory.CreateExecutorService(TAG);
 
             _logger = logger ?? new ConsoleLogger();
 
@@ -192,7 +193,7 @@ namespace WebRTC.H113
 
         public bool IsVideoEnable => _renderVideo;
         public bool IsAudioEnable => _enableAudio;
-        
+
         public void SetVideoEnabled(bool enable)
         {
             _executor.Execute(() =>
@@ -284,7 +285,7 @@ namespace WebRTC.H113
                 _peerConnection.CreateAnswer(_sdpMediaConstraints, _observer);
             });
         }
-        
+
         public void ResetIceConnection()
         {
             _executor.Execute(() =>
@@ -513,7 +514,7 @@ namespace WebRTC.H113
 
             _logger.Debug(TAG, "Closing peer connection done.");
             _peerConnectionEvents.OnPeerConnectionClosed();
-            PeerConnectionFactory.StopInternalTracingCapture();  
+            PeerConnectionFactory.StopInternalTracingCapture();
             PeerConnectionFactory.ShutdownInternalTracer();
         }
 
@@ -748,7 +749,7 @@ namespace WebRTC.H113
                             _events.OnIceDisconnected();
                             break;
                         case IceConnectionState.Failed:
-                            if(!_events.OnIceFailedHandle())
+                            if (!_events.OnIceFailedHandle())
                                 _peerConnectionClient.ReportError("Ice connection failed.");
                             break;
                     }
