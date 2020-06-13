@@ -10,34 +10,28 @@ using Location = Xamarin.Essentials.Location;
 
 namespace WebRTC.H113.Droid
 {
-    public class LocationService :Java.Lang.Object,ILocationListener,  ILocationService
+    public class LocationService : Java.Lang.Object, ILocationListener, ILocationService
     {
+        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+
         private readonly BehaviorSubject<Location> _onLocationChanged = new BehaviorSubject<Location>(null);
 
         private LocationService()
         {
-            // var locationManager = (LocationManager) Platform.AppContext.GetSystemService(Context.LocationService);
-            // locationManager.RequestLocationUpdates(LocationManager.GpsProvider,2000,1,this);
+            var locationManager = (LocationManager) Platform.AppContext.GetSystemService(Context.LocationService);
+            locationManager.RequestLocationUpdates(LocationManager.GpsProvider, 2000, 1, this);
         }
-        
+
         public static ILocationService Current { get; } = new LocationService();
-        
+
         public Task<Location> GetLastLocationAsync() => Geolocation.GetLastKnownLocationAsync();
 
         public IObservable<Location> OnLocationChanged => _onLocationChanged.AsObservable();
-        
+
         void ILocationListener.OnLocationChanged(Android.Locations.Location location)
         {
-            _onLocationChanged.OnNext(new Location
-            {
-                Latitude = location.Latitude,
-                Longitude = location.Longitude,
-                Accuracy = location.Accuracy,
-                Altitude = location.Altitude,
-                Speed = location.Speed,
-                VerticalAccuracy = location.VerticalAccuracyMeters,
-                IsFromMockProvider = false,
-            });
+            _onLocationChanged.OnNext(ToLocation(location));
         }
 
         void ILocationListener.OnProviderDisabled(string provider)
@@ -50,7 +44,40 @@ namespace WebRTC.H113.Droid
 
         void ILocationListener.OnStatusChanged(string provider, Availability status, Bundle extras)
         {
-         
+        }
+
+        static Location ToLocation(Android.Locations.Location location) =>
+            new Location
+            {
+                Latitude = location.Latitude,
+                Longitude = location.Longitude,
+                Altitude = location.HasAltitude ? location.Altitude : default(double?),
+                Timestamp = GetTimestamp(location).ToUniversalTime(),
+                Accuracy = location.HasAccuracy ? location.Accuracy : default(float?),
+                VerticalAccuracy =
+#if __ANDROID_26__
+                    H113Platform.HasApiLevelO && location.HasVerticalAccuracy
+                        ? location.VerticalAccuracyMeters
+                        : default(float?),
+#else
+                    default(float?),
+#endif
+                Course = location.HasBearing ? location.Bearing : default(double?),
+                Speed = location.HasSpeed ? location.Speed : default(double?),
+                IsFromMockProvider = H113Platform.HasApiLevel(global::Android.OS.BuildVersionCodes.JellyBeanMr2) &&
+                                     location.IsFromMockProvider
+            };
+
+        private static DateTimeOffset GetTimestamp(Android.Locations.Location location)
+        {
+            try
+            {
+                return new DateTimeOffset(Epoch.AddMilliseconds(location.Time));
+            }
+            catch (Exception)
+            {
+                return new DateTimeOffset(Epoch);
+            }
         }
     }
 }

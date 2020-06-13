@@ -20,6 +20,21 @@ namespace WebRTC.H113.Droid
             ExecutorServiceFactory.Factory = tag => new ExecutorServiceImpl(tag);
             ExecutorServiceFactory.MainExecutor = new MainExecutor();
         }
+        
+        internal static bool HasApiLevelO =>
+#if __ANDROID_26__
+            HasApiLevel(BuildVersionCodes.O);
+#else
+            false;
+#endif
+        
+        static int? _sdkInt;
+
+        internal static int SdkInt
+            => _sdkInt ??= (int)Build.VERSION.SdkInt;
+
+        internal static bool HasApiLevel(BuildVersionCodes versionCode) =>
+            SdkInt >= (int)versionCode;
 
         private class MainExecutor : IExecutor
         {

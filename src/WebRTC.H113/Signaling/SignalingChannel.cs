@@ -38,6 +38,8 @@ namespace WebRTC.H113.Signaling
         private bool _prevConnected;
         private bool _onCloseCalled;
 
+        private int _retryTries = 0;
+
         public SignalingChannel(ISignalingChannelEvents signalingChannelEvents, string wsUrl, string token,
             ILogger logger = null)
         {
@@ -132,6 +134,7 @@ namespace WebRTC.H113.Signaling
 
             _active = true;
             _onCloseCalled = false;
+            _retryTries = 0;
 
             if (State != SignalingChannelState.Reconnecting)
                 State = SignalingChannelState.Connecting;
@@ -172,6 +175,7 @@ namespace WebRTC.H113.Signaling
         {
             _executor.Execute(() =>
             {
+                _retryTries = 0;
                 if (State == SignalingChannelState.Reconnecting && !string.IsNullOrEmpty(_socketId) &&
                     !string.IsNullOrEmpty(_phone))
                 {
@@ -275,6 +279,9 @@ namespace WebRTC.H113.Signaling
         {
             if (!_active || !_prevConnected || !Connectivity.ConnectionProfiles.Any())
                 return false;
+            if (_retryTries >= 3)
+                return false;
+            _retryTries++;
             _logger.Debug(TAG, "Scheduling Reconnect");
             _executor.Execute(async () =>
             {

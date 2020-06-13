@@ -1,4 +1,6 @@
 using System;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using WebRTC.Abstraction;
 using WebRTC.H113.Extensions;
@@ -12,6 +14,9 @@ namespace WebRTC.H113
     {
         private const string TAG = nameof(AppClient);
 
+        private readonly SerialDisposable _onLocationChangedDisposable = new SerialDisposable();
+
+
         private readonly IAppClientEvents _appClientEvents;
         private readonly ILocationService _locationService;
         private readonly ILogger _logger;
@@ -24,6 +29,7 @@ namespace WebRTC.H113
         private DataChannel _dataChannel;
 
         private bool _disconnectInProgress;
+
 
         public AppClient(IAppClientEvents appClientEvents, ILocationService locationService, ILogger logger = null)
         {
@@ -65,6 +71,22 @@ namespace WebRTC.H113
 
                 _signalingChannel.SendMessage(new RegisterMessage(connectionParameters.Phone, lastLocation.Longitude,
                     lastLocation.Latitude));
+
+                _onLocationChangedDisposable.Disposable = _locationService.OnLocationChanged
+                    .Where(l => l != null)
+                    .Subscribe(location =>
+                    {
+                        _executor.Execute(() =>
+                        {
+                            _logger.Debug(TAG, $"Updating location {location}");
+                            if (_signalingChannel.State == SignalingChannelState.Registered &&
+                                SignalingParameters != null)
+                            {
+                                _signalingChannel.SendMessage(new UpdateInfoMessage(SignalingParameters.SocketId,
+                                    location));
+                            }
+                        });
+                    });
             });
         }
 
@@ -186,17 +208,14 @@ namespace WebRTC.H113
         {
             _executor.Execute(() =>
             {
-                _logger.Debug(TAG,"WebSocket reconnected resetting IceCandidates");
+                _logger.Debug(TAG, "WebSocket reconnected resetting IceCandidates");
                 _peerConnectionClient.ResetIceConnection();
             });
         }
 
         void ISignalingChannelEvents.ChannelDidClose(SignalingChannel channel, int code, string reason)
         {
-            _executor.Execute(() =>
-            {
-                DisconnectInternal(DisconnectType.WebSocket);
-            });
+            _executor.Execute(() => { DisconnectInternal(DisconnectType.WebSocket); });
         }
 
         void IPeerConnectionEvents.OnPeerFactoryCreated(IPeerConnectionFactory factory)
@@ -350,7 +369,7 @@ namespace WebRTC.H113
 
             _peerConnectionClient.AddRemoteIceCandidate(iceCandidate);
         }
-        
+
         private void DisconnectInternal(DisconnectType disconnectType)
         {
             if (_disconnectInProgress)
