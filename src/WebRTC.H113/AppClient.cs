@@ -385,6 +385,9 @@ namespace WebRTC.H113
         {
             _logger.Debug(TAG, "Clearing app state.");
 
+            _logger.Debug(TAG,"Stopping location updates.");
+            _onLocationChangedDisposable.Disposable = Disposable.Empty;
+
             CloseWebSocket();
 
             IsWebSocketConnected = false;
