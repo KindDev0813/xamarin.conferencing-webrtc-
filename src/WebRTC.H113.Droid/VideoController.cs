@@ -115,6 +115,7 @@ namespace WebRTC.H113.Droid
 
         void IAppClientEvents.ShowNotification(int type, string title, string message)
         {
+            _videoControllerListener.ShowNotification(type, title, message);
         }
     }
 }
