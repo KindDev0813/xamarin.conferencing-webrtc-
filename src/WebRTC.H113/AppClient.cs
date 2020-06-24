@@ -69,6 +69,9 @@ namespace WebRTC.H113
 
                 var lastLocation = await _locationService.GetLastLocationAsync();
 
+                if (lastLocation == null)
+                    return;
+
                 _signalingChannel.SendMessage(new RegisterMessage(connectionParameters.Phone, lastLocation.Longitude,
                     lastLocation.Latitude));
 
@@ -170,19 +173,19 @@ namespace WebRTC.H113
                         _logger.Error(TAG, $"Got wrong message type: {message.MessageType}");
                         break;
                     case SignalingMessageType.Registered:
-                        var registerMessage = (RegisteredMessage) message;
+                        var registerMessage = (RegisteredMessage)message;
                         SignalingParametersReady(registerMessage);
                         break;
                     case SignalingMessageType.Reconnecting:
-                        var reconnectedMessage = (ReconnectingMessage) message;
+                        var reconnectedMessage = (ReconnectingMessage)message;
                         //TODO(vali): impl this??
                         break;
                     case SignalingMessageType.ReceivedAnswer:
-                        var answerMessage = (SessionDescriptionMessage) message;
+                        var answerMessage = (SessionDescriptionMessage)message;
                         OnRemoteDescription(answerMessage.Description);
                         break;
                     case SignalingMessageType.ReceiveCandidate:
-                        var candidateMessage = (IceCandidateMessage) message;
+                        var candidateMessage = (IceCandidateMessage)message;
                         var iceCandidate = candidateMessage.IceCandidate;
                         OnRemoteIceCandidate(new IceCandidate(iceCandidate.Sdp, iceCandidate.SdpMid,
                             iceCandidate.SdpMLineIndex));
@@ -385,7 +388,7 @@ namespace WebRTC.H113
         {
             _logger.Debug(TAG, "Clearing app state.");
 
-            _logger.Debug(TAG,"Stopping location updates.");
+            _logger.Debug(TAG, "Stopping location updates.");
             _onLocationChangedDisposable.Disposable = Disposable.Empty;
 
             CloseWebSocket();

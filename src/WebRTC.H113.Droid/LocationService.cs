@@ -2,10 +2,14 @@ using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using Android;
 using Android.Content;
+using Android.Content.PM;
 using Android.Locations;
 using Android.OS;
+using AndroidX.Core.Content;
 using Xamarin.Essentials;
+
 using Location = Xamarin.Essentials.Location;
 
 namespace WebRTC.H113.Droid
@@ -19,13 +23,17 @@ namespace WebRTC.H113.Droid
 
         private LocationService()
         {
-            var locationManager = (LocationManager) Platform.AppContext.GetSystemService(Context.LocationService);
+            var hasAccessFineLocation = ContextCompat.CheckSelfPermission(Platform.AppContext, Manifest.Permission.AccessFineLocation) == (int)Permission.Granted;
+            if (hasAccessFineLocation == false)
+                return;
+
+            var locationManager = (LocationManager)Platform.AppContext.GetSystemService(Context.LocationService);
             locationManager.RequestLocationUpdates(LocationManager.GpsProvider, 2000, 1, this);
         }
 
         public static ILocationService Current { get; } = new LocationService();
 
-        public Task<Location> GetLastLocationAsync() => Geolocation.GetLastKnownLocationAsync();
+        public Task<Location> GetLastLocationAsync() => ContextCompat.CheckSelfPermission(Platform.AppContext, Manifest.Permission.AccessFineLocation) == (int)Permission.Granted ? Geolocation.GetLastKnownLocationAsync() : null;
 
         public IObservable<Location> OnLocationChanged => _onLocationChanged.AsObservable();
 

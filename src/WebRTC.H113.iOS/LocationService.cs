@@ -17,19 +17,21 @@ namespace WebRTC.H113.iOS
 
         private LocationService()
         {
-            _locationManager = new CLLocationManager ();
+            _locationManager = new CLLocationManager();
             Init();
         }
 
         public static LocationService Current { get; } = new LocationService();
-        public Task<Location> GetLastLocationAsync() => Geolocation.GetLocationAsync();
+        public Task<Location> GetLastLocationAsync() => ((CLLocationManager.Status == CLAuthorizationStatus.AuthorizedAlways || CLLocationManager.Status == CLAuthorizationStatus.AuthorizedWhenInUse)) ? Geolocation.GetLocationAsync() : null;
 
         public IObservable<Location> OnLocationChanged => _onLocationChanged.AsObservable();
-        
 
         private void Init()
         {
-            _locationManager.RequestAlwaysAuthorization();
+            if (!(CLLocationManager.Status == CLAuthorizationStatus.AuthorizedAlways || CLLocationManager.Status == CLAuthorizationStatus.AuthorizedWhenInUse))
+                return;
+
+            //   _locationManager.RequestAlwaysAuthorization();
 
             _locationManager.DesiredAccuracy = 1;
             _locationManager.LocationsUpdated += (s, e) =>
@@ -39,7 +41,7 @@ namespace WebRTC.H113.iOS
                     return;
                 _onLocationChanged.OnNext(ToLocation(location));
             };
-            
+
             _locationManager.StartUpdatingLocation();
         }
 
@@ -61,7 +63,7 @@ namespace WebRTC.H113.iOS
         {
             try
             {
-                return new DateTimeOffset((DateTime) timestamp);
+                return new DateTimeOffset((DateTime)timestamp);
             }
             catch
             {
