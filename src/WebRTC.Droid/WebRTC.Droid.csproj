@@ -98,7 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
-      <Project>{15baf860-547f-4e5f-ac88-97f4b47c5e4b}</Project>
+      <Project>{DEE78D03-E30B-49D1-B299-19944686EEBC}</Project>
       <Name>WebRTC.Abstraction</Name>
     </ProjectReference>
     <ProjectReference Include="..\WebRTC.Droid.Binding\WebRTC.Droid.Binding.csproj">
