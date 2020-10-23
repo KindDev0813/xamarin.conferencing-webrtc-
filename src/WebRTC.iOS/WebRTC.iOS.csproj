@@ -34,6 +34,9 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
+    <Reference Include="WebRTC.iOS.Binding, Version=1.0.7600.18255, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\libs\webrtc-ios-binding\WebRTC.iOS.Binding.dll</HintPath>
+    </Reference>
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
@@ -79,10 +82,6 @@
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
       <Project>{DEE78D03-E30B-49D1-B299-19944686EEBC}</Project>
       <Name>WebRTC.Abstraction</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WebRTC.iOS.Binding\WebRTC.iOS.Binding.csproj">
-      <Project>{98BCCC65-7E7D-45AE-90CB-952CE4E641AC}</Project>
-      <Name>WebRTC.iOS.Binding</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
