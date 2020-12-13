@@ -43,9 +43,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LocationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VideoViewController.cs" />
     <Compile Include="H113Platform.cs" />
   </ItemGroup>
   <ItemGroup>

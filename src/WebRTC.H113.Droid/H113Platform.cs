@@ -7,7 +7,7 @@ using WebRTC.H113.Schedulers;
 
 namespace WebRTC.H113.Droid
 {
-    static class H113Platform
+    public static class H113Platform
     {
         private static bool _wasInit;
         
@@ -19,6 +19,12 @@ namespace WebRTC.H113.Droid
             Platform.Init(activity);
             ExecutorServiceFactory.Factory = tag => new ExecutorServiceImpl(tag);
             ExecutorServiceFactory.MainExecutor = new MainExecutor();
+        }
+
+
+        public static void Cleanup()
+        {
+            
         }
         
         internal static bool HasApiLevelO =>
@@ -53,7 +59,7 @@ namespace WebRTC.H113.Droid
             {
                 _handlerThread = new HandlerThread(tag);
                 _handlerThread.Start();
-                _handler = new Handler(_handlerThread.Looper);
+                _handler = new Handler(_handlerThread.Looper!);
             }
 
 

@@ -30,10 +30,7 @@ namespace WebRTC.Droid
         {
             _context = context;
 
-            if (Platform.EglFactory != null)
-                EglBase = Platform.EglFactory(this);
-            else
-                EglBase = EglBaseHelper.Create();
+            EglBase = EglBaseHelper.Create();
 
             _factory = CreateNativeFactory(context, EglBaseContext);
             NativeObject = _factory;
@@ -163,12 +160,12 @@ namespace WebRTC.Droid
 
             var encoderFactory = new DefaultVideoEncoderFactory(eglBaseContext, true, true);
             var decoderFactory = new DefaultVideoDecoderFactory(eglBaseContext);
-            var factory =  PeerConnectionFactory.InvokeBuilder()
+            var factory = PeerConnectionFactory.InvokeBuilder()
                 .SetAudioDeviceModule(adm)
                 .SetVideoEncoderFactory(encoderFactory)
                 .SetVideoDecoderFactory(decoderFactory)
                 .CreatePeerConnectionFactory();
-            
+
             adm.Release();
 
             return factory;

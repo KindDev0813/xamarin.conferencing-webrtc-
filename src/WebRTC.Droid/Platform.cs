@@ -11,7 +11,6 @@ namespace WebRTC.Droid
             Init(context.Application, trialsFields, enabledInternalTracer);
         }
         
-        public static Func<IPeerConnectionFactoryAndroid,IEglBase> EglFactory { get; set; }
 
         public static void Init(Application application, string trialsFields = null, bool enabledInternalTracer = true)
         {

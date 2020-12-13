@@ -1,12 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using WebRTC.Abstraction;
 using WebRTC.H113.Extensions;
 using WebRTC.H113.Schedulers;
 using WebRTC.H113.Signaling;
 using WebRTC.H113.Signaling.Models;
+using Xamarin.Essentials;
 
 namespace WebRTC.H113
 {
@@ -16,11 +17,12 @@ namespace WebRTC.H113
 
         private readonly SerialDisposable _onLocationChangedDisposable = new SerialDisposable();
 
+        private readonly Queue<SignalingMessage> _messagesQueue = new Queue<SignalingMessage>();
 
         private readonly IAppClientEvents _appClientEvents;
-        private readonly ILocationService _locationService;
         private readonly ILogger _logger;
         private readonly IExecutor _executor;
+
 
         private SignalingChannel _signalingChannel;
 
@@ -28,13 +30,13 @@ namespace WebRTC.H113
 
         private DataChannel _dataChannel;
 
-        private bool _disconnectInProgress;
+        private bool IsWebSocketValidToWrite =>
+            IsWebSocketConnected && !DisconnectInProgress && _signalingChannel != null;
 
 
-        public AppClient(IAppClientEvents appClientEvents, ILocationService locationService, ILogger logger = null)
+        public AppClient(IAppClientEvents appClientEvents, ILogger logger = null)
         {
             _appClientEvents = appClientEvents;
-            _locationService = locationService;
             _logger = logger ?? new ConsoleLogger();
 
             _executor = ExecutorServiceFactory.MainExecutor;
@@ -47,13 +49,20 @@ namespace WebRTC.H113
 
         public bool IsWebRTCConnected { get; private set; }
         public bool IsWebSocketConnected { get; private set; }
+
+        public bool IsWebSocketRegister => _signalingChannel?.State == SignalingChannelState.Registered;
+        
         public ConnectionState ConnectionState { get; private set; }
+
+
+        public bool DisconnectInProgress { get; private set; }
 
         public bool IsVideoEnable => _peerConnectionClient?.IsVideoEnable ?? false;
 
         public bool IsAudioEnable => _peerConnectionClient?.IsAudioEnable ?? false;
 
-        public void Connect(ConnectionParameters connectionParameters)
+
+        public void Connect(ConnectionParameters connectionParameters, Location location)
         {
             _executor.Execute(async () =>
             {
@@ -67,29 +76,8 @@ namespace WebRTC.H113
                     return;
                 }
 
-                var lastLocation = await _locationService.GetLastLocationAsync();
-
-                if (lastLocation == null)
-                    return;
-
-                _signalingChannel.SendMessage(new RegisterMessage(connectionParameters.Phone, lastLocation.Longitude,
-                    lastLocation.Latitude));
-
-                _onLocationChangedDisposable.Disposable = _locationService.OnLocationChanged
-                    .Where(l => l != null)
-                    .Subscribe(location =>
-                    {
-                        _executor.Execute(() =>
-                        {
-                            _logger.Debug(TAG, $"Updating location {location}");
-                            if (_signalingChannel.State == SignalingChannelState.Registered &&
-                                SignalingParameters != null)
-                            {
-                                _signalingChannel.SendMessage(new UpdateInfoMessage(SignalingParameters.SocketId,
-                                    location));
-                            }
-                        });
-                    });
+                _signalingChannel.SendMessage(new RegisterMessage(connectionParameters.Phone, location.Longitude,
+                    location.Latitude));
             });
         }
 
@@ -128,6 +116,32 @@ namespace WebRTC.H113
             _peerConnectionClient?.SetAudioEnabled(enable);
         }
 
+        public void TrySendMessageToWebSocket(SignalingMessage signalingMessage, bool addToQueue)
+        {
+            if (IsWebSocketValidToWrite)
+            {
+                _signalingChannel.SendMessage(signalingMessage);
+            }
+            else if (addToQueue)
+            {
+                _messagesQueue.Enqueue(signalingMessage);
+            }
+            else
+            {
+                _logger.Warning(TAG, $"Can't send message to WS invalid state.\n\t\t{signalingMessage.ToJson()}");
+            }
+        }
+
+        private void ClearMessageQueue()
+        {
+            _logger.Info(TAG, $"Clearing message queue:{_messagesQueue.Count}");
+            while (_messagesQueue.Count > 0)
+            {
+                var msg = _messagesQueue.Dequeue();
+                _signalingChannel.SendMessage(msg);
+            }
+        }
+
         void ISignalingChannelEvents.ChannelDidChangeState(SignalingChannel channel, SignalingChannelState state)
         {
             _executor.Execute(() =>
@@ -144,6 +158,11 @@ namespace WebRTC.H113
                     case SignalingChannelState.Open:
                     case SignalingChannelState.Registered:
                         IsWebSocketConnected = true;
+                        if (state == SignalingChannelState.Registered)
+                        {
+                            ClearMessageQueue();
+                        }
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(state), state, null);
@@ -173,19 +192,19 @@ namespace WebRTC.H113
                         _logger.Error(TAG, $"Got wrong message type: {message.MessageType}");
                         break;
                     case SignalingMessageType.Registered:
-                        var registerMessage = (RegisteredMessage)message;
+                        var registerMessage = (RegisteredMessage) message;
                         SignalingParametersReady(registerMessage);
                         break;
                     case SignalingMessageType.Reconnecting:
-                        var reconnectedMessage = (ReconnectingMessage)message;
+                        var reconnectedMessage = (ReconnectingMessage) message;
                         //TODO(vali): impl this??
                         break;
                     case SignalingMessageType.ReceivedAnswer:
-                        var answerMessage = (SessionDescriptionMessage)message;
+                        var answerMessage = (SessionDescriptionMessage) message;
                         OnRemoteDescription(answerMessage.Description);
                         break;
                     case SignalingMessageType.ReceiveCandidate:
-                        var candidateMessage = (IceCandidateMessage)message;
+                        var candidateMessage = (IceCandidateMessage) message;
                         var iceCandidate = candidateMessage.IceCandidate;
                         OnRemoteIceCandidate(new IceCandidate(iceCandidate.Sdp, iceCandidate.SdpMid,
                             iceCandidate.SdpMLineIndex));
@@ -375,13 +394,13 @@ namespace WebRTC.H113
 
         private void DisconnectInternal(DisconnectType disconnectType)
         {
-            if (_disconnectInProgress)
+            if (DisconnectInProgress)
                 return;
-            _disconnectInProgress = true;
+            DisconnectInProgress = true;
             _logger.Debug(TAG, $"Disconnecting {disconnectType}.");
             _appClientEvents.OnDisconnect(disconnectType);
             ClearAppState();
-            _disconnectInProgress = false;
+            DisconnectInProgress = false;
         }
 
         private void ClearAppState()
