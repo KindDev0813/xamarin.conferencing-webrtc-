@@ -8,7 +8,7 @@ namespace WebRTC.H113.Signaling
 {
     public static class SignalingMessageFactory
     {
-        private static JsonSerializerSettings _settings;
+        private static readonly JsonSerializerSettings _settings;
 
         static SignalingMessageFactory()
         {
@@ -16,17 +16,7 @@ namespace WebRTC.H113.Signaling
             _settings.Converters.Add(new StringEnumConverter());
         }
 
-        public const string Register = "new-app-connection";
-        public const string Registered = "app-start-video";
-        public const string SendOffer = "amk-send-offer";
-        public const string ReceivedAnswer = "receive-answer";
-        public const string ReceiveCandidate = "receive-candidate";
-        public const string SendCandidate = "amk-send-candidate";
-        public const string Reconnecting = "app-connection-id";
-        public const string UpdateInfo = "app-update-info";
-        public const string DoReconnect = "app-reconnecting-ws";
-        public const string StopVideo = "app-amk-stop-video";
-        public const string CloseConnection = "app-close-connection";
+       
         
         public static SignalingMessage FromJson(string json)
         {
@@ -35,19 +25,19 @@ namespace WebRTC.H113.Signaling
             {
                 switch (values["type"].ToString())
                 {
-                    case Registered:
+                    case MessageTypesConstants.Registered:
                         return JsonConvert.DeserializeObject<RegisteredMessage>(json, _settings);
-                    case SendOffer:
+                    case MessageTypesConstants.SendOffer:
                         break;
-                    case StopVideo:
+                    case MessageTypesConstants.StopVideo:
                         return JsonConvert.DeserializeObject<StopVideoMessage>(json, _settings);
-                    case ReceivedAnswer:
+                    case MessageTypesConstants.ReceivedAnswer:
                         return GetAnswerSessionDescription(values["answer"].ToString());
-                    case ReceiveCandidate:
+                    case MessageTypesConstants.ReceiveCandidate:
                         return JsonConvert.DeserializeObject<IceCandidateMessage>(json, _settings);
-                    case Reconnecting:
+                    case MessageTypesConstants.Reconnecting:
                         return JsonConvert.DeserializeObject<ReconnectingMessage>(json, _settings);
-                    case CloseConnection:
+                    case MessageTypesConstants.CloseConnection:
                         return JsonConvert.DeserializeObject<CloseConnectionMessage>(json, _settings);
                 }
             }

@@ -1,6 +1,3 @@
-using System;
-using WebRTC.Abstraction;
-using Org.Webrtc;
 using WebRTC.Droid.Extensions;
 using ISdpObserver = Org.Webrtc.ISdpObserver;
 using SessionDescription = Org.Webrtc.SessionDescription;

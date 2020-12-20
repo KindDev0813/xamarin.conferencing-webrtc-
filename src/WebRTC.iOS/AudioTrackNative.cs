@@ -1,4 +1,3 @@
-using System;
 using WebRTC.Abstraction;
 using WebRTC.iOS.Binding;
 

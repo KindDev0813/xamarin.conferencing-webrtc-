@@ -7,7 +7,6 @@ using WebRTC.Abstraction;
 using WebRTC.Abstraction.Extensions;
 using Org.Webrtc;
 using WebRTC.Droid.Extensions;
-using Exception = System.Exception;
 using IceCandidate = WebRTC.Abstraction.IceCandidate;
 using ISdpObserver = WebRTC.Abstraction.ISdpObserver;
 using MediaConstraints = WebRTC.Abstraction.MediaConstraints;
@@ -162,7 +161,7 @@ namespace WebRTC.Droid
         {
             try
             {
-                ParcelFileDescriptor rtcEventLog = ParcelFileDescriptor.Open(new File(file),
+                var rtcEventLog = ParcelFileDescriptor.Open(new File(file),
                     ParcelFileMode.Create | ParcelFileMode.Truncate | ParcelFileMode.ReadWrite);
 
                 return _peerConnection.StartRtcEventLog(rtcEventLog.DetachFd(), fileSizeLimitBytes);

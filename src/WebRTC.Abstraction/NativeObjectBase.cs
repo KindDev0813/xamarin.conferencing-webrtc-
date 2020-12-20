@@ -1,5 +1,4 @@
 using System;
-using WebRTC.Abstraction;
 
 namespace WebRTC.Abstraction
 {

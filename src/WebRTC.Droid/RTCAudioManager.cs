@@ -1,5 +1,4 @@
 using Android.Media;
-using Org.Webrtc.Voiceengine;
 
 namespace WebRTC.Droid
 {

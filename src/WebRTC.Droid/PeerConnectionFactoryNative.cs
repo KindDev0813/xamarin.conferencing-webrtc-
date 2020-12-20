@@ -1,4 +1,3 @@
-using System.Linq;
 using Android.Content;
 using Android.OS;
 using Android.Util;
@@ -95,7 +94,7 @@ namespace WebRTC.Droid
         {
             try
             {
-                ParcelFileDescriptor aecDumpFileDescriptor = ParcelFileDescriptor.Open(new File(file),
+                var aecDumpFileDescriptor = ParcelFileDescriptor.Open(new File(file),
                     ParcelFileMode.Create | ParcelFileMode.Truncate | ParcelFileMode.ReadWrite);
 
                 return _factory.StartAecDump(aecDumpFileDescriptor.DetachFd(), fileSizeLimitBytes);

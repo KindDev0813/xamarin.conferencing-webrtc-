@@ -6,33 +6,37 @@ namespace WebRTC.H113.Signaling.Models
     {
         Unknown,
 
-        [EnumMember(Value = "new-app-connection")]
+        [EnumMember(Value = MessageTypesConstants.Register)]
         Register,
 
-        [EnumMember(Value = "app-start-video")]
+        [EnumMember(Value = MessageTypesConstants.Registered)]
         Registered,
-        [EnumMember(Value = "amk-send-offer")] Offer,
-        [EnumMember(Value = "receive-answer")] ReceivedAnswer,
 
-        [EnumMember(Value = "receive-candidate")]
+        [EnumMember(Value = MessageTypesConstants.SendOffer)]
+        Offer,
+
+        [EnumMember(Value = MessageTypesConstants.ReceivedAnswer)]
+        ReceivedAnswer,
+
+        [EnumMember(Value = MessageTypesConstants.ReceiveCandidate)]
         ReceiveCandidate,
 
-        [EnumMember(Value = "amk-send-candidate")]
+        [EnumMember(Value = MessageTypesConstants.SendCandidate)]
         SendCandidate,
 
-        [EnumMember(Value = "app-connection-id")]
+        [EnumMember(Value = MessageTypesConstants.Reconnecting)]
         Reconnecting,
 
-        [EnumMember(Value = "app-update-info")]
+        [EnumMember(Value = MessageTypesConstants.UpdateInfo)]
         UpdateInfo,
 
-        [EnumMember(Value = "app-reconnecting-ws")]
+        [EnumMember(Value = MessageTypesConstants.DoReconnect)]
         DoReconnect,
 
-        [EnumMember(Value = "app-close-connection")]
+        [EnumMember(Value = MessageTypesConstants.CloseConnection)]
         CloseConnection,
 
-        [EnumMember(Value = "app-amk-stop-video")]
+        [EnumMember(Value = MessageTypesConstants.StopVideo)]
         StopVideo,
     }
 }

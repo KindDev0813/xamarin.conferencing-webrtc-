@@ -79,7 +79,7 @@ namespace WebRTC.Droid
         private static IMediaStream[] ConvertToNative(MediaStream[] source)
         {
             var arr = new IMediaStream[source.Length];
-            for (int i = 0; i < source.Length; i++)
+            for (var i = 0; i < source.Length; i++)
             {
                 arr[i] = new MediaStreamNative(source[i]);
             }
