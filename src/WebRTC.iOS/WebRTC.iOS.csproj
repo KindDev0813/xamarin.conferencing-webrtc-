@@ -35,7 +35,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="WebRTC.iOS.Binding, Version=1.0.7691.14578, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\libs\webrtc-ios-binding\Release\WebRTC.iOS.Binding.dll</HintPath>
+      <HintPath>..\..\libs\webrtc-ios-binding\WebRTC.iOS.Binding.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
