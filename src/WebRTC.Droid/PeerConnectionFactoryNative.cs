@@ -1,4 +1,3 @@
-using System.Linq;
 using Android.Content;
 using Android.OS;
 using Android.Util;
@@ -26,19 +25,18 @@ namespace WebRTC.Droid
         private readonly PeerConnectionFactory _factory;
         private readonly Context _context;
 
-
         public PeerConnectionFactoryNative(Context context)
         {
             _context = context;
 
-            EglBaseContext = EglBaseHelper.Create().EglBaseContext;
+            EglBase = EglBaseHelper.Create();
 
             _factory = CreateNativeFactory(context, EglBaseContext);
             NativeObject = _factory;
         }
 
-        public IEglBaseContext EglBaseContext { get; }
-
+        public IEglBase EglBase { get; }
+        public IEglBaseContext EglBaseContext => EglBase.EglBaseContext;
 
         public override void Dispose()
         {
@@ -52,9 +50,7 @@ namespace WebRTC.Droid
             var nativeConfiguration = configuration.ToNative();
             var peerConnection = _factory.CreatePeerConnection(nativeConfiguration,
                 new PeerConnectionListenerProxy(peerConnectionListener));
-            if (peerConnection == null)
-                return null;
-            return new PeerConnectionNative(peerConnection, configuration, this);
+            return peerConnection == null ? null : new PeerConnectionNative(peerConnection, configuration, this);
         }
 
         public IAudioSource CreateAudioSource(MediaConstraints mediaConstraints)
@@ -98,7 +94,7 @@ namespace WebRTC.Droid
         {
             try
             {
-                ParcelFileDescriptor aecDumpFileDescriptor = ParcelFileDescriptor.Open(new File(file),
+                var aecDumpFileDescriptor = ParcelFileDescriptor.Open(new File(file),
                     ParcelFileMode.Create | ParcelFileMode.Truncate | ParcelFileMode.ReadWrite);
 
                 return _factory.StartAecDump(aecDumpFileDescriptor.DetachFd(), fileSizeLimitBytes);
@@ -163,12 +159,12 @@ namespace WebRTC.Droid
 
             var encoderFactory = new DefaultVideoEncoderFactory(eglBaseContext, true, true);
             var decoderFactory = new DefaultVideoDecoderFactory(eglBaseContext);
-            var factory =  PeerConnectionFactory.InvokeBuilder()
+            var factory = PeerConnectionFactory.InvokeBuilder()
                 .SetAudioDeviceModule(adm)
                 .SetVideoEncoderFactory(encoderFactory)
                 .SetVideoDecoderFactory(decoderFactory)
                 .CreatePeerConnectionFactory();
-            
+
             adm.Release();
 
             return factory;

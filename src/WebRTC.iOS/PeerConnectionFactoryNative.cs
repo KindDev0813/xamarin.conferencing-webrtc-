@@ -3,7 +3,6 @@ using WebRTC.Abstraction;
 using WebRTC.Abstraction.Extensions;
 using WebRTC.iOS.Extensions;
 using WebRTC.iOS.Binding;
-using System.Linq;
 
 namespace WebRTC.iOS
 {
@@ -16,7 +15,6 @@ namespace WebRTC.iOS
             var decoderFactory = new RTCDefaultVideoDecoderFactory();
             var encoderFactory = new RTCDefaultVideoEncoderFactory();
 
-         
 
             NativeObject = _factory = new RTCPeerConnectionFactory(encoderFactory, decoderFactory);
         }
@@ -29,27 +27,23 @@ namespace WebRTC.iOS
                 new NSDictionary<NSString, NSString>(new NSString("DtlsSrtpKeyAgreement"),
                     new NSString(configuration.EnableDtlsSrtp ? "false" : "true")));
 
+            var peerConnectionDelegate = new PeerConnectionListenerProxy(peerConnectionListener);
+
             var peerConnection = _factory.PeerConnectionWithConfiguration(rtcConfiguration, constraints,
-                new PeerConnectionListenerProxy(peerConnectionListener));
-            if (peerConnection == null)
-                return null;
-            return new PeerConnectionNative(peerConnection, configuration, this);
+                peerConnectionDelegate);
+            return peerConnection == null ? null : new PeerConnectionNative(peerConnection, configuration, this,peerConnectionDelegate);
         }
 
         public IAudioSource CreateAudioSource(MediaConstraints mediaConstraints)
         {
             var audioSource = _factory.AudioSourceWithConstraints(mediaConstraints.ToNative());
-            if (audioSource == null)
-                return null;
-            return new AudioSourceNative(audioSource);
+            return audioSource == null ? null : new AudioSourceNative(audioSource);
         }
 
         public IAudioTrack CreateAudioTrack(string id, IAudioSource audioSource)
         {
             var audioTrack = _factory.AudioTrackWithSource(audioSource.ToNative<RTCAudioSource>(), id);
-            if (audioTrack == null)
-                return null;
-            return new AudioTrackNative(audioTrack);
+            return audioTrack == null ? null : new AudioTrackNative(audioTrack);
         }
 
         public IVideoSource CreateVideoSource(bool isScreencast) => new VideoSourceNative(_factory.VideoSource);
@@ -57,9 +51,7 @@ namespace WebRTC.iOS
         public IVideoTrack CreateVideoTrack(string id, IVideoSource videoSource)
         {
             var videoTrack = _factory.VideoTrackWithSource(videoSource.ToNative<RTCVideoSource>(), id);
-            if (videoTrack == null)
-                return null;
-            return new VideoTrackNative(videoTrack);
+            return videoTrack == null ? null : new VideoTrackNative(videoTrack);
         }
 
         public ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, bool frontCamera)

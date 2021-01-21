@@ -1,5 +1,4 @@
 using System.Linq;
-using Foundation;
 using WebRTC.Abstraction;
 using WebRTC.iOS.Extensions;
 using WebRTC.iOS.Binding;
@@ -7,7 +6,7 @@ using WebRTC.iOS.Binding;
 
 namespace WebRTC.iOS
 {
-    internal class PeerConnectionListenerProxy : NSObject, IRTCPeerConnectionDelegate
+    internal class PeerConnectionListenerProxy : RTCPeerConnectionDelegate
     {
         private readonly IPeerConnectionListener _listener;
 
@@ -16,49 +15,55 @@ namespace WebRTC.iOS
             _listener = listener;
         }
 
-        public void DidChangeSignalingState(RTCPeerConnection peerConnection, RTCSignalingState stateChanged)
+        public override void DidChangeSignalingState(RTCPeerConnection peerConnection, RTCSignalingState stateChanged)
         {
             _listener?.OnSignalingChange(stateChanged.ToNet());
         }
 
-        public void DidAddStream(RTCPeerConnection peerConnection, RTCMediaStream stream)
+        public override void DidAddStream(RTCPeerConnection peerConnection, RTCMediaStream stream)
         {
             _listener?.OnAddStream(new MediaStreamNative(stream));
         }
 
-        public void DidRemoveStream(RTCPeerConnection peerConnection, RTCMediaStream stream)
+        public override void DidRemoveStream(RTCPeerConnection peerConnection, RTCMediaStream stream)
         {
             _listener?.OnRemoveStream(new MediaStreamNative(stream));
         }
 
-        public void PeerConnectionShouldNegotiate(RTCPeerConnection peerConnection)
+        public override void PeerConnectionShouldNegotiate(RTCPeerConnection peerConnection)
         {
             _listener?.OnRenegotiationNeeded();
         }
 
-        public void DidChangeIceConnectionState(RTCPeerConnection peerConnection, RTCIceConnectionState newState)
+        public override void DidChangeIceConnectionState(RTCPeerConnection peerConnection, RTCIceConnectionState newState)
         {
             _listener?.OnIceConnectionChange(newState.ToNet());
         }
 
-        public void DidChangeIceGatheringState(RTCPeerConnection peerConnection, RTCIceGatheringState newState)
+        public override void DidChangeIceGatheringState(RTCPeerConnection peerConnection, RTCIceGatheringState newState)
         {
             _listener?.OnIceGatheringChange(newState.ToNet());
         }
 
-        public void DidGenerateIceCandidate(RTCPeerConnection peerConnection, RTCIceCandidate candidate)
+        public override void DidGenerateIceCandidate(RTCPeerConnection peerConnection, RTCIceCandidate candidate)
         {
             _listener?.OnIceCandidate(candidate.ToNet());
         }
 
-        public void DidRemoveIceCandidates(RTCPeerConnection peerConnection, RTCIceCandidate[] candidates)
+        public override void DidRemoveIceCandidates(RTCPeerConnection peerConnection, RTCIceCandidate[] candidates)
         {
             _listener?.OnIceCandidatesRemoved(candidates.ToNet().ToArray());
         }
 
-        public void DidOpenDataChannel(RTCPeerConnection peerConnection, RTCDataChannel dataChannel)
+        public override void DidOpenDataChannel(RTCPeerConnection peerConnection, RTCDataChannel dataChannel)
         {
             _listener?.OnDataChannel(new DataChannelNative(dataChannel));
         }
+
+        public override void DidChangeConnectionState(RTCPeerConnection peerConnection, RTCPeerConnectionState newState)
+        {
+            _listener?.OnConnectionChange(newState.ToNet());
+        }
+
     }
 }

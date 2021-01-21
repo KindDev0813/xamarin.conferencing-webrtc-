@@ -4,7 +4,7 @@ namespace WebRTC.Abstraction
 {
     public class MediaConstraints
     {
-        public MediaConstraints() : this(null, null)
+        public MediaConstraints() : this(null)
         {
         }
 

@@ -17,15 +17,19 @@ namespace WebRTC.iOS
             get => _renderer;
             set
             {
-                if (_renderer == this)
+                if (Equals(_renderer, this))
                     throw new InvalidOperationException("You can set renderer to self");
                 _renderer = value;
             }
         }
 
+        public Action OnFirstFrame { get; set; }
+       
         public void RenderFrame(RTCVideoFrame frame)
         {
             Renderer?.RenderFrame(frame);
+            OnFirstFrame?.Invoke();
+            OnFirstFrame = null;
             frame.Dispose();
         }
 

@@ -1,4 +1,3 @@
-using System;
 using WebRTC.Abstraction;
 using WebRTC.Abstraction.Extensions;
 using WebRTC.iOS.Binding;
@@ -23,7 +22,6 @@ namespace WebRTC.iOS
         public void RemoveRenderer(IVideoRenderer videoRenderer)
         {
             _videoTrack.RemoveRenderer(videoRenderer.ToNative<IRTCVideoRenderer>());
-
         }
     }
 }

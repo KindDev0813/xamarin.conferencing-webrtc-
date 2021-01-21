@@ -20,9 +20,10 @@ namespace WebRTC.Droid
             }
         }
 
-        public void OnFrame(VideoFrame p0)
+        public virtual void OnFrame(VideoFrame p0)
         {
             Renderer?.OnFrame(p0);
+            p0?.Dispose();
         }
     }
 }

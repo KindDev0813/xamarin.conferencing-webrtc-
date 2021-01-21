@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Foundation;
 using WebRTC.Abstraction;
@@ -12,10 +13,17 @@ namespace WebRTC.iOS
     internal class PeerConnectionNative : NativeObjectBase, IPeerConnection
     {
         private readonly RTCPeerConnection _peerConnection;
+        private readonly List<object> _csharpObjects = new List<object>();
 
-        public PeerConnectionNative(RTCPeerConnection peerConnection, Abstraction.RTCConfiguration configuration, IPeerConnectionFactory factory)
+        // ReSharper disable once NotAccessedField.Local
+        // C# will dispose this object...
+        private IRTCPeerConnectionDelegate _peerConnectionDelegate;
+
+        public PeerConnectionNative(RTCPeerConnection peerConnection, Abstraction.RTCConfiguration configuration,
+            IPeerConnectionFactory factory, IRTCPeerConnectionDelegate peerConnectionDelegate) : base(peerConnection)
         {
             _peerConnection = peerConnection;
+            _peerConnectionDelegate = peerConnectionDelegate;
             Configuration = configuration;
             PeerConnectionFactory = factory;
         }
@@ -40,12 +48,20 @@ namespace WebRTC.iOS
             get
             {
                 if (Configuration.SdpSemantics != SdpSemantics.UnifiedPlan)
-                    throw new InvalidOperationException("GetTransceivers is only supported with Unified Plan SdpSemantics.");
-                return _peerConnection.Transceivers.Select(t => new RtpTransceiverNative(t)).Cast<IRtpTransceiver>().ToArray();
+                    throw new InvalidOperationException(
+                        "GetTransceivers is only supported with Unified Plan SdpSemantics.");
+                return _peerConnection.Transceivers.Select(t => new RtpTransceiverNative(t)).Cast<IRtpTransceiver>()
+                    .ToArray();
             }
         }
 
         public Abstraction.RTCConfiguration Configuration { get; private set; }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            _peerConnectionDelegate = null;
+        }
 
         public bool SetConfiguration(Abstraction.RTCConfiguration configuration)
         {
@@ -83,9 +99,7 @@ namespace WebRTC.iOS
         public IRtpSender AddTrack(IMediaStreamTrack track, string[] streamIds)
         {
             var rtpSender = _peerConnection.AddTrack(track.ToNative<RTCMediaStreamTrack>(), streamIds);
-            if (rtpSender == null)
-                return null;
-            return new RtpSenderNative(rtpSender);
+            return rtpSender == null ? null : new RtpSenderNative(rtpSender);
         }
 
         public bool RemoveTrack(IRtpSender sender)
@@ -96,9 +110,7 @@ namespace WebRTC.iOS
         public IRtpTransceiver AddTransceiverWithTrack(IMediaStreamTrack track)
         {
             var rtpTransceiver = _peerConnection.AddTransceiverWithTrack(track.ToNative<RTCMediaStreamTrack>());
-            if (rtpTransceiver == null)
-                return null;
-            return new RtpTransceiverNative(rtpTransceiver);
+            return rtpTransceiver == null ? null : new RtpTransceiverNative(rtpTransceiver);
         }
 
         public IRtpTransceiver AddTransceiverWithTrack(IMediaStreamTrack track, IRtpTransceiverInit init)
@@ -118,29 +130,28 @@ namespace WebRTC.iOS
 
         public void CreateOffer(MediaConstraints constraints, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer, this);
 
             _peerConnection.OfferForConstraints(constraints.ToNative(), sdpCallbacksHelper.CreateSdp);
         }
 
         public void CreateAnswer(MediaConstraints constraints, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer, this);
 
             _peerConnection.AnswerForConstraints(constraints.ToNative(), sdpCallbacksHelper.CreateSdp);
         }
 
         public void SetLocalDescription(SessionDescription sdp, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer, this);
 
             _peerConnection.SetLocalDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
-
         }
 
         public void SetRemoteDescription(SessionDescription sdp, ISdpObserver observer)
         {
-            var sdpCallbacksHelper = new SdpCallbackHelper(observer);
+            var sdpCallbacksHelper = new SdpCallbackHelper(observer, this);
 
             _peerConnection.SetRemoteDescription(sdp.ToNative(), sdpCallbacksHelper.SetSdp);
         }
@@ -156,11 +167,6 @@ namespace WebRTC.iOS
             return _peerConnection.SetBweMinBitrateBps(new NSNumber(min), new NSNumber(current), new NSNumber(max));
         }
 
-        public bool StartRtcEventLogWithFilePath(string filePath, long maxSizeInBytes)
-        {
-            return _peerConnection.StartRtcEventLogWithFilePath(filePath, maxSizeInBytes);
-        }
-
         public void StopRtcEventLog()
         {
             _peerConnection.StopRtcEventLog();
@@ -168,18 +174,19 @@ namespace WebRTC.iOS
 
         public bool StartRtcEventLog(string file, int fileSizeLimitBytes)
         {
-            throw new NotImplementedException();
+            return _peerConnection.StartRtcEventLogWithFilePath(file, fileSizeLimitBytes);
         }
-
-
 
         private class SdpCallbackHelper
         {
             private readonly ISdpObserver _observer;
+            private readonly PeerConnectionNative _peerConnectionNative;
 
-            public SdpCallbackHelper(ISdpObserver observer)
+            public SdpCallbackHelper(ISdpObserver observer, PeerConnectionNative peerConnectionNative)
             {
                 _observer = observer;
+                _peerConnectionNative = peerConnectionNative;
+                _peerConnectionNative._csharpObjects.Add(this);
             }
 
             public void SetSdp(NSError error)
@@ -188,11 +195,11 @@ namespace WebRTC.iOS
                     _observer?.OnSetFailure(error.LocalizedDescription);
                 else
                     _observer?.OnSetSuccess();
+                Clear();
             }
 
             public void CreateSdp(RTCSessionDescription sdp, NSError error)
             {
-
                 if (error != null)
                 {
                     _observer?.OnCreateFailure(error.LocalizedDescription);
@@ -201,6 +208,13 @@ namespace WebRTC.iOS
                 {
                     _observer?.OnCreateSuccess(sdp.ToNet());
                 }
+
+                Clear();
+            }
+
+            private void Clear()
+            {
+                _peerConnectionNative._csharpObjects.Remove(this);
             }
         }
     }

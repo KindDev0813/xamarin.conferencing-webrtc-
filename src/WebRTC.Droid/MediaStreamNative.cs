@@ -44,7 +44,7 @@ namespace WebRTC.Droid
         {
             var items = _mediaStream.AudioTracks;
             var arr = new IAudioTrack[items.Count];
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 arr[i] = new AudioTrackNative((AudioTrack) items[i]);
             }
@@ -56,7 +56,7 @@ namespace WebRTC.Droid
         {
             var items = _mediaStream.VideoTracks;
             var arr = new IVideoTrack[items.Count];
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 arr[i] = new VideoTrackNative((VideoTrack) items[i]);
             }

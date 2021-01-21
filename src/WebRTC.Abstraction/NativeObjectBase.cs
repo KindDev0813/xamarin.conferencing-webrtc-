@@ -1,5 +1,4 @@
 using System;
-using WebRTC.Abstraction;
 
 namespace WebRTC.Abstraction
 {
@@ -21,10 +20,14 @@ namespace WebRTC.Abstraction
 
         public virtual void Dispose()
         {
-            if(NativeObject == null)
-                throw new NullReferenceException();
-            if (NativeObject is IDisposable disposable)
-                disposable.Dispose();
+            switch (NativeObject)
+            {
+                case null:
+                    throw new NullReferenceException();
+                case IDisposable disposable:
+                    disposable.Dispose();
+                    break;
+            }
         }
     }
 }

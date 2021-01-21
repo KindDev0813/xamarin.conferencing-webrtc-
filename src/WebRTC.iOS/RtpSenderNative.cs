@@ -1,4 +1,5 @@
 using WebRTC.Abstraction;
+using WebRTC.Abstraction.Extensions;
 using WebRTC.iOS.Extensions;
 using WebRTC.iOS.Binding;
 
@@ -19,6 +20,20 @@ namespace WebRTC.iOS
         {
             get => _rtpSender.Track.ToNet();
             set => _rtpSender.Track = value.ToNative();
+        }
+
+        public IRtpParameters Parameters =>  new RtpParametersNative(_rtpSender.Parameters);
+        public bool SetParameters(IRtpParameters parameters)
+        {
+            try
+            {
+                _rtpSender.Parameters = parameters.ToNative<RTCRtpParameters>();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

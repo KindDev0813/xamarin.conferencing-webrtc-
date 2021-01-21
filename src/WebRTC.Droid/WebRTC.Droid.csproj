@@ -14,8 +14,9 @@
     <FileAlignment>512</FileAlignment>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <TargetFrameworkVersion>v7.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AndroidStoreUncompressedFileExtensions></AndroidStoreUncompressedFileExtensions>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,6 +26,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <MandroidI18n></MandroidI18n>
+    <JavaMaximumHeapSize></JavaMaximumHeapSize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +36,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>anycpu</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
@@ -41,6 +45,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
+    <Reference Include="WebRTC.Droid.Binding, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\libs\webrtc-android-binding\Release\WebRTC.Droid.Binding.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\DataChannelConfigurationExtension.cs" />
@@ -67,8 +74,11 @@
     <Compile Include="PeerConnectionListenerProxy.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RptSenderNative.cs" />
     <Compile Include="RTCAudioManager.cs" />
+    <Compile Include="RtcpParameters.cs" />
+    <Compile Include="RtpEncodingParametersNative.cs" />
+    <Compile Include="RtpHeaderExtensionNative.cs" />
+    <Compile Include="RtpParametersNative.cs" />
     <Compile Include="RtpReceiverNative.cs" />
     <Compile Include="RtpSenderNative.cs" />
     <Compile Include="RtpTransceiverNative.cs" />
@@ -91,12 +101,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
-      <Project>{15baf860-547f-4e5f-ac88-97f4b47c5e4b}</Project>
+      <Project>{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}</Project>
       <Name>WebRTC.Abstraction</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WebRTC.Droid.Binding\WebRTC.Droid.Binding.csproj">
-      <Project>{7a7ca35c-13fc-4e57-a0e3-8619974bb41b}</Project>
-      <Name>WebRTC.Droid.Binding</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

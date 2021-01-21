@@ -1,2 +1,0 @@
-# Clear out a Mono environment variable to decrease logging
-MONO_LOG_LEVEL=error

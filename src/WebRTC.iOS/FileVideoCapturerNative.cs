@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using WebRTC.Abstraction;
 using WebRTC.Abstraction.Extensions;

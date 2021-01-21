@@ -8,7 +8,7 @@ using Org.Webrtc;
 
 namespace WebRTC.Droid
 {
-    internal static class EglBaseHelper
+    public static class EglBaseHelper
     {
         private static int[] CreateConfigAttributes()
         {
@@ -64,8 +64,8 @@ namespace WebRTC.Droid
                 _eglDisplay = GetEglDisplay();
                 _eglConfig = GetEglConfig(_eglDisplay, configAttributes);
 
-                int openGlesVersion = GetOpenGlesVersionFromConfig(configAttributes);
-                Logging.D("EglBase14Impl", "Using OpenGL ES version " + openGlesVersion);
+                var openGlesVersion = GetOpenGlesVersionFromConfig(configAttributes);
+                Logging.D("EglBaseHelper", "Using OpenGL ES version " + openGlesVersion);
                 _eglContext = CreateEglContext(sharedContext, _eglDisplay, _eglConfig, openGlesVersion);
             }
 
@@ -207,15 +207,13 @@ namespace WebRTC.Droid
                 {
                     throw new RuntimeException("Already has an EGLSurface");
                 }
-                else
+
+                var surfaceAttribs = new[] { 12344 };
+                _eglSurface = EGL14.EglCreateWindowSurface(_eglDisplay, _eglConfig, surface, surfaceAttribs, 0);
+                if (_eglSurface == EGL14.EglNoSurface)
                 {
-                    int[] surfaceAttribs = new int[] { 12344 };
-                    _eglSurface = EGL14.EglCreateWindowSurface(_eglDisplay, _eglConfig, surface, surfaceAttribs, 0);
-                    if (_eglSurface == EGL14.EglNoSurface)
-                    {
-                        throw new RuntimeException("Failed to create window surface: 0x" +
-                                                   Integer.ToHexString(EGL14.EglGetError()));
-                    }
+                    throw new RuntimeException("Failed to create window surface: 0x" +
+                                               Integer.ToHexString(EGL14.EglGetError()));
                 }
             }
 
@@ -260,7 +258,7 @@ namespace WebRTC.Droid
                     throw new RuntimeException("Unable to find any matching EGL config");
                 }
 
-                EGLConfig eglConfig = configs[0];
+                var eglConfig = configs[0];
                 if (eglConfig == null)
                 {
                     throw new RuntimeException("eglChooseConfig returned null");
@@ -277,7 +275,7 @@ namespace WebRTC.Droid
                     throw new RuntimeException("Invalid sharedContext");
                 }
 
-                int[] contextAttributes = new int[] { 12440, openGlesVersion, 12344 };
+                var contextAttributes = new int[] { 12440, openGlesVersion, 12344 };
                 var rootContext = sharedContext ?? EGL14.EglNoContext;
                 EGLContext eglContext;
 
@@ -297,7 +295,7 @@ namespace WebRTC.Droid
 
             private static int GetOpenGlesVersionFromConfig(int[] configAttributes)
             {
-                for (int i = 0; i < configAttributes.Length - 1; ++i)
+                for (var i = 0; i < configAttributes.Length - 1; ++i)
                 {
                     if (configAttributes[i] == 12352)
                     {

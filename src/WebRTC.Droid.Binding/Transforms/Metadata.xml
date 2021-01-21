@@ -7,20 +7,15 @@
   This sample removes the method: android.support.v4.content.CursorLoader.loadInBackground:
   <remove-node path="/api/package[@name='android.support.v4.content']/class[@name='CursorLoader']/method[@name='loadInBackground']" />
   -->
-    <attr path="/api/package[@name='org.webrtc']/class[@name='StatsReport.Value']"
-          name="name">StatsValue
+    <attr path="/api/package[@name='org.webrtc']/class[@name='StatsReport.Value']" name="name">StatsValue
     </attr>
-
-    <attr path="/api/package[@name='org.webrtc']/class[@name='SessionDescription']/field[@name='type']"
-          name="managedName">SdpType
+    <attr path="/api/package[@name='org.webrtc']/class[@name='SessionDescription']/field[@name='type']" name="managedName">SdpType
     </attr>
-
-<!--    <attr path="/api/package[@name='org.webrtc']/class[@name='PeerConnectionFactory']/method[@name='builder']"-->
-<!--          name="name">NewBuilder-->
-<!--    </attr>-->
-
-<!--    <attr path="/api/package[@name='org.webrtc']/interface[@name='SdpObserver']"-->
-<!--          name="name">ISdpObserverEx-->
-<!--    </attr>-->
-
+    <attr path="/api/package[@name='org.webrtc']/interface[@name='PeerConnection.Observer']/method[@name='onConnectionChange' and count(parameter)=1 and parameter[1][@type='org.webrtc.PeerConnection.PeerConnectionState']]" name="abstract">true</attr>
+    <!--    <attr path="/api/package[@name='org.webrtc']/class[@name='PeerConnectionFactory']/method[@name='builder']"-->
+    <!--          name="name">NewBuilder-->
+    <!--    </attr>-->
+    <!--    <attr path="/api/package[@name='org.webrtc']/interface[@name='SdpObserver']"-->
+    <!--          name="name">ISdpObserverEx-->
+    <!--    </attr>-->
 </metadata>

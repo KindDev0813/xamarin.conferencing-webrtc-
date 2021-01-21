@@ -1,4 +1,3 @@
-using System.Security;
 using System.Text;
 
 namespace WebRTC.Abstraction

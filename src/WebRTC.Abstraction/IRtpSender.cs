@@ -5,5 +5,9 @@ namespace WebRTC.Abstraction
         string SenderId { get; }
 
         IMediaStreamTrack Track { get;  }
+        
+        IRtpParameters Parameters { get; }
+
+        bool SetParameters(IRtpParameters parameters);
     }
 }
