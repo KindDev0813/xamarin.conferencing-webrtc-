@@ -46,7 +46,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="WebRTC.Droid.Binding, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\libs\webrtc-android-binding\WebRTC.Droid.Binding.dll</HintPath>
+      <HintPath>..\..\libs\webrtc-android-binding\Release\WebRTC.Droid.Binding.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -101,7 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
-      <Project>{DEE78D03-E30B-49D1-B299-19944686EEBC}</Project>
+      <Project>{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}</Project>
       <Name>WebRTC.Abstraction</Name>
     </ProjectReference>
   </ItemGroup>

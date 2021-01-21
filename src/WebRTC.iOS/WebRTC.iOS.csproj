@@ -34,8 +34,8 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="WebRTC.iOS.Binding, Version=1.0.7600.18255, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\libs\webrtc-ios-binding\WebRTC.iOS.Binding.dll</HintPath>
+    <Reference Include="WebRTC.iOS.Binding, Version=1.0.7691.14578, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\libs\webrtc-ios-binding\Release\WebRTC.iOS.Binding.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
@@ -80,7 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
-      <Project>{DEE78D03-E30B-49D1-B299-19944686EEBC}</Project>
+      <Project>{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}</Project>
       <Name>WebRTC.Abstraction</Name>
     </ProjectReference>
   </ItemGroup>
