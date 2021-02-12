@@ -15,6 +15,7 @@ namespace WebRTC.iOS
 
         private readonly RTCCameraVideoCapturer _capturer;
         private bool _usingFrontCamera;
+        private string _deviceName;
 
         private int _videoWidth;
         private int _videoHeight;
@@ -39,8 +40,7 @@ namespace WebRTC.iOS
             _videoWidth = videoWidth;
             _videoHeight = videoHeight;
 
-            var position = _usingFrontCamera ? AVCaptureDevicePosition.Back : AVCaptureDevicePosition.Front;
-            var device = FindDeviceForPosition(position);
+            var device = GetCapturerDevice();
             var format = SelectFormatForDevice(device, videoWidth, videoHeight);
 
             if (format == null)
@@ -71,19 +71,29 @@ namespace WebRTC.iOS
             StartCapture(_videoWidth, _videoHeight, _fps);
         }
 
-        private AVCaptureDevice FindDeviceForPosition(AVCaptureDevicePosition position)
+        public void SwitchCamera(string deviceName)
         {
-            var captureDevices = RTCCameraVideoCapturer.CaptureDevices;
-            foreach (var device in captureDevices)
+            _deviceName = deviceName;
+            StartCapture(_videoWidth, _videoHeight, _fps);
+        }
+
+        private AVCaptureDevice GetCapturerDevice()
+        {
+            AVCaptureDevice device;
+
+            if (!string.IsNullOrEmpty(_deviceName))
             {
-                if (device.Position == position)
-                {
-                    return device;
-                }
+                device = FindDeviceForName(_deviceName);
+            }
+            else
+            {
+                var position = _usingFrontCamera ? AVCaptureDevicePosition.Back : AVCaptureDevicePosition.Front;
+                device = FindDeviceForPosition(position);
             }
 
-            return captureDevices.FirstOrDefault();
+            return device;
         }
+
 
         private AVCaptureDeviceFormat SelectFormatForDevice(AVCaptureDevice device, int targetWidth, int targetHeight)
         {
@@ -114,14 +124,38 @@ namespace WebRTC.iOS
             return selectedFormat;
         }
 
-        private int SelectFpsForFormat(AVCaptureDeviceFormat format)
+        private static AVCaptureDevice FindDeviceForPosition(AVCaptureDevicePosition position)
         {
-            var maxSupportedFramerate = 0d;
-            foreach (var fpsRange in format.VideoSupportedFrameRateRanges)
+            var captureDevices = RTCCameraVideoCapturer.CaptureDevices;
+            foreach (var device in captureDevices)
             {
-                maxSupportedFramerate = Math.Max(maxSupportedFramerate, fpsRange.MaxFrameRate);
+                if (device.Position == position)
+                {
+                    return device;
+                }
             }
 
+            return captureDevices.FirstOrDefault();
+        }
+
+        private static AVCaptureDevice FindDeviceForName(string name)
+        {
+            var captureDevices = RTCCameraVideoCapturer.CaptureDevices;
+            foreach (var device in captureDevices)
+            {
+                if (device.LocalizedName == name)
+                {
+                    return device;
+                }
+            }
+
+            return captureDevices.FirstOrDefault();
+        }
+
+        private static int SelectFpsForFormat(AVCaptureDeviceFormat format)
+        {
+            var maxSupportedFramerate = format.VideoSupportedFrameRateRanges.Select(fpsRange => fpsRange.MaxFrameRate)
+                .Prepend(0d).Max();
             return (int) Math.Min(maxSupportedFramerate, FramerateLimit);
         }
     }

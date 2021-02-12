@@ -113,17 +113,10 @@ namespace WebRTC.Droid
 
         private ICameraVideoCapturer CreateCameraVideoCapturer(VideoSource videoSource, bool frontCamera)
         {
-            Org.Webrtc.ICameraVideoCapturer videoCapturer;
-
-            videoCapturer = UseCamera2()
-                ? CreateCameraCapturer(new Camera2Enumerator(_context), frontCamera)
-                : CreateCameraCapturer(new Camera1Enumerator(false), frontCamera);
-
-            if (videoCapturer == null)
-                return null;
-
-
-            return new CameraVideoCapturerNative(videoCapturer, _context, videoSource, EglBaseContext);
+            var videoCapturer = CreateCameraCapturer(_context.GetAllCameras(), frontCamera);
+            return videoCapturer == null
+                ? null
+                : new CameraVideoCapturerNative(videoCapturer, _context, videoSource, EglBaseContext);
         }
 
         private Org.Webrtc.ICameraVideoCapturer CreateCameraCapturer(ICameraEnumerator cameraEnumerator,
@@ -149,8 +142,6 @@ namespace WebRTC.Droid
 
             return null;
         }
-
-        private bool UseCamera2() => Camera2Enumerator.IsSupported(_context);
 
 
         private static PeerConnectionFactory CreateNativeFactory(Context context, IEglBaseContext eglBaseContext)

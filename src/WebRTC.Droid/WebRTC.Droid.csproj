@@ -50,6 +50,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ContextExtensions.cs" />
     <Compile Include="Extensions\DataChannelConfigurationExtension.cs" />
     <Compile Include="Extensions\ScalingTypeExtensions.cs" />
     <Compile Include="Platform.cs" />

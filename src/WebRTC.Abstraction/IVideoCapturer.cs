@@ -7,6 +7,7 @@ namespace WebRTC.Abstraction
         void StartCapture();
         
         void StartCapture(int videoWidth, int videoHeight, int fps);
+        
         void StopCapture();
     }
 }
