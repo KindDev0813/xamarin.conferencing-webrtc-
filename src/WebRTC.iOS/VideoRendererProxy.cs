@@ -24,7 +24,17 @@ namespace WebRTC.iOS
         }
 
         public Action OnFirstFrame { get; set; }
-       
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _renderer = null;
+            }
+
+            base.Dispose(disposing);
+        }
+
         public void RenderFrame(RTCVideoFrame frame)
         {
             Renderer?.RenderFrame(frame);

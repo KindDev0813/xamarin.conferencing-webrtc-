@@ -20,6 +20,15 @@ namespace WebRTC.Droid
             }
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _renderer = null;
+            }
+            base.Dispose(disposing);
+        }
+
         public virtual void OnFrame(VideoFrame p0)
         {
             Renderer?.OnFrame(p0);
