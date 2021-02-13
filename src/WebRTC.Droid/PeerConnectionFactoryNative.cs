@@ -40,8 +40,8 @@ namespace WebRTC.Droid
 
         public override void Dispose()
         {
-            EglBaseContext.Dispose();
             base.Dispose();
+            EglBase.Release();
         }
 
         public IPeerConnection CreatePeerConnection(RTCConfiguration configuration,

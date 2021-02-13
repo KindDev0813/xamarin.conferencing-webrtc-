@@ -14,8 +14,6 @@ namespace WebRTC.Abstraction
             NativeObject = nativeObject;
         }
 
-       
-
         public object NativeObject { get; protected set; }
 
         public virtual void Dispose()
