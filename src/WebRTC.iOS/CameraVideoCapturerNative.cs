@@ -71,9 +71,9 @@ namespace WebRTC.iOS
             StartCapture(_videoWidth, _videoHeight, _fps);
         }
 
-        public void SwitchCamera(string deviceName)
+        public void SwitchCamera(RTCCameraDevice device)
         {
-            _deviceName = deviceName;
+            _deviceName = device.DeviceId;
             StartCapture(_videoWidth, _videoHeight, _fps);
         }
 

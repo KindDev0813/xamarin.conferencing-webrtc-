@@ -7,7 +7,8 @@ namespace WebRTC.iOS
 {
     public static class Platform
     {
-        public static void Init(IDictionary<string,string> trialsFields = null,bool enableInternalTracer = true)
+        public static void Init(IDictionary<string, string> trialsFields = null, bool enableInternalTracer = true,
+            bool mockSimulatorCamera = true)
         {
             if (trialsFields?.Any() ?? false)
             {
@@ -18,9 +19,9 @@ namespace WebRTC.iOS
             {
                 RTCTracing.RTCStartInternalCapture("log.txt");
             }
-            
+
             RTCSSLAdapter.RTCInitializeSSL();
-            Abstraction.NativeFactory.Init(new NativeFactory());
+            Abstraction.NativeFactory.Init(new NativeFactory(mockSimulatorCamera));
         }
 
         public static void Cleanup()

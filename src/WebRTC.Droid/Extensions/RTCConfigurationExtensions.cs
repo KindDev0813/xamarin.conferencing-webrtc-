@@ -32,8 +32,8 @@ namespace WebRTC.Droid.Extensions
                 DisableIpv6 = self.DisableIPv6,
                 SdpSemantics = self.SdpSemantics.ToNative(),
                 ActiveResetSrtpParams = self.ActiveResetSrtpParams,
-                UseMediaTransport = self.UseMediaTransport,
-                UseMediaTransportForDataChannels = self.UseMediaTransportForDataChannels,
+                // UseMediaTransport = self.UseMediaTransport,
+                // UseMediaTransportForDataChannels = self.UseMediaTransportForDataChannels,
                 EnableDtlsSrtp = !self.EnableDtlsSrtp ? new Boolean(true) : null,
                 Certificate = self.Certificate?.ToNative()
             };

@@ -1,3 +1,4 @@
+using System.Linq;
 using Android.Content;
 using WebRTC.Abstraction;
 using Org.Webrtc;
@@ -13,12 +14,15 @@ namespace WebRTC.Droid
         public NativeFactory(Context context)
         {
             _context = context;
+            CameraDevices = GetSupportedCameraDevices(context);
         }
 
         public IPeerConnectionFactory CreatePeerConnectionFactory() => new PeerConnectionFactoryNative(_context);
 
         public RTCCertificate GenerateCertificate(EncryptionKeyType keyType, long expires) =>
             RtcCertificatePem.GenerateCertificate(keyType.ToNative(), expires).ToNet();
+
+        public RTCCameraDevice[] CameraDevices { get; }
 
 
         public void StopInternalTracingCapture()
@@ -29,6 +33,14 @@ namespace WebRTC.Droid
         public void ShutdownInternalTracer()
         {
             PeerConnectionFactory.ShutdownInternalTracer();
+        }
+
+        private static RTCCameraDevice[] GetSupportedCameraDevices(Context context)
+        {
+            var allCameras = context.GetAllCameras();
+
+            return allCameras.GetDeviceNames()
+                .Select(camera => new RTCCameraDevice(camera, allCameras.IsFrontFacing(camera))).ToArray();
         }
     }
 }

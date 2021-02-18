@@ -2,8 +2,6 @@ using System;
 
 namespace WebRTC.Abstraction
 {
-    
-  
     internal static class NativeFactory
     {
         private static INativeFactory _factory;
@@ -11,6 +9,7 @@ namespace WebRTC.Abstraction
         public static void Init(INativeFactory factory)
         {
             _factory = factory;
+            RTCCameraDevice.SupportedDevices = factory.CameraDevices;
         }
 
         internal static RTCCertificate GenerateCertificate(EncryptionKeyType keyType, long expires)
