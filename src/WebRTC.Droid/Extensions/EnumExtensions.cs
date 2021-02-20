@@ -12,7 +12,7 @@ namespace WebRTC.Droid.Extensions
             switch (self)
             {
                 case IceTransportPolicy.None:
-                   return PeerConnection.IceTransportsType.None;
+                    return PeerConnection.IceTransportsType.None;
                 case IceTransportPolicy.Relay:
                     return PeerConnection.IceTransportsType.Relay;
                 case IceTransportPolicy.NoHost:
@@ -29,7 +29,7 @@ namespace WebRTC.Droid.Extensions
             switch (self)
             {
                 case BundlePolicy.Balanced:
-                     return PeerConnection.BundlePolicy.Balanced;
+                    return PeerConnection.BundlePolicy.Balanced;
                 case BundlePolicy.MaxCompat:
                     return PeerConnection.BundlePolicy.Maxcompat;
                 case BundlePolicy.MaxBundle:
@@ -57,7 +57,7 @@ namespace WebRTC.Droid.Extensions
             switch (self)
             {
                 case TcpCandidatePolicy.Enabled:
-                     return PeerConnection.TcpCandidatePolicy.Enabled;
+                    return PeerConnection.TcpCandidatePolicy.Enabled;
                 case TcpCandidatePolicy.Disabled:
                     return PeerConnection.TcpCandidatePolicy.Disabled;
                 default:
@@ -129,7 +129,7 @@ namespace WebRTC.Droid.Extensions
                     throw new ArgumentOutOfRangeException(nameof(self), self, null);
             }
         }
-        
+
         public static SessionDescription.Type ToNative(this SdpType self)
         {
             switch (self)
@@ -138,6 +138,8 @@ namespace WebRTC.Droid.Extensions
                     return SessionDescription.Type.Answer;
                 case SdpType.Offer:
                     return SessionDescription.Type.Offer;
+                case SdpType.PrAnswer:
+                    return SessionDescription.Type.Pranswer;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(self), self, null);
             }
@@ -163,14 +165,16 @@ namespace WebRTC.Droid.Extensions
                     throw new ArgumentOutOfRangeException(nameof(self), self, null);
             }
         }
-        
+
         public static SdpType ToNet(this SessionDescription.Type self)
         {
             if (self == SessionDescription.Type.Answer)
                 return SdpType.Answer;
             if (self == SessionDescription.Type.Offer)
                 return SdpType.Offer;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            if (self == SessionDescription.Type.Pranswer)
+                return SdpType.PrAnswer;
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
 
         public static MediaStreamTrackState ToNet(this MediaStreamTrack.State self)
@@ -179,7 +183,7 @@ namespace WebRTC.Droid.Extensions
                 return MediaStreamTrackState.Live;
             if (self == MediaStreamTrack.State.Ended)
                 return MediaStreamTrackState.Ended;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
 
         public static IceConnectionState ToNet(this PeerConnection.IceConnectionState self)
@@ -198,7 +202,7 @@ namespace WebRTC.Droid.Extensions
                 return IceConnectionState.Failed;
             if (self == PeerConnection.IceConnectionState.New)
                 return IceConnectionState.New;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
 
         public static IceGatheringState ToNet(this PeerConnection.IceGatheringState self)
@@ -209,7 +213,7 @@ namespace WebRTC.Droid.Extensions
                 return IceGatheringState.Gathering;
             if (self == PeerConnection.IceGatheringState.New)
                 return IceGatheringState.New;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
 
         public static SignalingState ToNet(this PeerConnection.SignalingState self)
@@ -226,7 +230,7 @@ namespace WebRTC.Droid.Extensions
                 return SignalingState.HaveRemoteOffer;
             if (self == PeerConnection.SignalingState.HaveRemotePranswer)
                 return SignalingState.HaveRemotePrAnswer;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
 
         public static DataChannelState ToNet(this DataChannel.State self)
@@ -239,7 +243,7 @@ namespace WebRTC.Droid.Extensions
                 return DataChannelState.Connecting;
             if (self == DataChannel.State.Open)
                 return DataChannelState.Open;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
 
         public static PeerConnectionState ToNet(this PeerConnection.PeerConnectionState self)
@@ -256,7 +260,7 @@ namespace WebRTC.Droid.Extensions
                 return PeerConnectionState.Failed;
             if (self == PeerConnection.PeerConnectionState.New)
                 return PeerConnectionState.New;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
 
         public static SourceState ToNet(this MediaSource.State self)
@@ -269,7 +273,7 @@ namespace WebRTC.Droid.Extensions
                 return SourceState.Live;
             if (self == MediaSource.State.Muted)
                 return SourceState.Muted;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
 
         public static RtpMediaType ToNet(this MediaStreamTrack.MediaType self)
@@ -278,7 +282,7 @@ namespace WebRTC.Droid.Extensions
                 return RtpMediaType.Audio;
             if (self == MediaStreamTrack.MediaType.MediaTypeVideo)
                 return RtpMediaType.Video;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
 
         public static RtpTransceiverDirection ToNet(this RtpTransceiver.RtpTransceiverDirection self)
@@ -291,7 +295,7 @@ namespace WebRTC.Droid.Extensions
                 return RtpTransceiverDirection.SendOnly;
             if (self == RtpTransceiver.RtpTransceiverDirection.SendRecv)
                 return RtpTransceiverDirection.SendRecv;
-            throw new ArgumentOutOfRangeException(nameof(self),self,null);
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
     }
 }

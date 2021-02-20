@@ -60,6 +60,12 @@ namespace WebRTC.iOS
             return new CameraVideoCapturerNative(capturer, frontCamera);
         }
 
+        public ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, RTCCameraDevice cameraDevice)
+        {
+            var capturer = new RTCCameraVideoCapturer(videoSource.ToNative<RTCVideoSource>());
+            return new CameraVideoCapturerNative(capturer, cameraDevice);
+        }
+
         public IFileVideoCapturer CreateFileCapturer(IVideoSource videoSource, string file)
         {
             return new FileVideoCapturer(videoSource, file);

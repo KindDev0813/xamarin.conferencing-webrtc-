@@ -27,6 +27,12 @@ namespace WebRTC.iOS
             _usingFrontCamera = frontCamera;
         }
 
+        public CameraVideoCapturerNative(RTCCameraVideoCapturer capturer, RTCCameraDevice cameraDevice) : base(capturer)
+        {
+            _capturer = capturer;
+            _deviceName = cameraDevice.DeviceId;
+        }
+
         public bool IsScreencast => false;
 
         public void StartCapture()
@@ -91,7 +97,7 @@ namespace WebRTC.iOS
                 device = FindDeviceForPosition(position);
             }
 
-            return device;
+            return device ?? RTCCameraVideoCapturer.CaptureDevices.FirstOrDefault();
         }
 
 

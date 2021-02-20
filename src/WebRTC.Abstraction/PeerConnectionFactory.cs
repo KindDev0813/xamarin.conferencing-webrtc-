@@ -1,4 +1,3 @@
-
 namespace WebRTC.Abstraction
 {
     public class PeerConnectionFactory : IPeerConnectionFactory
@@ -9,7 +8,9 @@ namespace WebRTC.Abstraction
         {
             _factory = NativeFactory.CreatePeerConnectionFactory();
         }
+
         public object NativeObject => _factory;
+
         public void Dispose()
         {
             _factory.Dispose();
@@ -44,6 +45,11 @@ namespace WebRTC.Abstraction
         public ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, bool frontCamera)
         {
             return _factory.CreateCameraCapturer(videoSource, frontCamera);
+        }
+
+        public ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, RTCCameraDevice cameraDevice)
+        {
+            return _factory.CreateCameraCapturer(videoSource, cameraDevice);
         }
 
         public IFileVideoCapturer CreateFileCapturer(IVideoSource videoSource, string file)

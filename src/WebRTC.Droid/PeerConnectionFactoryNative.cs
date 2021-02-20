@@ -83,6 +83,16 @@ namespace WebRTC.Droid
         public ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, bool frontCamera) =>
             CreateCameraVideoCapturer(videoSource.ToNative<VideoSource>(), frontCamera);
 
+        public ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, RTCCameraDevice cameraDevice)
+        {
+            var cameraEnumerator = _context.GetAllCameras();
+            var videoCapturer = cameraEnumerator.CreateCapturer(cameraDevice.DeviceId, null);
+            return videoCapturer == null
+                ? null
+                : new CameraVideoCapturerNative(videoCapturer, _context, videoSource.ToNative<VideoSource>(),
+                    EglBaseContext);
+        }
+
         public IFileVideoCapturer CreateFileCapturer(IVideoSource videoSource, string file)
         {
             var fileVideoCapturer = new FileVideoCapturer(file);

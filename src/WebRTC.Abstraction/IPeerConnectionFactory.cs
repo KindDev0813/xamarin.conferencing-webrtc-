@@ -13,9 +13,11 @@ namespace WebRTC.Abstraction
 
         IVideoTrack CreateVideoTrack(string id, IVideoSource videoSource);
 
-        ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource,bool frontCamera);
+        ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, bool frontCamera);
 
-        IFileVideoCapturer CreateFileCapturer(IVideoSource videoSource,string file);
+        ICameraVideoCapturer CreateCameraCapturer(IVideoSource videoSource, RTCCameraDevice cameraDevice);
+
+        IFileVideoCapturer CreateFileCapturer(IVideoSource videoSource, string file);
 
         bool StartAecDump(string file, int fileSizeLimitBytes);
         void StopAecDump();
