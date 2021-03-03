@@ -9,6 +9,7 @@ namespace WebRTC.iOS
     public class VideoRendererProxy : NSObject, IRTCVideoRenderer, IVideoRenderer
     {
         private IRTCVideoRenderer _renderer;
+        private CGSize? _currentSize;
 
         public object NativeObject => this;
 
@@ -20,6 +21,10 @@ namespace WebRTC.iOS
                 if (Equals(_renderer, this))
                     throw new InvalidOperationException("You can set renderer to self");
                 _renderer = value;
+                if (_currentSize != null)
+                {
+                    _renderer.SetSize(_currentSize.Value);
+                }
             }
         }
 
@@ -45,6 +50,7 @@ namespace WebRTC.iOS
 
         public void SetSize(CGSize size)
         {
+            _currentSize = size;
             Renderer?.SetSize(size);
         }
     }
