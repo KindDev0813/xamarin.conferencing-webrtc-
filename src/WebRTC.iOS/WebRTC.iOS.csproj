@@ -80,7 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WebRTC.Abstraction\WebRTC.Abstraction.csproj">
-      <Project>{15BAF860-547F-4E5F-AC88-97F4B47C5E4B}</Project>
+      <Project>{DEE78D03-E30B-49D1-B299-19944686EEBC}</Project>
       <Name>WebRTC.Abstraction</Name>
     </ProjectReference>
   </ItemGroup>
