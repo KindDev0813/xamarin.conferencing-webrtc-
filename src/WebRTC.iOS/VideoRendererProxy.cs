@@ -21,6 +21,8 @@ namespace WebRTC.iOS
                 if (Equals(_renderer, this))
                     throw new InvalidOperationException("You can set renderer to self");
                 _renderer = value;
+                if (_renderer == null)
+                    return;
                 if (_currentSize != null)
                 {
                     _renderer.SetSize(_currentSize.Value);
