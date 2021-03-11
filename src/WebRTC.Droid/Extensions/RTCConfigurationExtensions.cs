@@ -35,7 +35,8 @@ namespace WebRTC.Droid.Extensions
                 // UseMediaTransport = self.UseMediaTransport,
                 // UseMediaTransportForDataChannels = self.UseMediaTransportForDataChannels,
                 EnableDtlsSrtp = !self.EnableDtlsSrtp ? new Boolean(true) : null,
-                Certificate = self.Certificate?.ToNative()
+                Certificate = self.Certificate?.ToNative(),
+                EnableRtpDataChannel = self.EnableRtpDataChannel
             };
         }
     }

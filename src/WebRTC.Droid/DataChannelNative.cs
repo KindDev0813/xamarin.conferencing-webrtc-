@@ -4,6 +4,7 @@ using Java.Nio;
 using WebRTC.Abstraction;
 using Org.Webrtc;
 using WebRTC.Droid.Extensions;
+using Debug = System.Diagnostics.Debug;
 
 
 namespace WebRTC.Droid
@@ -17,6 +18,7 @@ namespace WebRTC.Droid
         {
             _dataChannel = dataChannel;
             _dataChannel.RegisterObserver(this);
+            Debug.WriteLine($"DataChannelNative({dataChannel.Label()}): status -> {State}");
         }
 
         public event EventHandler OnStateChange;

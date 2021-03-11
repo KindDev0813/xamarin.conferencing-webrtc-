@@ -83,6 +83,8 @@ namespace WebRTC.Abstraction
         public bool EnableDtlsSrtp { get; set; }
         
         public RTCCertificate Certificate { get; set; }
+        
+        public bool EnableRtpDataChannel { get; set; }
 
         //CryptoOptions CryptoOptions { get; set; }
         
