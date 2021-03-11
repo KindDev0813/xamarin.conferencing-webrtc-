@@ -34,7 +34,7 @@ namespace WebRTC.iOS.Extensions
                 ActiveResetSrtpParams = self.ActiveResetSrtpParams,
                 UseMediaTransport = self.UseMediaTransport,
                 UseMediaTransportForDataChannels = self.UseMediaTransportForDataChannels,
-                //EnableDtlsSrtp = self.EnableDtlsSrtp.HasValue ? new Boolean(self.EnableDtlsSrtp.Value) : null,
+                //EnableDtlsSrtp = self.EnableDtlsSrtp,
                 Certificate = self.Certificate?.ToNative()
             };
         }
