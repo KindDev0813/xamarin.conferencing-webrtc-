@@ -8,9 +8,9 @@ namespace WebRTC.Droid
     {
         private readonly RtpTransceiver _rtpTransceiver;
 
-        private IRtpSender _rtpSender;
+        private IRtpSender? _rtpSender;
 
-        private IRtpReceiver _rtpReceiver;
+        private IRtpReceiver? _rtpReceiver;
 
         public RtpTransceiverNative(RtpTransceiver rtpTransceiverNative) : base(rtpTransceiverNative)
         {

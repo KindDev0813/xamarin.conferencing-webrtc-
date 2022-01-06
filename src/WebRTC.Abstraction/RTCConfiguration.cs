@@ -43,9 +43,8 @@ namespace WebRTC.Abstraction
         public CandidateNetworkPolicy CandidateNetworkPolicy { get; set; }
         
         public ContinualGatheringPolicy  ContinualGatheringPolicy { get; set; }
-        
-        
-        
+
+
         public bool DisableIPv6 { get; set; }
         
         public bool DisableIPv6OnWiFi { get; set; }
@@ -82,7 +81,7 @@ namespace WebRTC.Abstraction
         
         public bool EnableDtlsSrtp { get; set; }
         
-        public RTCCertificate Certificate { get; set; }
+        public RTCCertificate? Certificate { get; set; }
         
         public bool EnableRtpDataChannel { get; set; }
 

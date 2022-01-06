@@ -2,26 +2,18 @@ using System.Text;
 
 namespace WebRTC.Abstraction
 {
-    public class IceServer
+    public record IceServer(string[] Urls, string Username, string Password,
+        TlsCertPolicy TlsCertPolicy = TlsCertPolicy.Secure)
     {
         public IceServer(string uri, string username = "", string password = "",
             TlsCertPolicy tlsCertPolicy = TlsCertPolicy.Secure) : this(new[] {uri}, username, password, tlsCertPolicy)
         {
         }
 
-        public IceServer(string[] urls, string username, string password,
-            TlsCertPolicy tlsCertPolicy = TlsCertPolicy.Secure)
-        {
-            Urls = urls;
-            Username = username;
-            Password = password;
-            TlsCertPolicy = tlsCertPolicy;
-        }
-
-        public string[] Urls { get; }
-        public string Username { get; }
-        public string Password { get; }
-        public TlsCertPolicy TlsCertPolicy { get; }
+        public string[] Urls { get; } = Urls;
+        public string Username { get; } = Username;
+        public string Password { get; } = Password;
+        public TlsCertPolicy TlsCertPolicy { get; } = TlsCertPolicy;
 
         public override string ToString()
         {

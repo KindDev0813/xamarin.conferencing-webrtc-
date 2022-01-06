@@ -30,8 +30,8 @@ namespace WebRTC.Droid
         public IPeerConnectionFactory PeerConnectionFactory { get; }
 
         //public IMediaStream[] LocalStreams { get; }
-        public SessionDescription LocalDescription => _peerConnection.LocalDescription?.ToNet();
-        public SessionDescription RemoteDescription => _peerConnection.RemoteDescription?.ToNet();
+        public SessionDescription? LocalDescription => _peerConnection.LocalDescription?.ToNet();
+        public SessionDescription? RemoteDescription => _peerConnection.RemoteDescription?.ToNet();
         public SignalingState SignalingState => _peerConnection.InvokeSignalingState().ToNet();
         public IceConnectionState IceConnectionState => _peerConnection.InvokeIceConnectionState().ToNet();
         public PeerConnectionState PeerConnectionState => _peerConnection.ConnectionState().ToNet();

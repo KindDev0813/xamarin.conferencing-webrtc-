@@ -1,23 +1,11 @@
-using Newtonsoft.Json;
-
 namespace WebRTC.Abstraction
 {
-    public class IceCandidate
+    public record IceCandidate(string Sdp, string SdpMid, int SdpMLineIndex)
     {
-        public IceCandidate(string sdp, string sdpMid, int sdpMLineIndex)
-        {
-            Sdp = sdp;
-            SdpMid = sdpMid;
-            SdpMLineIndex = sdpMLineIndex;
-        }
+        public string Sdp { get; } = Sdp;
 
-        [JsonProperty("sdp")]
-        public string Sdp { get; }
-        
-        [JsonProperty("sdpMid")]
-        public string SdpMid { get; }
-        
-        [JsonProperty("sdpMlineIndex")]
-        public int SdpMLineIndex { get; }
+        public string SdpMid { get; } = SdpMid;
+
+        public int SdpMLineIndex { get; } = SdpMLineIndex;
     }
 }

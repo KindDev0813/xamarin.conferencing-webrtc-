@@ -4,7 +4,6 @@ namespace WebRTC.Abstraction
 {
     public abstract class NativeObjectBase : INativeObject
     {
-        
         protected NativeObjectBase()
         {
         }
@@ -14,7 +13,7 @@ namespace WebRTC.Abstraction
             NativeObject = nativeObject;
         }
 
-        public object NativeObject { get; protected set; }
+        public object? NativeObject { get; protected set; }
 
         public virtual void Dispose()
         {

@@ -4,13 +4,13 @@ namespace WebRTC.Abstraction
 {
     public class MediaConstraints
     {
-        public MediaConstraints() : this(null)
+        public MediaConstraints() : this(new Dictionary<string, string>())
         {
         }
 
-        public MediaConstraints(IDictionary<string, string> mandatory, IDictionary<string, string> optional = null)
+        public MediaConstraints(IDictionary<string, string> mandatory, IDictionary<string, string>? optional = null)
         {
-            Mandatory = mandatory ?? new Dictionary<string, string>();
+            Mandatory = mandatory;
             Optional = optional ?? new Dictionary<string, string>();
         }
 

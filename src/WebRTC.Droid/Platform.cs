@@ -5,13 +5,13 @@ namespace WebRTC.Droid
 {
     public static class Platform
     {
-        public static void Init(Activity context, string trialsFields = null, bool enabledInternalTracer = true)
+        public static void Init(Activity context, string? trialsFields = null, bool enabledInternalTracer = true)
         {
             Init(context.Application, trialsFields, enabledInternalTracer);
         }
         
 
-        public static void Init(Application application, string trialsFields = null, bool enabledInternalTracer = true)
+        public static void Init(Application application, string? trialsFields = null, bool enabledInternalTracer = true)
         {
             var options = PeerConnectionFactory.InitializationOptions.InvokeBuilder(application)
                 .SetEnableInternalTracer(enabledInternalTracer);

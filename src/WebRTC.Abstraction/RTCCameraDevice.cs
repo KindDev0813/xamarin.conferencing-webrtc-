@@ -23,7 +23,7 @@ namespace WebRTC.Abstraction
 
         public string Description { get; }
 
-        public static RTCCameraDevice[] SupportedDevices { get; internal set; }
+        public static RTCCameraDevice[] SupportedDevices { get; internal set; } = Array.Empty<RTCCameraDevice>();
 
         public static RTCCameraDevice GetFacingCameraOrDefault(bool isFront) =>
             SupportedDevices.FirstOrDefault(i => i.IsFront == isFront) ?? SupportedDevices.FirstOrDefault();
@@ -33,14 +33,14 @@ namespace WebRTC.Abstraction
             return $"{(isFront ? "Front" : "Back")} {deviceId}";
         }
 
-        public bool Equals(RTCCameraDevice other)
+        public bool Equals(RTCCameraDevice? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return DeviceId == other.DeviceId;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

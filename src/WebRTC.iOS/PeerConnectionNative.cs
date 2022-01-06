@@ -13,7 +13,7 @@ namespace WebRTC.iOS
     internal class PeerConnectionNative : NativeObjectBase, IPeerConnection
     {
         private readonly RTCPeerConnection _peerConnection;
-        private readonly List<object> _csharpObjects = new List<object>();
+        private readonly List<object> _csharpObjects = new();
 
         // ReSharper disable once NotAccessedField.Local
         // C# will dispose this object...

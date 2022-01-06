@@ -1,22 +1,12 @@
 using System;
-using Newtonsoft.Json;
 
 namespace WebRTC.Abstraction
 {
-    public class SessionDescription
+    public record SessionDescription(SdpType Type, string Sdp)
     {
-        public SessionDescription(SdpType type, string sdp)
-        {
-            Sdp = sdp;
-            Type = type;
-        }
+        public SdpType Type { get; } = Type;
 
-
-        [JsonProperty("type")] 
-        public SdpType Type { get; }
-
-        [JsonProperty("sdp")] 
-        public string Sdp { get; }
+        public string Sdp { get; } = Sdp;
 
         public static SdpType GetSdpTypeFromString(string sdp)
         {

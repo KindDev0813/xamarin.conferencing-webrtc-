@@ -4,7 +4,7 @@ namespace WebRTC.Abstraction
 {
     internal static class NativeFactory
     {
-        private static INativeFactory _factory;
+        private static INativeFactory _factory = null!;
 
         public static void Init(INativeFactory factory)
         {

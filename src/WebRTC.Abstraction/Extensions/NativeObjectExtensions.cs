@@ -4,7 +4,7 @@ namespace WebRTC.Abstraction.Extensions
     {
         public static T ToNative<T>(this INativeObject self)
         {
-            return (T) self.NativeObject;
+            return (T) self.NativeObject!;
         }
     }
 }

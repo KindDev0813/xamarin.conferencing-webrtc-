@@ -6,8 +6,8 @@ namespace WebRTC.Abstraction
         string Mid { get; }
         bool IsStopped { get; }
         RtpTransceiverDirection Direction { get; }
-        IRtpSender Sender { get; }
-        IRtpReceiver Receiver { get; }
+        IRtpSender? Sender { get; }
+        IRtpReceiver? Receiver { get; }
         void Stop();
     }
 }

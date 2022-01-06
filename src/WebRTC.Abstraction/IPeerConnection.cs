@@ -19,8 +19,8 @@ namespace WebRTC.Abstraction
         IPeerConnectionFactory PeerConnectionFactory { get; }
         
         //IMediaStream[] LocalStreams { get; }
-        SessionDescription LocalDescription { get; }
-        SessionDescription RemoteDescription { get; }
+        SessionDescription? LocalDescription { get; }
+        SessionDescription? RemoteDescription { get; }
         
         SignalingState SignalingState { get; }
         
